@@ -2,7 +2,7 @@
 // Normally generated via `npm run db:types` (supabase gen types), never
 // hand-written (see db/migrations/README.md). This build has no Docker/local
 // Supabase available to run against, so these types were written by hand from
-// db/migrations/0003-0007 to keep the app compiling. Regenerate for real once
+// db/migrations/0003-0010 to keep the app compiling. Regenerate for real once
 // `supabase start` (or a hosted project) is reachable — treat this file as
 // unverified against a live schema until then.
 
@@ -23,6 +23,7 @@ export type TransactionType = 'event_scan' | 'surge_correct_answer' | 'admin_man
 export type AuditAction = 'force_reset' | 'manual_joule_adjustment' | 'csv_import' | 'role_change';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
+export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
 
 export interface Database {
   public: {
@@ -161,6 +162,31 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      live_rounds: {
+        Row: {
+          id: string; surge_id: string; room_code: string; phase: LivePhase;
+          question_index: number; question_started_at: string | null;
+          created_by: string; created_at: string;
+        };
+        Insert: never; // only via host_create_round()
+        Update: never; // only via host_advance_round()
+        Relationships: [];
+      };
+      live_round_teams: {
+        Row: { id: string; round_id: string; student_id: string; team_name: string; joined_at: string };
+        Insert: never; // only via join_live_round()
+        Update: never;
+        Relationships: [];
+      };
+      live_round_answers: {
+        Row: {
+          id: string; round_id: string; team_id: string; question_id: string;
+          selected_option: SurgeOption; correct: boolean; response_time_ms: number | null; created_at: string;
+        };
+        Insert: never; // only via submit_live_answer()
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -226,6 +252,27 @@ export interface Database {
       };
       admin_set_role: { Args: { p_admin_id: string; p_role: AdminRole; p_volunteer_event_id?: string | null }; Returns: undefined };
       log_csv_import: { Args: { p_surge_id: string; p_details: Json }; Returns: undefined };
+      host_create_round: { Args: { p_surge_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
+      join_live_round: {
+        Args: { p_room_code: string; p_team_name: string };
+        Returns: Database['public']['Tables']['live_round_teams']['Row'];
+      };
+      host_advance_round: { Args: { p_round_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
+      submit_live_answer: {
+        Args: { p_round_id: string; p_question_id: string; p_selected_option: string; p_response_time_ms?: number | null };
+        Returns: { correct: boolean; correct_option: SurgeOption; awarded: number }[];
+      };
+      live_round_scoreboard: {
+        Args: { p_round_id: string };
+        Returns: { team_id: string; team_name: string; total_amount: number; rank: number }[];
+      };
+      live_round_question: {
+        Args: { p_round_id: string };
+        Returns: {
+          id: string; text: string; option_a: string; option_b: string; option_c: string; option_d: string;
+          time_limit_seconds: number; correct_option: SurgeOption | null; phase: LivePhase; question_index: number;
+        }[];
+      };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth/session';
 import { adminLogoutAction } from '@/app/(auth)/actions';
-import { ScanLine, Zap, BarChart3, Users, Settings, LogOut } from '@/lib/icons';
+import { ScanLine, Zap, BarChart3, Users, Settings, LogOut, MonitorPlay } from '@/lib/icons';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
@@ -9,6 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const nav = [
     { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['owner', 'officer', 'volunteer'] },
     { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['owner', 'officer'] },
+    { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['owner', 'officer'] },
     { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['owner', 'officer'] },
     { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['owner'] },
     { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['owner'] },

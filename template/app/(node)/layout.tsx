@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { requireStudent } from '@/lib/auth/session';
-import { Home, ScanLine, Trophy, User } from '@/lib/icons';
+import { Home, ScanLine, Trophy, User, MonitorPlay } from '@/lib/icons';
 
 const NAV = [
   { href: '/dashboard', label: 'Grid', icon: Home },
   { href: '/scan', label: 'Scan', icon: ScanLine },
+  { href: '/live', label: 'Live', icon: MonitorPlay },
   { href: '/catalyst', label: 'Records', icon: Trophy },
   { href: '/profile', label: 'Profile', icon: User },
 ] as const;

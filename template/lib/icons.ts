@@ -53,6 +53,9 @@ export {
   CircleCheck,
   CircleX,
   Sparkles,
+  MonitorPlay,
+  Play,
+  Crown,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';
