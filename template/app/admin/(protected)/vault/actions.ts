@@ -16,11 +16,22 @@ export interface ActionResult {
  * Uses the service-role client (Auth Admin API) because setting an arbitrary
  * password requires it; the audit log write also goes through service-role
  * since it's a trusted server-only context, never a client-reachable insert.
+ *
+ * The Auth Admin API operates on ANY auth.users row, students or admins —
+ * unlike admin_adjust_joules/admin_set_student_status, it isn't naturally
+ * scoped by a foreign key to `students`. Without this check, an Owner could
+ * pass another admin's (even another Owner's) id as "studentId" and silently
+ * reset their password through this feature — no distinct audit trail from
+ * a real student reset, and no functional barrier stopping it. Confirmed
+ * during a security retrospective; this check is the fix.
  */
 export async function forceResetAction(studentId: string): Promise<ActionResult> {
   const admin = await requireAdmin(['owner']);
-  const service = createServiceRoleClient();
+  const supabase = await createClient();
+  const { data: student } = await supabase.from('students').select('id').eq('id', studentId).maybeSingle();
+  if (!student) return { error: 'That account is not a student. Force Reset only applies to students.' };
 
+  const service = createServiceRoleClient();
   const tempPassword = randomBytes(9).toString('base64url');
   const { error } = await service.auth.admin.updateUserById(studentId, { password: tempPassword });
   if (error) return { error: error.message };
