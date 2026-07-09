@@ -70,10 +70,54 @@ const c = {
   dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
 };
 
+/** Files where line comments, block comments, and JSDoc lines are code comments, not copy. */
+const COMMENT_AWARE = /\.(tsx?|jsx?|css)$/i;
+
+/**
+ * Strip comment text from a line so the rules only see real content: JSX
+ * text, string literals, CSS values. Tracks whether a multi-line block
+ * comment (CSS header comments, JSDoc) is still open across calls. Returns
+ * null for a line that's entirely comment. Deliberately simple (line-based,
+ * not a parser) — mechanical hygiene only, matching this tool's own stated
+ * scope. A trailing `//` preceded by an odd number of quote chars is assumed
+ * to be inside a string, not a comment, and left alone.
+ */
+function stripComments(line: string, inBlockComment: boolean): [string | null, boolean] {
+  let out = line;
+  if (inBlockComment) {
+    const end = out.indexOf('*/');
+    if (end === -1) return [null, true]; // still inside the block, nothing to check
+    out = out.slice(end + 2);
+    inBlockComment = false;
+  }
+  out = out.replace(/\/\*.*?\*\//g, ''); // any complete single-line block comments
+  const openIdx = out.indexOf('/*');
+  if (openIdx !== -1) {
+    out = out.slice(0, openIdx);
+    inBlockComment = true; // an unterminated block comment starts here
+  }
+  const t = out.trim();
+  if (t.startsWith('//') || t.startsWith('*') || t === '') return [inBlockComment ? '' : null, inBlockComment];
+  const idx = out.indexOf('//');
+  if (idx !== -1) {
+    const before = out.slice(0, idx);
+    const oddQuotes = [/'/g, /"/g, /`/g].some((re) => ((before.match(re) || []).length) % 2 === 1);
+    if (!oddQuotes) out = out.slice(0, idx);
+  }
+  return [out, inBlockComment];
+}
+
 function lintFile(file: string): Finding[] {
   const findings: Finding[] = [];
-  const lines = readFileSync(file, 'utf8').split(/\r?\n/);
-  lines.forEach((line, i) => {
+  const commentAware = COMMENT_AWARE.test(file);
+  const rawLines = readFileSync(file, 'utf8').split(/\r?\n/);
+  let inBlockComment = false;
+  rawLines.forEach((rawLine, i) => {
+    let line: string | null = rawLine;
+    if (commentAware) {
+      [line, inBlockComment] = stripComments(rawLine, inBlockComment);
+    }
+    if (!line) return;
     for (const rule of RULES) {
       rule.re.lastIndex = 0;
       let m: RegExpExecArray | null;
@@ -104,6 +148,18 @@ function stagedFiles(): string[] {
 
 const TEXTY = /\.(tsx?|jsx?|mdx?|md|html?|json|txt|css)$/i;
 
+/**
+ * Internal method/process docs and automation scripts — never shipped as site
+ * copy, so the AI-tell house style (which uses em-dashes deliberately,
+ * throughout this codebase's own comments and docs) doesn't apply. Excluded
+ * only from the automatic staged-commit lint; still lintable by passing the
+ * path explicitly (`ai-tell-lint.ts docs/conventions.md`). Also covers this
+ * file itself, which inherently contains its own pattern strings as literal
+ * data and would otherwise always self-trip.
+ */
+const INTERNAL_DOC =
+  /(^|\/)(docs\/|tooling\/|README\.md$|CLAUDE\.md$|CLAUDE\.md\.template$|BACKLOG\.md$|CHANGELOG\.md$|SETUP\.md$|\.claude\/|elements\/.*\.md$)/i;
+
 function main() {
   let files = process.argv.slice(2);
   let fromStaged = false;
@@ -116,7 +172,9 @@ function main() {
     }
   }
 
-  const targets = files.filter((f) => existsSync(f) && statSync(f).isFile() && TEXTY.test(f));
+  const targets = files
+    .filter((f) => existsSync(f) && statSync(f).isFile() && TEXTY.test(f))
+    .filter((f) => !fromStaged || !INTERNAL_DOC.test(f));
   const findings = targets.flatMap(lintFile);
 
   if (findings.length === 0) {

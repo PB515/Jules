@@ -32,6 +32,7 @@ Plus the two craft rails:
 - **No new dependencies without asking** (rail 5).
 - **Naming & folders** follow the `template/` structure; brand/contact constants live in `lib/site.ts`, edited once per site.
 - **Polish bar (Phase 5), made explicit because the AI skips it:** responsive to 360px, real empty/error states, SEO (title/meta/OG/schema), accessibility (alt text, focus, contrast, keyboard), performance (image sizes, bundle), analytics + privacy page.
+- **Log token/cost per phase.** Run `/cost` at the end of each working session and add a row to the master IDP's `docs/metrics/token-usage.md` (sibling folder, e.g. `../IDP/docs/metrics/token-usage.md`) — this repo doesn't keep its own copy; the track record lives centrally.
 
 ---
 

@@ -1,61 +1,133 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   DESIGN TOKENS  —  ⚠ REQUIRED TO CUSTOMISE PER SITE. THIS IS NOT A DEFAULT. ⚠
-
-   Keeping these placeholder values is exactly how you get the "AI-made look".
-   The single anti-sameness rule: the IDP standardises the PLUMBING, never the
-   SKIN. Replace every token below from doc 04 (Design System & Vibe) BEFORE you
-   build any UI — set the tokens first, then design on top of them.
-
-   The placeholder palette is deliberately loud (magenta) so an un-customised
-   site is obvious on sight — if you still see hot pink, you skipped this step.
-
-   See: docs/modules/anti-ai-look.md
+   DESIGN TOKENS. Project Jules, "solar blue". Frozen per docs/project-spec.md §3.
+   Do not hardcode hex anywhere else, read from these tokens only.
    ============================================================================ */
 
 :root {
-  /* — Brand colours — REPLACE all of these — */
-  --background: #fff5fb;          /* PLACEHOLDER */
-  --foreground: #1a0014;          /* PLACEHOLDER */
-  --muted: #8a6c80;               /* PLACEHOLDER — secondary text */
-  --border: #f0c4e0;              /* PLACEHOLDER */
+  /* — Backgrounds — */
+  --bezel: #0f1620;        /* phone frame / device chrome */
+  --background: #070b12;   /* main dark canvas */
+  --card: #0d1620;         /* rows, cards, inputs */
 
-  /* The CTA/accent needs its OWN shade that passes WCAG AA, plus the text
-     colour that sits ON it. (v5 #6 — a single accent failed AA on Purven.)
-     Verify --accent-foreground vs --accent is ≥ 4.5:1 before launch. */
-  --accent: #d6008c;              /* PLACEHOLDER — brand/CTA colour */
-  --accent-foreground: #ffffff;   /* PLACEHOLDER — text ON accent; MUST pass AA */
+  /* — Borders — */
+  --border: #1c2836;       /* hairlines, input borders */
+  --border-muted: #2b2745; /* onboarding-style inputs */
 
-  /* — Typography — REPLACE with DISTINCTIVE fonts.
-     NEVER Inter / Roboto / Arial / system defaults / Space Grotesk. Pair a
-     characterful display face with a refined body face (wired via next/font). */
-  --font-display: Georgia, "Times New Roman", serif;   /* PLACEHOLDER */
-  --font-body: system-ui, sans-serif;                  /* PLACEHOLDER */
+  /* — Accents — */
+  --accent: #E34234;              /* kumkum/vermilion — emphasis, locked, incorrect */
+  --accent-foreground: #eef4fb;
+  --gold: #FFC72C;                /* neon gold — energy values, correct, CTAs */
+  --gold-foreground: #070b12;
+  --success: #3ba26b;
 
-  /* — Spacing scale (v5 #15 — named rhythm, not magic numbers) — */
+  /* — Text — */
+  --foreground: #eef4fb;   /* primary body text */
+  --muted: #6e8aa3;        /* labels, muted UI text */
+  --tertiary: #5c7690;     /* placeholders, hints, timestamps */
+
+  /* — Tier colors — */
+  --tier-ember-text: #d99a4e;   --tier-ember-border: #4a3018;   --tier-ember-bg: #1c140a;
+  --tier-volt-text: #FFC72C;    --tier-volt-border: #6b4a10;    --tier-volt-bg: #1c1608;
+  --tier-current-text: #FFC72C; --tier-current-border: #E34234; --tier-current-bg: #1a1210;
+  --tier-plasma-text: #FFC72C;  --tier-plasma-border: #FFC72C;  --tier-plasma-bg: #241a05;
+
+  /* — Typography — system sans, two weights only (400/500), no bold — */
+  --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* — Spacing scale — */
   --space-tight: 0.5rem;
   --space-section: 4rem;
   --space-major: 8rem;
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 }
 
 /* Map tokens to Tailwind v4 theme so utilities (bg-background, text-accent,
    font-display, rounded-[var(--radius)] …) read from the tokens above. */
 @theme inline {
+  --color-bezel: var(--bezel);
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
+  --color-card: var(--card);
   --color-border: var(--border);
+  --color-border-muted: var(--border-muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-success: var(--success);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-tertiary: var(--tertiary);
+  --color-tier-ember-text: var(--tier-ember-text);
+  --color-tier-ember-border: var(--tier-ember-border);
+  --color-tier-ember-bg: var(--tier-ember-bg);
+  --color-tier-volt-text: var(--tier-volt-text);
+  --color-tier-volt-border: var(--tier-volt-border);
+  --color-tier-volt-bg: var(--tier-volt-bg);
+  --color-tier-current-text: var(--tier-current-text);
+  --color-tier-current-border: var(--tier-current-border);
+  --color-tier-current-bg: var(--tier-current-bg);
+  --color-tier-plasma-text: var(--tier-plasma-text);
+  --color-tier-plasma-border: var(--tier-plasma-border);
+  --color-tier-plasma-bg: var(--tier-plasma-bg);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes count-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.tier-plasma-pulse {
+  animation: plasma-pulse 2.4s ease-in-out infinite;
+}
+@keyframes plasma-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 199, 44, 0); }
+  50% { box-shadow: 0 0 18px rgba(255, 199, 44, 0.35); }
+}
+@keyframes float-drift {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+.ambient-drift { animation: float-drift 6s ease-in-out infinite; }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+}
+
+/* Shared form input — auth pages + a few admin forms. */
+.auth-input,
+.input {
+  background: var(--card);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  width: 100%;
+}
+.auth-input::placeholder,
+.input::placeholder {
+  color: var(--tertiary);
+}
+.auth-input:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--gold);
 }

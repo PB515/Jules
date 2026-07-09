@@ -1,0 +1,132 @@
+'use server';
+
+import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/session';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import type { ParsedRow } from '@/lib/jules/csv';
+import type { TablesUpdate } from '@/lib/supabase/database.types';
+
+export interface ActionResult {
+  error?: string;
+}
+
+export async function createSurgeAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin(['owner', 'officer']);
+  const name = String(formData.get('name') ?? '').trim();
+  const points = parseInt(String(formData.get('points_per_question') ?? '20'), 10);
+  if (!name) return { error: 'Name is required.' };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: activeSeason } = await supabase
+    .from('seasons')
+    .select('id')
+    .lte('start_date', new Date().toISOString())
+    .gte('end_date', new Date().toISOString())
+    .maybeSingle();
+
+  const { data, error } = await supabase
+    .from('surges')
+    .insert({
+      name,
+      points_per_question: Number.isFinite(points) && points > 0 ? points : 20,
+      season_id: activeSeason?.id ?? null,
+      created_by: user?.id,
+    })
+    .select('id')
+    .single();
+
+  if (error) return { error: error.message };
+  redirect(`/admin/surges/${data.id}`);
+}
+
+export async function setSurgeStatusAction(surgeId: string, status: 'draft' | 'live' | 'complete') {
+  await requireAdmin(['owner', 'officer']);
+  const supabase = await createClient();
+  const { error } = await supabase.from('surges').update({ status }).eq('id', surgeId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/surges/${surgeId}`);
+}
+
+export async function addQuestionAction(
+  surgeId: string,
+  q: {
+    text: string;
+    option_a: string;
+    option_b: string;
+    option_c: string;
+    option_d: string;
+    correct_option: 'A' | 'B' | 'C' | 'D';
+    time_limit_seconds: number;
+    tag: string;
+    order_index: number;
+  }
+) {
+  await requireAdmin(['owner', 'officer']);
+  const supabase = await createClient();
+  const { error } = await supabase.from('questions').insert({ surge_id: surgeId, ...q });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/surges/${surgeId}`);
+}
+
+export async function updateQuestionAction(questionId: string, surgeId: string, patch: TablesUpdate<'questions'>) {
+  await requireAdmin(['owner', 'officer']);
+  const supabase = await createClient();
+  const { error } = await supabase.from('questions').update(patch).eq('id', questionId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/surges/${surgeId}`);
+}
+
+export async function deleteQuestionAction(questionId: string, surgeId: string) {
+  await requireAdmin(['owner', 'officer']);
+  const supabase = await createClient();
+  const { error } = await supabase.from('questions').delete().eq('id', questionId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/surges/${surgeId}`);
+}
+
+export async function importQuestionsAction(surgeId: string, rows: ParsedRow[]) {
+  await requireAdmin(['owner', 'officer']);
+  const supabase = await createClient();
+
+  const clean = rows.filter((r) => r.errors.length === 0);
+  const { data: existingMax } = await supabase
+    .from('questions')
+    .select('order_index')
+    .eq('surge_id', surgeId)
+    .order('order_index', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  let nextIndex = (existingMax?.order_index ?? -1) + 1;
+
+  const payload = clean.map((r) => ({
+    surge_id: surgeId,
+    text: r.question,
+    option_a: r.option_a,
+    option_b: r.option_b,
+    option_c: r.option_c,
+    option_d: r.option_d,
+    correct_option: r.correct_option as 'A' | 'B' | 'C' | 'D',
+    time_limit_seconds: r.time_limit_seconds,
+    time_limit_flagged: r.time_limit_flagged,
+    tag: r.tag || null,
+    order_index: nextIndex++,
+  }));
+
+  if (payload.length > 0) {
+    const { error } = await supabase.from('questions').insert(payload);
+    if (error) throw new Error(error.message);
+  }
+
+  await supabase.rpc('log_csv_import', {
+    p_surge_id: surgeId,
+    p_details: { imported: payload.length, skipped: rows.length - payload.length },
+  });
+
+  revalidatePath(`/admin/surges/${surgeId}`);
+  return { imported: payload.length, skipped: rows.length - payload.length };
+}

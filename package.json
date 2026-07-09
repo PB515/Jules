@@ -23,7 +23,8 @@
     "deploy:check": "tsx tooling/deploy-check.ts",
     "verify": "tsx tooling/verify.ts",
     "verify:selftest": "tsx tooling/verify.ts selftest",
-    "lint:ai-tell": "tsx tooling/ai-tell-lint.ts"
+    "lint:ai-tell": "tsx tooling/ai-tell-lint.ts",
+    "bootstrap:owner": "tsx scripts/bootstrap-owner.ts"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.47.10",
