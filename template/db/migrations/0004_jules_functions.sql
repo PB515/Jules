@@ -207,10 +207,17 @@ $$;
 
 create or replace function public.qr_token_for_epoch(p_event_id uuid, p_epoch bigint)
 returns text
-language sql stable security definer set search_path = public
+language sql stable security definer set search_path = public, extensions
 as $$
   select upper(substring(
-    encode(hmac(p_event_id::text || ':' || p_epoch::text, public.qr_secret(), 'sha256'), 'hex')
+    encode(
+      hmac(
+        convert_to(p_event_id::text || ':' || p_epoch::text, 'UTF8'),
+        convert_to(public.qr_secret(), 'UTF8'),
+        'sha256'
+      ),
+      'hex'
+    )
     from 1 for 10
   ));
 $$;
