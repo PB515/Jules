@@ -7,7 +7,19 @@ const PUBLIC_PATHS = [
   '/forgot-password',
   '/reset-password',
   '/admin/login',
+  '/events',
+  '/get-app',
+  '/afterglow',
+  '/gallery',
+  '/mobile-required',
 ];
+
+// Student "Node" routes — per the professor's requirement, these only ever
+// run as an installed PWA on a phone (see lib/components/pwa-required.tsx
+// for the full rationale). This is Layer 1 (server-side, catches "opened on
+// a laptop" before any bundle loads); Layer 2 lives in app/(node)/layout.tsx
+// and additionally requires standalone display-mode, which only JS can see.
+const NODE_PATHS = ['/dashboard', '/scan', '/live', '/surge', '/catalyst', '/profile'];
 
 function isPublic(pathname: string): boolean {
   if (pathname === '/') return true;
@@ -17,13 +29,32 @@ function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
+function isNodePath(pathname: string): boolean {
+  return NODE_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+function looksLikeMobile(userAgent: string): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(userAgent);
+}
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // A soft gate, not a security boundary (same posture as the QR geofence
+  // check) — a user-agent is self-reported and easy to fake from dev tools.
+  // It stops the ordinary case (a student opens the link on a laptop) cold.
+  if (isNodePath(pathname) && !looksLikeMobile(request.headers.get('user-agent') ?? '')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/mobile-required';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
   // Refresh the session first — no code between createServerClient and
   // getUser (lib/supabase/middleware.ts), so route-protection logic below
   // reads a trustworthy `user`.
   const { supabaseResponse, user } = await updateSession(request);
 
-  const { pathname } = request.nextUrl;
   if (isPublic(pathname)) return supabaseResponse;
 
   if (!user) {

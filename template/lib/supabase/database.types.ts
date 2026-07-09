@@ -2,7 +2,7 @@
 // Normally generated via `npm run db:types` (supabase gen types), never
 // hand-written (see db/migrations/README.md). This build has no Docker/local
 // Supabase available to run against, so these types were written by hand from
-// db/migrations/0003-0010 to keep the app compiling. Regenerate for real once
+// db/migrations/0003-0014 to keep the app compiling. Regenerate for real once
 // `supabase start` (or a hosted project) is reachable — treat this file as
 // unverified against a live schema until then.
 
@@ -187,6 +187,27 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      afterglow_posts: {
+        Row: {
+          id: string; title: string; body: string; event_id: string;
+          uploaded_by: string | null; created_at: string;
+        };
+        Insert: {
+          id?: string; title: string; body: string; event_id: string;
+          uploaded_by?: string | null; created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['afterglow_posts']['Insert']>;
+        Relationships: [];
+      };
+      gallery_images: {
+        Row: { id: string; caption: string | null; file_path: string; uploaded_by: string | null; created_at: string };
+        Insert: {
+          id?: string; caption?: string | null; file_path: string;
+          uploaded_by?: string | null; created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['gallery_images']['Insert']>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -272,6 +293,14 @@ export interface Database {
           id: string; text: string; option_a: string; option_b: string; option_c: string; option_d: string;
           time_limit_seconds: number; correct_option: SurgeOption | null; phase: LivePhase; question_index: number;
         }[];
+      };
+      public_events: {
+        Args: Record<string, never>;
+        Returns: { id: string; name: string; type: EventType; event_date: string; location: string | null }[];
+      };
+      public_event_stats: {
+        Args: { p_event_id: string };
+        Returns: { total_attendees: number; total_joules: number }[];
       };
     };
     Enums: { [_ in never]: never };

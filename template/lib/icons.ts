@@ -56,6 +56,10 @@ export {
   MonitorPlay,
   Play,
   Crown,
+  Image as ImageIcon,
+  Smartphone,
+  Download,
+  BookOpen,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';
