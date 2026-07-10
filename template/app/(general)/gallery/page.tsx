@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { EmptyState } from '@/lib/patterns/empty-state';
-import { ImageIcon } from '@/lib/icons';
+import { GalleryPlaceholder } from '@/lib/components/gallery-placeholder';
 
 export const metadata = { title: 'Gallery' };
 
@@ -24,7 +23,15 @@ export default async function GalleryPage() {
       </div>
 
       {withUrls.length === 0 ? (
-        <EmptyState icon={ImageIcon} title="No photos yet" message="Event photos will appear here." />
+        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border p-10 text-center">
+          <GalleryPlaceholder className="h-28 w-40" />
+          <div>
+            <h3 className="text-base font-medium">Real photos coming soon</h3>
+            <p className="mt-1 max-w-sm text-sm text-tertiary">
+              The Gallery is being filled in. Check back after the next event.
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {withUrls.map((img) => (
