@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getStudent, getAdmin } from '@/lib/auth/session';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
+import { EnergyField } from '@/lib/components/energy-field';
+import { HeroAtom } from '@/lib/components/hero-atom';
 import { ArrowRight, Calendar, MapPin } from '@/lib/icons';
 
 export const metadata = { title: 'Home' };
@@ -18,8 +20,11 @@ export default async function GeneralHomePage() {
     .slice(0, 3);
 
   return (
-    <div className="flex flex-col gap-16">
-      <section className="flex flex-col items-center gap-4 py-10 text-center">
+    <div className="relative z-10 flex flex-col gap-16">
+      <EnergyField />
+
+      <section className="relative isolate flex flex-col items-center gap-4 py-10 text-center">
+        <HeroAtom className="absolute inset-0 -z-10 opacity-10" />
         <p className="text-xs uppercase tracking-[0.3em] text-gold">Energy Management Club</p>
         <h1 className="max-w-2xl text-4xl leading-tight font-medium">{site.tagline}</h1>
         <p className="max-w-xl text-muted">{site.description}</p>
