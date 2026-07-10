@@ -22,6 +22,18 @@ export default async function LiveRoundPlayPage({ params }: { params: Promise<{ 
   if (!team) redirect('/live');
 
   const { data: surge } = await supabase.from('surges').select('points_per_question').eq('id', round.surge_id).single();
+  const { count: totalQuestions } = await supabase
+    .from('questions')
+    .select('id', { count: 'exact', head: true })
+    .eq('surge_id', round.surge_id);
 
-  return <TeamClient roundId={roundId} initialRound={round} teamName={team.team_name} pointsPerQuestion={surge?.points_per_question ?? 20} />;
+  return (
+    <TeamClient
+      roundId={roundId}
+      initialRound={round}
+      teamName={team.team_name}
+      pointsPerQuestion={surge?.points_per_question ?? 20}
+      totalQuestions={totalQuestions ?? 0}
+    />
+  );
 }

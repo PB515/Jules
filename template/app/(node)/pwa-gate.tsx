@@ -12,6 +12,7 @@
  */
 import { useEffect, useState } from 'react';
 import { PwaRequired } from '@/lib/components/pwa-required';
+import { LaunchSplash } from '@/lib/components/launch-splash';
 
 export function PwaGate({ children }: { children: React.ReactNode }) {
   const [standalone, setStandalone] = useState(false);
@@ -23,5 +24,5 @@ export function PwaGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!standalone) return <PwaRequired />;
-  return <>{children}</>;
+  return <LaunchSplash>{children}</LaunchSplash>;
 }

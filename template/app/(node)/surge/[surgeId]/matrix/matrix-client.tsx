@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import { TierBadge } from '@/lib/components/tier-badge';
+import { WinnerBurst } from '@/lib/components/winner-burst';
 import type { Tier } from '@/lib/supabase/database.types';
 
 interface Row {
@@ -52,19 +53,33 @@ export function MatrixClient({ top10, mine, myTier }: { top10: Row[]; mine: Row 
         <p className="text-sm text-muted">No answers were recorded for this Surge yet.</p>
       ) : (
         <ol className="flex flex-col gap-2">
-          {visibleTop10.map((row) => (
-            <li
-              key={row.student_id}
-              className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3 opacity-0"
-              style={{ animation: 'matrix-row-in 0.4s ease-out forwards' }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-6 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
-                <span className="text-sm">{row.name}</span>
+          {visibleTop10.map((row) => {
+            const rowContent = (
+              <div className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
+                  <span className="text-sm">{row.name}</span>
+                </div>
+                <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
               </div>
-              <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
-            </li>
-          ))}
+            );
+            // Rank 1 gets the shared winner beat (confetti + sound + vibration)
+            // instead of the plain fade every other row uses — it's the last
+            // one revealed, so this fires exactly once, right on cue.
+            return row.rank === 1 ? (
+              <li key={row.student_id}>
+                <WinnerBurst scale="compact">{rowContent}</WinnerBurst>
+              </li>
+            ) : (
+              <li
+                key={row.student_id}
+                className="opacity-0"
+                style={{ animation: 'matrix-row-in 0.4s ease-out forwards' }}
+              >
+                {rowContent}
+              </li>
+            );
+          })}
         </ol>
       )}
 

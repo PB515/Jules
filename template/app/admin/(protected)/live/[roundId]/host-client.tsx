@@ -8,6 +8,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Crown, Check, Loader2 } from '@/lib/icons';
+import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
+import { playSound } from '@/lib/jules/sound';
+import { vibrate } from '@/lib/jules/haptics';
 import type { Database, LivePhase } from '@/lib/supabase/database.types';
 
 type Round = Database['public']['Tables']['live_rounds']['Row'];
@@ -101,6 +104,28 @@ export function HostClient({
   const q = questions[round.question_index];
   const isLast = round.question_index + 1 >= questions.length;
 
+  // The final question's reveal gets a suspense beat (drumroll, dimmed/
+  // pulsing hold) before showing the same reveal data every other question
+  // shows instantly — a client-side pacing effect only, not a new DB phase.
+  const [suspense, setSuspense] = useState(false);
+  useEffect(() => {
+    if (round.phase !== 'reveal' || !isLast) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/isLast, same pattern as lib/components/count-up.tsx
+      setSuspense(false);
+      return;
+    }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      setSuspense(false);
+      return;
+    }
+    setSuspense(true);
+    playSound('drumroll');
+    vibrate([80, 60, 80, 60, 80, 60, 200]);
+    const t = setTimeout(() => setSuspense(false), 1500);
+    return () => clearTimeout(t);
+  }, [round.phase, isLast]);
+
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 p-8 text-center">
       <div className="text-xs uppercase tracking-[0.2em] text-tertiary">{surgeName} · Live Round</div>
@@ -119,7 +144,7 @@ export function HostClient({
       ) : null}
 
       {(round.phase === 'reveal' || round.phase === 'leaderboard') && q ? (
-        <RevealView q={q} points={pointsPerQuestion} phase={round.phase} scoreboard={scoreboard} />
+        <RevealView q={q} points={pointsPerQuestion} phase={round.phase} scoreboard={scoreboard} suspense={suspense} />
       ) : null}
 
       {round.phase === 'complete' ? <FinalView scoreboard={scoreboard} /> : null}
@@ -217,11 +242,13 @@ function RevealView({
   points,
   phase,
   scoreboard,
+  suspense,
 }: {
   q: Question;
   points: number;
   phase: LivePhase;
   scoreboard: ScoreRow[];
+  suspense: boolean;
 }) {
   const options: [Option, string][] = [
     ['A', q.option_a],
@@ -229,6 +256,15 @@ function RevealView({
     ['C', q.option_c],
     ['D', q.option_d],
   ];
+
+  if (phase === 'reveal' && suspense) {
+    return (
+      <div className="flex w-full flex-col items-center gap-4 py-16 text-center">
+        <p className="animate-pulse text-lg font-medium text-gold">Revealing the answer&hellip;</p>
+        <p className="text-sm text-tertiary">Final question</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -270,7 +306,10 @@ function FinalView({ scoreboard }: { scoreboard: ScoreRow[] }) {
   return (
     <div className="flex w-full flex-col gap-6">
       <h1 className="text-2xl font-medium">Final standings</h1>
-      <Scoreboard rows={scoreboard} />
+      <RevealScoreboard
+        scale="full"
+        rows={scoreboard.map((r) => ({ key: r.team_id, label: r.team_name, amount: r.total_amount, rank: r.rank }))}
+      />
     </div>
   );
 }

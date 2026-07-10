@@ -8,6 +8,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { EnergyBar } from '@/lib/components/energy-bar';
+import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
+import { playSound } from '@/lib/jules/sound';
+import { vibrate } from '@/lib/jules/haptics';
 import { Check, X, Crown } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -21,11 +24,13 @@ export function TeamClient({
   initialRound,
   teamName,
   pointsPerQuestion,
+  totalQuestions,
 }: {
   roundId: string;
   initialRound: Round;
   teamName: string;
   pointsPerQuestion: number;
+  totalQuestions: number;
 }) {
   const [round, setRound] = useState(initialRound);
   const [question, setQuestion] = useState<LiveQuestion | null>(null);
@@ -33,6 +38,7 @@ export function TeamClient({
   const [awarded, setAwarded] = useState<number | null>(null);
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
   const supabase = useRef(createClient()).current;
+  const isLastQuestion = round.question_index + 1 >= totalQuestions;
 
   const loadQuestion = useCallback(async () => {
     const { data } = await supabase.rpc('live_round_question', { p_round_id: roundId });
@@ -120,6 +126,35 @@ export function TeamClient({
     return () => clearInterval(id);
   }, [question, round.question_started_at]);
 
+  // Quiet per-question feedback (skipped on the final question, which gets
+  // the bigger drumroll + winner treatment below instead).
+  useEffect(() => {
+    if (awarded === null || isLastQuestion) return;
+    playSound(awarded > 0 ? 'correct' : 'incorrect');
+    vibrate(30);
+  }, [awarded, isLastQuestion]);
+
+  // Same suspense-before-reveal beat as the host screen (see host-client.tsx)
+  // — kept in sync deliberately: same duration, same vibration pattern.
+  const [suspense, setSuspense] = useState(false);
+  useEffect(() => {
+    if (round.phase !== 'reveal' || !isLastQuestion) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/isLastQuestion, same pattern as lib/components/count-up.tsx
+      setSuspense(false);
+      return;
+    }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      setSuspense(false);
+      return;
+    }
+    setSuspense(true);
+    playSound('drumroll');
+    vibrate([80, 60, 80, 60, 80, 60, 200]);
+    const t = setTimeout(() => setSuspense(false), 1500);
+    return () => clearTimeout(t);
+  }, [round.phase, isLastQuestion]);
+
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
       <div className="flex items-center justify-between text-xs text-tertiary">
@@ -168,7 +203,14 @@ export function TeamClient({
         </div>
       ) : null}
 
-      {round.phase === 'reveal' && question ? (
+      {round.phase === 'reveal' && question && suspense ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
+          <p className="animate-pulse text-lg font-medium text-gold">Revealing the answer&hellip;</p>
+          <p className="text-sm text-tertiary">Final question</p>
+        </div>
+      ) : null}
+
+      {round.phase === 'reveal' && question && !suspense ? (
         <div className="flex flex-1 flex-col gap-6">
           <h2 className="text-lg leading-snug font-medium">{question.text}</h2>
           <div className="flex flex-1 flex-col gap-3">
@@ -200,9 +242,9 @@ export function TeamClient({
         </div>
       ) : null}
 
-      {(round.phase === 'leaderboard' || round.phase === 'complete') ? (
+      {round.phase === 'leaderboard' ? (
         <div className="flex flex-1 flex-col gap-4">
-          <h2 className="text-lg font-medium">{round.phase === 'complete' ? 'Final standings' : 'Scoreboard'}</h2>
+          <h2 className="text-lg font-medium">Scoreboard</h2>
           <ul className="flex flex-col gap-2">
             {scoreboard.map((r) => (
               <li
@@ -222,6 +264,22 @@ export function TeamClient({
               </li>
             ))}
           </ul>
+        </div>
+      ) : null}
+
+      {round.phase === 'complete' ? (
+        <div className="flex flex-1 flex-col gap-4">
+          <h2 className="text-lg font-medium">Final standings</h2>
+          <RevealScoreboard
+            scale="compact"
+            rows={scoreboard.map((r) => ({
+              key: r.team_id,
+              label: r.team_name,
+              amount: r.total_amount,
+              rank: r.rank,
+              highlight: r.team_name === teamName,
+            }))}
+          />
         </div>
       ) : null}
     </main>
