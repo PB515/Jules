@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import type { EventType } from '@/lib/supabase/database.types';
-import { ChevronDown, ChevronUp } from '@/lib/icons';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { ChevronDown, ChevronUp, Calendar } from '@/lib/icons';
 
 interface EventRow {
   id: string;
@@ -45,7 +46,7 @@ export function EventTimeline({ events }: { events: EventRow[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-tertiary">No events in this filter.</p>
+        <EmptyState icon={Calendar} title="No events in this filter" />
       ) : (
         <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
           {filtered.map((e) => {

@@ -4,7 +4,7 @@
  * recordings separately) — every call here is fire-and-forget, so a missing
  * file or a blocked autoplay never throws or surfaces to the user.
  */
-export type SoundName = 'tick' | 'correct' | 'incorrect' | 'drumroll' | 'winner';
+export type SoundName = 'tick' | 'correct' | 'incorrect' | 'drumroll' | 'winner' | 'tier-up';
 
 const cache = new Map<SoundName, HTMLAudioElement>();
 let primed = false;

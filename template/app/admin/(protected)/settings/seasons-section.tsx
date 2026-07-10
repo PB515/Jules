@@ -2,6 +2,8 @@
 
 import { useActionState, useState } from 'react';
 import { createSeasonAction, type ActionResult } from './actions';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { Calendar } from '@/lib/icons';
 
 interface Season {
   id: string;
@@ -19,17 +21,20 @@ export function SeasonsSection({ seasons }: { seasons: Season[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
-        {seasons.map((s) => (
-          <li key={s.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
-            <span>{s.label}</span>
-            <span className="text-xs text-tertiary">
-              {s.start_date} → {s.end_date} · {s.cadence}
-            </span>
-          </li>
-        ))}
-        {seasons.length === 0 ? <li className="px-4 py-4 text-center text-sm text-tertiary">No seasons yet.</li> : null}
-      </ul>
+      {seasons.length === 0 ? (
+        <EmptyState icon={Calendar} title="No seasons yet" />
+      ) : (
+        <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+          {seasons.map((s) => (
+            <li key={s.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+              <span>{s.label}</span>
+              <span className="text-xs text-tertiary">
+                {s.start_date} → {s.end_date} · {s.cadence}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {open ? (
         <form action={formAction} className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-card p-4">

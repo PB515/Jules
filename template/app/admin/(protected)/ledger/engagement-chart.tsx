@@ -4,6 +4,8 @@
  * bars — no chart library needed for a handful of months of club data.
  */
 import { useState } from 'react';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { BarChart3 } from '@/lib/icons';
 import type { EventType } from '@/lib/supabase/database.types';
 
 interface Row {
@@ -37,7 +39,7 @@ export function EngagementChart({ rows }: { rows: Row[] }) {
   );
 
   if (months.length === 0) {
-    return <p className="text-sm text-tertiary">No engagement data yet.</p>;
+    return <EmptyState icon={BarChart3} title="No engagement data yet" />;
   }
 
   return (

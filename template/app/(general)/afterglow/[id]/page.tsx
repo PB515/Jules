@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Users, Zap, Calendar } from '@/lib/icons';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { Users, Zap, Calendar, BookOpen } from '@/lib/icons';
 
 export const metadata = { title: 'Afterglow' };
 
@@ -9,7 +9,13 @@ export default async function AfterglowPostPage({ params }: { params: Promise<{ 
   const supabase = await createClient();
 
   const { data: post } = await supabase.from('afterglow_posts').select('*').eq('id', id).maybeSingle();
-  if (!post) notFound();
+  if (!post) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <EmptyState icon={BookOpen} title="Post not found" />
+      </div>
+    );
+  }
 
   const [{ data: events }, { data: stats }] = await Promise.all([
     supabase.rpc('public_events'),

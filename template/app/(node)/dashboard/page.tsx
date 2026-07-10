@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireStudent } from '@/lib/auth/session';
 import { CountUp } from '@/lib/components/count-up';
 import { TierBadge } from '@/lib/components/tier-badge';
+import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
 import { PowerGrid } from '@/lib/components/power-grid';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
   const student = await requireStudent();
   const supabase = await createClient();
 
-  const [{ data: totalsRows }, { data: activity }, { data: season }] = await Promise.all([
+  const [{ data: totalsRows }, { data: activity }, { data: season }, { data: firstTransaction }] = await Promise.all([
     supabase.rpc('my_totals'),
     supabase
       .from('joule_transactions')
@@ -34,6 +35,15 @@ export default async function DashboardPage() {
       .limit(10)
       .returns<ActivityRow[]>(),
     supabase.from('seasons').select('*').lte('start_date', new Date().toISOString()).gte('end_date', new Date().toISOString()).maybeSingle(),
+    // Only way to know if a row in the latest-10 feed above is truly the
+    // student's first-ever transaction, not just the oldest of the last 10.
+    supabase
+      .from('joule_transactions')
+      .select('id')
+      .eq('student_id', student.id)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const totals = totalsRows?.[0] ?? {
@@ -52,6 +62,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
+      <TierUpCelebration tier={totals.tier} />
+
       <div>
         <p className="text-sm text-muted">Welcome back,</p>
         <h1 className="text-xl font-medium">{student.name.split(' ')[0]}</h1>
@@ -111,15 +123,18 @@ export default async function DashboardPage() {
           />
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
-            {activity.map((row) => (
-              <li key={row.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                <div>
-                  <p>{row.events?.name ?? row.surges?.name ?? activityLabel(row.type)}</p>
-                  <p className="text-xs text-tertiary">{new Date(row.created_at).toLocaleString()}</p>
-                </div>
-                <span className="font-medium text-gold">+{row.amount} J</span>
-              </li>
-            ))}
+            {activity.map((row) => {
+              const isFirstSpark = row.id === firstTransaction?.id;
+              return (
+                <li key={row.id} className="flex items-center justify-between px-4 py-3 text-sm">
+                  <div>
+                    <p>{isFirstSpark ? 'Your first spark ⚡' : (row.events?.name ?? row.surges?.name ?? activityLabel(row.type))}</p>
+                    <p className="text-xs text-tertiary">{new Date(row.created_at).toLocaleString()}</p>
+                  </div>
+                  <span className="font-medium text-gold">+{row.amount} J</span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

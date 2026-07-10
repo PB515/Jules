@@ -46,7 +46,7 @@ export function EnergyBar({
 
   const pct = Math.max(0, Math.min(1, remainingMs / (totalSeconds * 1000)));
   const low = pct < 0.2;
-  const color = pct > 0.5 ? 'var(--gold)' : pct > 0.2 ? '#e0a020' : 'var(--accent)';
+  const color = pct > 0.5 ? 'var(--gold)' : pct > 0.2 ? 'var(--tier-ember-text)' : 'var(--accent)';
 
   return (
     <div className={`h-2 w-full overflow-hidden rounded-full bg-card ${low ? 'energy-jitter' : ''}`}>

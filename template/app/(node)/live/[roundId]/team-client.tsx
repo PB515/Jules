@@ -157,7 +157,7 @@ export function TeamClient({
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
-      <div className="flex items-center justify-between text-xs text-tertiary">
+      <div className="flex items-center justify-between text-xs text-accent">
         <span>Team: {teamName}</span>
         <span className="text-gold">+{pointsPerQuestion} J per correct answer</span>
       </div>
@@ -166,6 +166,12 @@ export function TeamClient({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <p className="text-lg font-medium">You&apos;re in!</p>
           <p className="text-sm text-tertiary">Waiting for the host to start the round…</p>
+        </div>
+      ) : null}
+
+      {(round.phase === 'question' || round.phase === 'reveal') && !question ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+          <p className="text-sm text-tertiary">Loading question…</p>
         </div>
       ) : null}
 

@@ -5,6 +5,7 @@
  */
 import { useMemo, useState, useTransition } from 'react';
 import { TierBadge } from '@/lib/components/tier-badge';
+import { EmptyState } from '@/lib/patterns/empty-state';
 import { Search, Lock, Unlock, KeyRound } from '@/lib/icons';
 import { adjustJoulesAction, forceResetAction, setStudentStatusAction } from './actions';
 import type { Tier, StudentStatus } from '@/lib/supabase/database.types';
@@ -43,27 +44,34 @@ export function VaultClient({ students }: { students: StudentRow[] }) {
         />
       </label>
 
-      <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
-        {filtered.map((s) => (
-          <li key={s.id}>
-            <button
-              onClick={() => setExpanded(expanded === s.id ? null : s.id)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{s.name}</span>
-                {s.status === 'locked' ? <Lock className="size-3.5 text-accent" aria-label="Locked" /> : null}
-              </div>
-              <div className="flex items-center gap-2">
-                <TierBadge tier={s.tier} />
-                <span className="text-xs text-tertiary">{s.season_joules} J</span>
-              </div>
-            </button>
-            {expanded === s.id ? <StudentDetail student={s} /> : null}
-          </li>
-        ))}
-        {filtered.length === 0 ? <li className="px-4 py-6 text-center text-sm text-tertiary">No matches.</li> : null}
-      </ul>
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          title={students.length === 0 ? 'No students yet' : 'No matches'}
+          message={students.length === 0 ? 'Students appear here once they sign up.' : 'Try a different name or email.'}
+        />
+      ) : (
+        <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+          {filtered.map((s) => (
+            <li key={s.id}>
+              <button
+                onClick={() => setExpanded(expanded === s.id ? null : s.id)}
+                className="flex w-full items-center justify-between px-4 py-3 text-left"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{s.name}</span>
+                  {s.status === 'locked' ? <Lock className="size-3.5 text-accent" aria-label="Locked" /> : null}
+                </div>
+                <div className="flex items-center gap-2">
+                  <TierBadge tier={s.tier} />
+                  <span className="text-xs text-tertiary">{s.season_joules} J</span>
+                </div>
+              </button>
+              {expanded === s.id ? <StudentDetail student={s} /> : null}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

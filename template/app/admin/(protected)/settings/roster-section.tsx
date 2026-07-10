@@ -2,6 +2,8 @@
 
 import { useActionState, useState } from 'react';
 import { createAdminAction, type ActionResult } from './actions';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { Users } from '@/lib/icons';
 
 interface Admin {
   id: string;
@@ -23,17 +25,21 @@ export function RosterSection({ admins, events }: { admins: Admin[]; events: Eve
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
-        {admins.map((a) => (
-          <li key={a.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
-            <div>
-              <p>{a.name}</p>
-              <p className="text-xs text-tertiary">{a.email}</p>
-            </div>
-            <span className="rounded-full border border-border px-2 py-0.5 text-xs capitalize text-muted">{a.role}</span>
-          </li>
-        ))}
-      </ul>
+      {admins.length === 0 ? (
+        <EmptyState icon={Users} title="No admins yet" message="Add the first Officer or Volunteer below." />
+      ) : (
+        <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+          {admins.map((a) => (
+            <li key={a.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+              <div>
+                <p>{a.name}</p>
+                <p className="text-xs text-tertiary">{a.email}</p>
+              </div>
+              <span className="rounded-full border border-border px-2 py-0.5 text-xs capitalize text-muted">{a.role}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {open ? (
         <form action={formAction} className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-card p-4">

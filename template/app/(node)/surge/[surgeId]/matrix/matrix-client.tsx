@@ -7,6 +7,8 @@
 import { useEffect, useState } from 'react';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { WinnerBurst } from '@/lib/components/winner-burst';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { Trophy } from '@/lib/icons';
 import type { Tier } from '@/lib/supabase/database.types';
 
 interface Row {
@@ -50,7 +52,7 @@ export function MatrixClient({ top10, mine, myTier }: { top10: Row[]; mine: Row 
   return (
     <div className="flex flex-col gap-6">
       {top10.length === 0 ? (
-        <p className="text-sm text-muted">No answers were recorded for this Surge yet.</p>
+        <EmptyState icon={Trophy} title="No answers were recorded" message="Nobody answered a question in this Surge yet." />
       ) : (
         <ol className="flex flex-col gap-2">
           {visibleTop10.map((row) => {

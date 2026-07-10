@@ -115,34 +115,38 @@ export function ScanClient({
 
       <div className="rounded-[var(--radius)] border border-border bg-card p-4">
         <p className="mb-3 text-xs uppercase tracking-wide text-muted">Or check in manually</p>
-        <div className="flex flex-col gap-3">
-          <select
-            className="input"
-            value={eventId}
-            onChange={(e) => setEventId(e.target.value)}
-          >
-            <option value="">Select event…</option>
-            {events.map((ev) => (
-              <option key={ev.id} value={ev.id}>
-                {ev.name} ({ev.joule_value}J)
-              </option>
-            ))}
-          </select>
-          <input
-            className="input"
-            placeholder="10-character code"
-            value={token}
-            onChange={(e) => setToken(e.target.value.toUpperCase())}
-            maxLength={10}
-          />
-          <button
-            onClick={() => redeem(eventId, token)}
-            disabled={!eventId || !token || result.state === 'redeeming'}
-            className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-50"
-          >
-            {result.state === 'redeeming' ? 'Checking in…' : 'Check in'}
-          </button>
-        </div>
+        {events.length === 0 ? (
+          <p className="text-sm text-tertiary">No events are open for check-in right now.</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <select
+              className="input"
+              value={eventId}
+              onChange={(e) => setEventId(e.target.value)}
+            >
+              <option value="">Select event…</option>
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.name} ({ev.joule_value}J)
+                </option>
+              ))}
+            </select>
+            <input
+              className="input"
+              placeholder="10-character code"
+              value={token}
+              onChange={(e) => setToken(e.target.value.toUpperCase())}
+              maxLength={10}
+            />
+            <button
+              onClick={() => redeem(eventId, token)}
+              disabled={!eventId || !token || result.state === 'redeeming'}
+              className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-50"
+            >
+              {result.state === 'redeeming' ? 'Checking in…' : 'Check in'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

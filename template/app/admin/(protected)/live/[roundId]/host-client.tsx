@@ -128,7 +128,7 @@ export function HostClient({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 p-8 text-center">
-      <div className="text-xs uppercase tracking-[0.2em] text-tertiary">{surgeName} · Live Round</div>
+      <div className="text-xs uppercase tracking-[0.2em] text-accent">{surgeName} · Live Round</div>
 
       {round.phase === 'lobby' ? <LobbyView roomCode={round.room_code} teamCount={teamCount} /> : null}
 
@@ -175,7 +175,7 @@ function LobbyView({ roomCode, teamCount }: { roomCode: string; teamCount: numbe
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted">Teams join at /live with this code</p>
-      <div className="rounded-2xl border-2 border-gold bg-card px-12 py-8 text-6xl font-medium tracking-[0.3em] text-gold">
+      <div className="rounded-2xl border-2 border-accent bg-card px-12 py-8 text-6xl font-medium tracking-[0.3em] text-gold">
         {roomCode}
       </div>
       <p className="text-lg text-foreground">

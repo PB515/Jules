@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getStudent, getAdmin } from '@/lib/auth/session';
 import { site } from '@/lib/site';
+import { EmptyState } from '@/lib/patterns/empty-state';
 import { ArrowRight, Calendar, MapPin } from '@/lib/icons';
 
 export const metadata = { title: 'Home' };
@@ -63,9 +64,7 @@ export default async function GeneralHomePage() {
           </Link>
         </div>
         {upcoming.length === 0 ? (
-          <p className="rounded-[var(--radius)] border border-dashed border-border p-6 text-center text-sm text-tertiary">
-            Nothing scheduled yet. Check back soon.
-          </p>
+          <EmptyState icon={Calendar} title="Nothing scheduled yet" message="Check back soon." />
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
             {upcoming.map((e) => (

@@ -13,7 +13,8 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
-import { Check, ShieldAlert } from '@/lib/icons';
+import { EmptyState } from '@/lib/patterns/empty-state';
+import { Check, ShieldAlert, ScanLine } from '@/lib/icons';
 
 interface Props {
   eventId: string;
@@ -120,9 +121,7 @@ export function StationClient({ eventId, eventName, jouleValue }: Props) {
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted">Recent scans</h2>
         {recent.length === 0 ? (
-          <p className="rounded-[var(--radius)] border border-dashed border-border p-6 text-center text-sm text-tertiary">
-            No scans yet. They&apos;ll appear here in real time.
-          </p>
+          <EmptyState icon={ScanLine} title="No scans yet" message="They'll appear here in real time." />
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
             {recent.map((r, i) => (

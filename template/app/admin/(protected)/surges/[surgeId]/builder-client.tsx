@@ -14,6 +14,7 @@ import {
   setSurgeStatusAction,
   updateQuestionAction,
 } from '../actions';
+import { EmptyState } from '@/lib/patterns/empty-state';
 import { Upload, Plus, Trash2, Check, AlertCircle } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -292,7 +293,7 @@ function QuestionList({ surgeId, questions, editable }: { surgeId: string; quest
   const count = useMemo(() => questions.length, [questions]);
 
   if (count === 0) {
-    return <p className="rounded-[var(--radius)] border border-dashed border-border p-6 text-center text-sm text-tertiary">No questions yet.</p>;
+    return <EmptyState icon={Plus} title="No questions yet" message="Import a CSV or add one manually above." />;
   }
 
   return (
