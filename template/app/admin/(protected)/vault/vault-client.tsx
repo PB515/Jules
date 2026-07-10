@@ -34,7 +34,7 @@ export function VaultClient({ students }: { students: StudentRow[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex items-center gap-2 rounded-[var(--radius)] border border-border-muted bg-card px-3 py-2">
+      <label className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2">
         <Search className="size-4 text-tertiary" aria-hidden />
         <input
           value={query}

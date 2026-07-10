@@ -1,4 +1,12 @@
+'use client';
+/**
+ * Client Component so the nav can highlight the active section via
+ * usePathname() (no server-only calls here, so no split-out needed like
+ * the admin sidebar). Kumkum ("you are here") reuses Live Round's own
+ * identity meaning (decision 39), not a new per-section color.
+ */
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { site } from '@/lib/site';
 
 const NAV = [
@@ -9,6 +17,8 @@ const NAV = [
 ] as const;
 
 export default function GeneralLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="border-b border-border bg-card">
@@ -17,11 +27,18 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
             {site.name}
           </Link>
           <nav className="flex items-center gap-5 text-sm text-muted">
-            {NAV.map((item) => (
-              <Link key={item.href} href={item.href} className="hover:text-foreground">
-                {item.label}
-              </Link>
-            ))}
+            {NAV.map((item) => {
+              const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={active ? 'border-b-2 border-accent pb-0.5 text-accent' : 'border-b-2 border-transparent pb-0.5 hover:text-foreground'}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
             <Link
               href="/get-app"
               className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground"

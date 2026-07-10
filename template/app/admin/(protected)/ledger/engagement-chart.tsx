@@ -15,6 +15,10 @@ interface Row {
   scan_count: number;
 }
 
+// Deliberately reuses gold/accent/success as a 4-category chart palette here,
+// not their usual correct/incorrect/emphasis meaning elsewhere in the app —
+// a categorical data-viz palette needs distinct hues regardless of what
+// those hues mean on other screens. Reviewed, not a consistency violation.
 const TYPE_COLOR: Record<EventType, string> = {
   standard_meeting: 'var(--border-muted)',
   expert_session: 'var(--gold)',

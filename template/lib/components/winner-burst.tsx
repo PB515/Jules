@@ -23,7 +23,14 @@ import { vibrate } from '@/lib/jules/haptics';
 const DEFAULT_COLOR_VARS = ['--gold', '--accent'];
 const DEFAULT_VIBRATION = [50, 40, 50, 40, 120];
 
-/** Reads real token values off :root instead of hardcoding their hex, so this never drifts from globals.css. */
+/**
+ * Reads real token values off :root instead of hardcoding their hex, so this
+ * never drifts from globals.css. The one literal '#ffffff' is a deliberate,
+ * reviewed exception, not an invented brand color: a pure-white sparkle mixed
+ * into every burst genuinely reads better than the off-white --foreground
+ * token would, and it doubles as the last-resort fallback if every requested
+ * CSS var somehow resolves empty.
+ */
 function resolveColors(vars: string[]): string[] {
   const root = getComputedStyle(document.documentElement);
   const resolved = vars.map((v) => root.getPropertyValue(v).trim()).filter(Boolean);

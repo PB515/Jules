@@ -1,21 +1,10 @@
-import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth/session';
 import { adminLogoutAction } from '@/app/(auth)/actions';
-import { ScanLine, Zap, BarChart3, Users, Settings, LogOut, MonitorPlay, BookOpen, ImageIcon } from '@/lib/icons';
+import { AdminNav } from './admin-nav-client';
+import { LogOut } from '@/lib/icons';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
-
-  const nav = [
-    { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['owner', 'officer', 'volunteer'] },
-    { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['owner', 'officer'] },
-    { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['owner', 'officer'] },
-    { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['owner', 'officer'] },
-    { href: '/admin/afterglow', label: 'Afterglow', icon: BookOpen, roles: ['owner', 'officer'] },
-    { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['owner', 'officer'] },
-    { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['owner'] },
-    { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['owner'] },
-  ].filter((item) => item.roles.includes(admin.role));
 
   return (
     <div className="flex min-h-screen flex-1 bg-background">
@@ -24,18 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <p className="text-xs uppercase tracking-[0.2em] text-muted">Jules</p>
           <p className="text-sm font-medium">Reactor Command Center</p>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 p-3">
-          {nav.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-2.5 rounded-[var(--radius)] px-3 py-2 text-sm text-muted hover:bg-background hover:text-foreground"
-            >
-              <Icon className="size-4" aria-hidden />
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <AdminNav role={admin.role} />
         <div className="border-t border-border p-3">
           <p className="px-3 py-1 text-xs text-tertiary">{admin.name} · {admin.role}</p>
           <form action={adminLogoutAction}>
