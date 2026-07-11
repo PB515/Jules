@@ -11,7 +11,9 @@ import { Crown, Check, Loader2 } from '@/lib/icons';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
+import { site } from '@/lib/site';
 import type { Database, LivePhase } from '@/lib/supabase/database.types';
+import QRCode from 'react-qr-code';
 
 type Round = Database['public']['Tables']['live_rounds']['Row'];
 type Question = {
@@ -172,9 +174,13 @@ export function HostClient({
 }
 
 function LobbyView({ roomCode, teamCount }: { roomCode: string; teamCount: number }) {
+  const joinLink = `${site.url}/live?code=${roomCode}`;
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-sm text-muted">Teams join at /live with this code</p>
+      <p className="text-sm text-muted">Teams join at /live with this code, or scan to join</p>
+      <div className="rounded-[var(--radius)] bg-white p-3">
+        <QRCode value={joinLink} size={140} />
+      </div>
       <div className="rounded-2xl border-2 border-accent bg-card px-12 py-8 text-6xl font-medium tracking-[0.3em] text-gold">
         {roomCode}
       </div>

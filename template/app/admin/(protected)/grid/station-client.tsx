@@ -5,16 +5,18 @@
  * column). This client polls for the current token + live metrics every 5s so
  * the display always shows a fresh, redeemable code without a full reload.
  *
- * No QR image library is vendored here (see CLAUDE.md build log) — the
- * check-in link + a large human-readable code cover the same flow and are
- * fully testable without a camera. Wiring a real scannable QR image is a
- * flagged follow-up needing a one-line dependency decision.
+ * Renders a real scannable QR (react-qr-code, decision 43) alongside the
+ * text code + copy link, which stay as the manual/accessible fallback. The
+ * QR itself is kept standard black-on-white (not theme-colored) — real-world
+ * scan reliability across random phone cameras and lighting matters more
+ * here than matching the dark UI around it.
  */
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Check, ShieldAlert, ScanLine } from '@/lib/icons';
+import QRCode from 'react-qr-code';
 
 interface Props {
   eventId: string;
@@ -94,7 +96,12 @@ export function StationClient({ eventId, eventName, jouleValue }: Props) {
           ) : null}
         </div>
 
-        <div className="mt-6 flex flex-col items-center gap-3">
+        <div className="mt-6 flex flex-col items-center gap-4">
+          {link ? (
+            <div className="rounded-[var(--radius)] bg-white p-3">
+              <QRCode value={link} size={160} />
+            </div>
+          ) : null}
           <p className="text-xs text-muted">Current check-in code</p>
           <p className="font-mono text-4xl tracking-[0.15em] text-gold">{token ?? '··········'}</p>
           <button

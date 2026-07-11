@@ -1,6 +1,7 @@
 import { site } from '@/lib/site';
 import { Smartphone } from '@/lib/icons';
 import { InstallButton } from './install-button';
+import QRCode from 'react-qr-code';
 
 export const metadata = { title: 'Get the App' };
 
@@ -15,6 +16,10 @@ export default function GetAppPage() {
           installed app on your phone. This keeps quizzes fair and focused, one device, nothing else
           open.
         </p>
+      </div>
+
+      <div className="rounded-[var(--radius)] bg-white p-3">
+        <QRCode value={site.url} size={140} />
       </div>
 
       <div className="w-full rounded-[var(--radius)] border border-border bg-card p-5 text-left">
