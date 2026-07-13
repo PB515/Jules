@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: site.name,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#071620",
+  themeColor: "#faf7f2",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

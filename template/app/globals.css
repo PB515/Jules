@@ -2,50 +2,56 @@
 
 /* ============================================================================
    DESIGN TOKENS. Synergy platform (rebrand from single-club "Jules").
-   Palette direction "A" — inspired by Adani Group's real official brand
-   colors (Honolulu Blue #0B74B0, X11 Maroon #BD3861, Persia/lavender
-   #75479C — see docs/prompts or CLAUDE.md for the sourcing), since the
-   platform now sits inside, and should visually belong to, Adani
-   University. Variable NAMES are kept exactly as before (--gold, --accent,
-   etc.) even though the hues they carry have changed — every component in
-   the codebase already reads these by name (the project's own "tokens
-   only" convention), so this is a value swap, not a rearchitecture.
+   Palette direction "C" — warm ivory light theme (the professor asked for
+   a light background, not the earlier dark navy canvas). Still built off
+   Adani Group's real official brand colors (Honolulu Blue #0B74B0, X11
+   Maroon #BD3861, Persia/lavender #75479C — see docs/prompts or CLAUDE.md
+   for the sourcing) — the maroon brand accent is untouched, only the
+   canvas/text values flipped to light. Variable NAMES are kept exactly as
+   before (--gold, --accent, etc.) even though the hues they carry have
+   changed — every component in the codebase already reads these by name
+   (the project's own "tokens only" convention), so this is a value swap,
+   not a rearchitecture.
    Do not hardcode hex anywhere else, read from these tokens only.
    ============================================================================ */
 
 :root {
-  /* — Backgrounds — dark navy family off Honolulu Blue's hue — */
-  --bezel: #091a26;        /* phone frame / device chrome */
-  --background: #071620;   /* main dark canvas */
-  --card: #0d2436;         /* rows, cards, inputs */
+  /* — Backgrounds — warm ivory, softer than clinical white or cool gray — */
+  --bezel: #f0eae0;        /* phone frame / device chrome */
+  --background: #faf7f2;   /* main light canvas */
+  --card: #ffffff;         /* rows, cards, inputs */
 
   /* — Borders — */
-  --border: #1c3446;       /* hairlines, input borders */
-  --border-muted: #2b3a52; /* onboarding-style inputs */
+  --border: #e8e1d6;       /* hairlines, input borders */
+  --border-muted: #ded5c6; /* onboarding-style inputs */
 
   /* — Accents — */
-  /* --gold is the primary brand/CTA accent — now Adani's X11 Maroon,
+  /* --gold is the primary brand/CTA accent — Adani's X11 Maroon,
      not literal gold. Kept the variable name to avoid a codebase-wide
-     rename of every bg-gold/text-gold usage. */
+     rename of every bg-gold/text-gold usage. Unchanged by the light-theme
+     flip — it already reads correctly on a light canvas. */
   --gold: #BD3861;                /* X11 Maroon — energy values, correct, CTAs */
   --gold-foreground: #fdf1f4;
   /* --accent is the danger/incorrect/locked meaning — deliberately a
      distinct hue (warm orange-red) from the maroon above, so "wrong
-     answer" and "brand identity" never visually collide. */
-  --accent: #E0521F;
+     answer" and "brand identity" never visually collide. Deepened from
+     the dark-theme value so it still clears AA contrast on a light card. */
+  --accent: #c7401a;
   --accent-foreground: #fff6f0;
-  --success: #3ba26b;
+  --success: #2e8659;
 
   /* — Text — */
-  --foreground: #eef4fb;   /* primary body text */
-  --muted: #6e8aa3;        /* labels, muted UI text */
-  --tertiary: #5c7690;     /* placeholders, hints, timestamps */
+  --foreground: #2a2521;   /* primary body text — warm near-black, not pure black */
+  --muted: #7a7266;        /* labels, muted UI text */
+  --tertiary: #948c7e;     /* placeholders, hints, timestamps */
 
-  /* — Tier colors — */
-  --tier-ember-text: #d99a4e;   --tier-ember-border: #4a3018;   --tier-ember-bg: #1c140a;
-  --tier-volt-text: #BD3861;    --tier-volt-border: #5c1a2c;    --tier-volt-bg: #200a11;
-  --tier-current-text: #BD3861; --tier-current-border: #E0521F; --tier-current-bg: #1f0d08;
-  --tier-plasma-text: #BD3861;  --tier-plasma-border: #BD3861;  --tier-plasma-bg: #2a0f18;
+  /* — Tier colors — light pastel tints (were subtle dark tints tuned for
+     the old dark canvas; a near-black chip would read as a jarring solid
+     box on the new light ivory background) — */
+  --tier-ember-text: #8a5a1e;   --tier-ember-border: #e8c896;   --tier-ember-bg: #fbf0dc;
+  --tier-volt-text: #BD3861;    --tier-volt-border: #f0c3d1;    --tier-volt-bg: #fbe9ef;
+  --tier-current-text: #BD3861; --tier-current-border: #c7401a; --tier-current-bg: #fce7de;
+  --tier-plasma-text: #BD3861;  --tier-plasma-border: #BD3861;  --tier-plasma-bg: #f8e3ea;
 
   /* — Typography — system sans, two weights only (400/500), no bold — */
   --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
