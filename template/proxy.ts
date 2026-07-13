@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   '/events',
   '/get-app',
   '/event-reports',
+  '/api/event-reports',
   '/gallery',
   '/mobile-required',
 ];

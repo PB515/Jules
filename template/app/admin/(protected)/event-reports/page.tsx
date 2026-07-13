@@ -33,14 +33,19 @@ export default async function AdminEventReportsListPage() {
       ) : (
         <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
           {reports.map((r) => (
-            <li key={r.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="text-sm">{r.title}</p>
-                <p className="text-xs text-tertiary">{eventNames.get(r.event_id)}</p>
-              </div>
-              <span className="text-xs text-tertiary">
-                {new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-              </span>
+            <li key={r.id}>
+              <Link
+                href={`/event-reports/${r.id}`}
+                className="flex items-center justify-between px-4 py-3 hover:bg-background"
+              >
+                <div>
+                  <p className="text-sm">{r.title}</p>
+                  <p className="text-xs text-tertiary">{eventNames.get(r.event_id)}</p>
+                </div>
+                <span className="text-xs text-tertiary">
+                  {new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
