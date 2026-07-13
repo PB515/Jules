@@ -6,6 +6,7 @@
  * identity meaning (decision 39), not a new per-section color.
  */
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { site } from '@/lib/site';
@@ -26,8 +27,9 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-medium tracking-tight text-gold">
-            {site.name}
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="h-7 w-auto" priority />
+            <span className="text-lg font-medium tracking-tight text-gold">{site.name}</span>
           </Link>
 
           <nav className="hidden items-center gap-5 text-sm text-muted sm:flex">
