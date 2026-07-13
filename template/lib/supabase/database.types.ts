@@ -262,8 +262,8 @@ export interface Database {
         }[];
       };
       season_leaderboard: {
-        Args: { p_season_id: string };
-        Returns: { student_id: string; name: string; total_amount: number; rank: number }[];
+        Args: { p_season_id: string; p_limit?: number; p_offset?: number };
+        Returns: { student_id: string; name: string; total_amount: number; rank: number; total_count: number }[];
       };
       monthly_engagement: {
         Args: Record<string, never>;

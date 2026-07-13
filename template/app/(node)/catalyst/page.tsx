@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireStudent } from '@/lib/auth/session';
 import { SeasonPicker } from './season-picker';
@@ -6,13 +7,15 @@ import { Trophy } from '@/lib/icons';
 
 export const metadata = { title: 'Catalyst Records' };
 
+const PAGE_SIZE = 50;
+
 export default async function CatalystPage({
   searchParams,
 }: {
-  searchParams: Promise<{ season?: string }>;
+  searchParams: Promise<{ season?: string; page?: string }>;
 }) {
   const student = await requireStudent();
-  const { season: seasonParam } = await searchParams;
+  const { season: seasonParam, page: pageParam } = await searchParams;
   const supabase = await createClient();
 
   const { data: seasons } = await supabase
@@ -29,8 +32,20 @@ export default async function CatalystPage({
   }
 
   const selectedId = seasonParam ?? seasons[0].id;
-  const { data: leaderboard } = await supabase.rpc('season_leaderboard', { p_season_id: selectedId });
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const { data: leaderboard } = await supabase.rpc('season_leaderboard', {
+    p_season_id: selectedId,
+    p_limit: PAGE_SIZE,
+    p_offset: offset,
+  });
   const rows = leaderboard ?? [];
+  const totalCount = rows[0]?.total_count ?? 0;
+  const rangeStart = rows.length > 0 ? offset + 1 : 0;
+  const rangeEnd = offset + rows.length;
+  const hasPrev = page > 1;
+  const hasNext = rangeEnd < totalCount;
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
@@ -43,24 +58,48 @@ export default async function CatalystPage({
 
       {/* Static — no reveal animation (spec §6): a settled record, not a live moment. */}
       {rows.length === 0 ? (
-        <EmptyState icon={Trophy} title="No Joules recorded" message="Nobody had earned Joules in this season yet." />
+        <EmptyState icon={Trophy} title="No students yet" />
       ) : (
-        <ol className="flex flex-col gap-2">
-          {rows.map((row) => (
-            <li
-              key={row.student_id}
-              className={`flex items-center justify-between rounded-[var(--radius)] border px-4 py-3 ${
-                row.student_id === student.id ? 'border-gold' : 'border-border'
-              } bg-card`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-6 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
-                <span className="text-sm">{row.name}</span>
-              </div>
-              <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
-            </li>
-          ))}
-        </ol>
+        <>
+          <p className="text-xs text-tertiary">
+            {rangeStart}–{rangeEnd} of {totalCount} students
+          </p>
+          <ol className="flex flex-col gap-2">
+            {rows.map((row) => (
+              <li
+                key={row.student_id}
+                className={`flex items-center justify-between rounded-[var(--radius)] border px-4 py-3 ${
+                  row.student_id === student.id ? 'border-gold' : 'border-border'
+                } bg-card`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-8 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
+                  <span className="text-sm">{row.name}</span>
+                </div>
+                <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
+              </li>
+            ))}
+          </ol>
+
+          {hasPrev || hasNext ? (
+            <div className="flex items-center justify-between text-sm">
+              {hasPrev ? (
+                <Link href={`/catalyst?season=${selectedId}&page=${page - 1}`} className="text-gold">
+                  ← Previous
+                </Link>
+              ) : (
+                <span />
+              )}
+              {hasNext ? (
+                <Link href={`/catalyst?season=${selectedId}&page=${page + 1}`} className="text-gold">
+                  Next →
+                </Link>
+              ) : (
+                <span />
+              )}
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );
