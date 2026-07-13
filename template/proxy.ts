@@ -77,6 +77,6 @@ export const config = {
      * session cookie stays fresh across the whole app (rail: don't run logic
      * between createServerClient and getUser, satisfied inside updateSession).
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp3|wav)$).*)',
   ],
 };
