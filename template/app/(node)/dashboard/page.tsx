@@ -1,11 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireStudent } from '@/lib/auth/session';
-import { CountUp } from '@/lib/components/count-up';
-import { TierBadge } from '@/lib/components/tier-badge';
-import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
+import { DemoControls } from '@/lib/components/demo-controls';
 import { PowerGrid } from '@/lib/components/power-grid';
+import { DashboardTeaser } from '@/lib/components/avatar-3d/dashboard-teaser';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
 import { ScanLine, Clock } from '@/lib/icons';
 import Link from 'next/link';
 import type { Tier } from '@/lib/supabase/database.types';
@@ -54,48 +52,24 @@ export default async function DashboardPage() {
     status: 'active' as const,
   };
 
-  const progress = tierProgress(totals.season_joules);
-  const nextAt = nextTierAt(totals.season_joules);
   const litCount = activity?.length ?? 0;
 
   const daysLeft = season ? daysUntil(season.end_date) : null;
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
-      <TierUpCelebration tier={totals.tier} />
-
       <div>
         <p className="text-sm text-muted">Welcome back,</p>
         <h1 className="text-xl font-medium">{student.name.split(' ')[0]}</h1>
       </div>
 
-      <section className="rounded-2xl border border-border bg-card p-6 ambient-drift">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted">Season Joules</p>
-            <CountUp value={totals.season_joules} className="text-4xl font-medium text-gold" />
-          </div>
-          <TierBadge tier={totals.tier} />
-        </div>
+      <DemoControls
+        initialSeasonJoules={totals.season_joules}
+        initialLifetimeJoules={totals.lifetime_joules}
+        daysLeft={daysLeft}
+      />
 
-        <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-background">
-          <div
-            className="h-full rounded-full bg-gold transition-all duration-700 ease-out"
-            style={{ width: `${Math.round(progress * 100)}%` }}
-          />
-        </div>
-        <p className="mt-1.5 text-xs text-tertiary">
-          {nextAt ? `${nextAt - totals.season_joules} J to next tier` : 'Top tier, uncapped'}
-        </p>
-
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <span className="text-muted">Lifetime Joules</span>
-          <CountUp value={totals.lifetime_joules} className="font-medium" />
-        </div>
-        {daysLeft !== null ? (
-          <p className="mt-1 text-xs text-tertiary">Season ends in {daysLeft} days</p>
-        ) : null}
-      </section>
+      <DashboardTeaser />
 
       <section>
         <div className="mb-2 flex items-center justify-between">

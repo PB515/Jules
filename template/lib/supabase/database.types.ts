@@ -23,6 +23,7 @@ export type TransactionType = 'event_scan' | 'surge_correct_answer' | 'admin_man
 export type AuditAction = 'force_reset' | 'manual_joule_adjustment' | 'csv_import' | 'role_change';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
+export type AvatarSlot = 'hat' | 'outfit' | 'accessory' | 'effect';
 export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
 
 export interface Database {
@@ -301,6 +302,10 @@ export interface Database {
       public_event_stats: {
         Args: { p_event_id: string };
         Returns: { total_attendees: number; total_joules: number }[];
+      };
+      avatar_items_catalog: {
+        Args: Record<string, never>;
+        Returns: { id: string; slot: AvatarSlot; name: string; joule_threshold: number; color_hex: string }[];
       };
     };
     Enums: { [_ in never]: never };

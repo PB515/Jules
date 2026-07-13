@@ -1,8 +1,14 @@
 /**
  * UI sound effects. Mobile browsers block audio until a real user gesture
- * unlocks it, and the actual files may not exist yet (the club supplies real
- * recordings separately) — every call here is fire-and-forget, so a missing
- * file or a blocked autoplay never throws or surfaces to the user.
+ * unlocks it — every call here is fire-and-forget, so a blocked autoplay
+ * never throws or surfaces to the user.
+ *
+ * The 6 files in public/sounds/*.wav are synthesized placeholder tones
+ * (plain sine-wave beeps/chimes, generated with a script — no audio-gen
+ * tool or ffmpeg was available in this session), standing in until the
+ * club supplies real recordings. WAV, not MP3, since there was no encoder
+ * available to produce a real MP3 — swap the extension back once real
+ * files land, if they come as MP3s.
  */
 export type SoundName = 'tick' | 'correct' | 'incorrect' | 'drumroll' | 'winner' | 'tier-up';
 
@@ -12,7 +18,7 @@ let primed = false;
 function getAudio(name: SoundName): HTMLAudioElement {
   let audio = cache.get(name);
   if (!audio) {
-    audio = new Audio(`/sounds/${name}.mp3`);
+    audio = new Audio(`/sounds/${name}.wav`);
     cache.set(name, audio);
   }
   return audio;

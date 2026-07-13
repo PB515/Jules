@@ -33,6 +33,11 @@
   --tier-current-text: #FFC72C; --tier-current-border: #E34234; --tier-current-bg: #1a1210;
   --tier-plasma-text: #FFC72C;  --tier-plasma-border: #FFC72C;  --tier-plasma-bg: #241a05;
 
+  /* — Cosmetic rarity (avatar system, decision 44) — stays in the warm/
+     organic family rather than introducing an unrelated ramp — */
+  --cosmetic-rare: #C98A3E;   /* amber-dust */
+  --cosmetic-epic: #2E8B7A;  /* deep verdant-teal */
+
   /* — Typography — system sans, two weights only (400/500), no bold — */
   --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -73,6 +78,8 @@
   --color-tier-plasma-text: var(--tier-plasma-text);
   --color-tier-plasma-border: var(--tier-plasma-border);
   --color-tier-plasma-bg: var(--tier-plasma-bg);
+  --color-cosmetic-rare: var(--cosmetic-rare);
+  --color-cosmetic-epic: var(--cosmetic-epic);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
