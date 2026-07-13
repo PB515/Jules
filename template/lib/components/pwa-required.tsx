@@ -12,9 +12,9 @@ export function PwaRequired() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-12 text-center">
       <Smartphone className="size-10 text-gold" aria-hidden />
       <div>
-        <h1 className="text-lg font-medium">Jules is built for your phone</h1>
+        <h1 className="text-lg font-medium">Synergy is built for your phone</h1>
         <p className="mt-2 max-w-sm text-sm text-muted">
-          To keep quizzes fair and focused, one device, nothing else open, the student side of Jules
+          To keep quizzes fair and focused, one device, nothing else open, the student side of Synergy
           only runs as an installed app on your phone, not in a laptop browser.
         </p>
       </div>

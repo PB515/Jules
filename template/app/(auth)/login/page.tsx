@@ -67,7 +67,7 @@ function LoginForm() {
             Lost connection?
           </Link>
           <p>
-            New to Jules?{' '}
+            New to Synergy?{' '}
             <Link href="/signup" className="text-gold">
               Connect now
             </Link>

@@ -35,7 +35,7 @@ export function InstallButton() {
       className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
     >
       <Download className="size-4" aria-hidden />
-      Install Jules
+      Install Synergy
     </button>
   );
 }

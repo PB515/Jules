@@ -1,25 +1,39 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   DESIGN TOKENS. Project Jules, "solar blue". Frozen per docs/project-spec.md §3.
+   DESIGN TOKENS. Synergy platform (rebrand from single-club "Jules").
+   Palette direction "A" — inspired by Adani Group's real official brand
+   colors (Honolulu Blue #0B74B0, X11 Maroon #BD3861, Persia/lavender
+   #75479C — see docs/prompts or CLAUDE.md for the sourcing), since the
+   platform now sits inside, and should visually belong to, Adani
+   University. Variable NAMES are kept exactly as before (--gold, --accent,
+   etc.) even though the hues they carry have changed — every component in
+   the codebase already reads these by name (the project's own "tokens
+   only" convention), so this is a value swap, not a rearchitecture.
    Do not hardcode hex anywhere else, read from these tokens only.
    ============================================================================ */
 
 :root {
-  /* — Backgrounds — */
-  --bezel: #0f1620;        /* phone frame / device chrome */
-  --background: #070b12;   /* main dark canvas */
-  --card: #0d1620;         /* rows, cards, inputs */
+  /* — Backgrounds — dark navy family off Honolulu Blue's hue — */
+  --bezel: #091a26;        /* phone frame / device chrome */
+  --background: #071620;   /* main dark canvas */
+  --card: #0d2436;         /* rows, cards, inputs */
 
   /* — Borders — */
-  --border: #1c2836;       /* hairlines, input borders */
-  --border-muted: #2b2745; /* onboarding-style inputs */
+  --border: #1c3446;       /* hairlines, input borders */
+  --border-muted: #2b3a52; /* onboarding-style inputs */
 
   /* — Accents — */
-  --accent: #E34234;              /* kumkum/vermilion — emphasis, locked, incorrect */
-  --accent-foreground: #eef4fb;
-  --gold: #FFC72C;                /* neon gold — energy values, correct, CTAs */
-  --gold-foreground: #070b12;
+  /* --gold is the primary brand/CTA accent — now Adani's X11 Maroon,
+     not literal gold. Kept the variable name to avoid a codebase-wide
+     rename of every bg-gold/text-gold usage. */
+  --gold: #BD3861;                /* X11 Maroon — energy values, correct, CTAs */
+  --gold-foreground: #fdf1f4;
+  /* --accent is the danger/incorrect/locked meaning — deliberately a
+     distinct hue (warm orange-red) from the maroon above, so "wrong
+     answer" and "brand identity" never visually collide. */
+  --accent: #E0521F;
+  --accent-foreground: #fff6f0;
   --success: #3ba26b;
 
   /* — Text — */
@@ -29,14 +43,9 @@
 
   /* — Tier colors — */
   --tier-ember-text: #d99a4e;   --tier-ember-border: #4a3018;   --tier-ember-bg: #1c140a;
-  --tier-volt-text: #FFC72C;    --tier-volt-border: #6b4a10;    --tier-volt-bg: #1c1608;
-  --tier-current-text: #FFC72C; --tier-current-border: #E34234; --tier-current-bg: #1a1210;
-  --tier-plasma-text: #FFC72C;  --tier-plasma-border: #FFC72C;  --tier-plasma-bg: #241a05;
-
-  /* — Cosmetic rarity (avatar system, decision 44) — stays in the warm/
-     organic family rather than introducing an unrelated ramp — */
-  --cosmetic-rare: #C98A3E;   /* amber-dust */
-  --cosmetic-epic: #2E8B7A;  /* deep verdant-teal */
+  --tier-volt-text: #BD3861;    --tier-volt-border: #5c1a2c;    --tier-volt-bg: #200a11;
+  --tier-current-text: #BD3861; --tier-current-border: #E0521F; --tier-current-bg: #1f0d08;
+  --tier-plasma-text: #BD3861;  --tier-plasma-border: #BD3861;  --tier-plasma-bg: #2a0f18;
 
   /* — Typography — system sans, two weights only (400/500), no bold — */
   --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -78,8 +87,6 @@
   --color-tier-plasma-text: var(--tier-plasma-text);
   --color-tier-plasma-border: var(--tier-plasma-border);
   --color-tier-plasma-bg: var(--tier-plasma-bg);
-  --color-cosmetic-rare: var(--cosmetic-rare);
-  --color-cosmetic-epic: var(--cosmetic-epic);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }

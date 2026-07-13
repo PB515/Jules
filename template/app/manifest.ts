@@ -13,8 +13,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: site.description,
     start_url: '/dashboard',
     display: 'standalone',
-    background_color: '#070b12',
-    theme_color: '#070b12',
+    background_color: '#071620',
+    theme_color: '#071620',
     // TBD: swap for real 192/512/maskable PNGs before launch (docs 06b). SVG
     // placeholder works as an installable icon in Chromium/Android today.
     icons: [

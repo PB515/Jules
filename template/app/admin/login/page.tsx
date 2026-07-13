@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
     <main className="flex flex-1 items-center justify-center bg-background px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">Jules</div>
+          <div className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">Synergy</div>
           <h1 className="text-lg font-medium">Reactor Command Center</h1>
         </div>
         <form action={formAction} className="flex flex-col gap-4">

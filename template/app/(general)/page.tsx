@@ -53,11 +53,12 @@ export default async function GeneralHomePage() {
       <section>
         <h2 className="mb-2 text-lg font-medium">The idea</h2>
         <p className="max-w-3xl text-sm leading-relaxed text-muted">
-          Jules bridges the Joule, the SI unit of energy, with Shakti, the primordial energy that the
+          Synergy bridges the Joule, the SI unit of energy, with Shakti, the primordial energy that the
           Vishwambhari Stuti describes as present in every atom of the universe. Every meeting, expert
-          session, volunteer task, and live quiz is a spark of that energy. Members are atoms of the
-          club, generating Joules through engagement, climbing through standing energy states (Ember,
-          Volt, Current, Plasma), and building a permanent record of participation in Catalyst Records.
+          session, volunteer task, and live quiz across every club is a spark of that energy. Members are
+          atoms of the program, generating Joules through engagement, climbing through standing energy
+          states (Ember, Volt, Current, Plasma), and building one shared permanent record of participation
+          in Catalyst Records, a single points system shared across every club, not one per club.
         </p>
       </section>
 

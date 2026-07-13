@@ -8,25 +8,30 @@ export interface ActionResult {
   error?: string;
 }
 
-export async function createAfterglowPostAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function createEventReportAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin(['owner', 'officer']);
   const title = String(formData.get('title') ?? '').trim();
-  const body = String(formData.get('body') ?? '').trim();
+  const summary = String(formData.get('summary') ?? '').trim();
   const eventId = String(formData.get('event_id') ?? '');
-  if (!title || !body || !eventId) return { error: 'Fill in the event, title, and write-up.' };
+  const highlights = formData
+    .getAll('highlights')
+    .map((h) => String(h).trim())
+    .filter(Boolean);
+  if (!title || !summary || !eventId) return { error: 'Fill in the event, title, and summary.' };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { error } = await supabase.from('afterglow_posts').insert({
+  const { error } = await supabase.from('event_reports').insert({
     title,
-    body,
+    summary,
+    highlights,
     event_id: eventId,
     uploaded_by: user?.id,
   });
   if (error) return { error: error.message };
 
-  redirect('/admin/afterglow');
+  redirect('/admin/event-reports');
 }

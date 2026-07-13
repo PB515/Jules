@@ -10,9 +10,9 @@ export default function GetAppPage() {
     <div className="mx-auto flex max-w-md flex-col items-center gap-8 py-6 text-center">
       <Smartphone className="size-10 text-gold" aria-hidden />
       <div>
-        <h1 className="text-2xl font-medium">Get Jules on your phone</h1>
+        <h1 className="text-2xl font-medium">Get Synergy on your phone</h1>
         <p className="mt-2 text-sm text-muted">
-          The student side of Jules, your Grid, QR check-ins, Surges, and Live Round, only runs as an
+          The student side of Synergy, your Grid, QR check-ins, Surges, and Live Round, only runs as an
           installed app on your phone. This keeps quizzes fair and focused, one device, nothing else
           open.
         </p>

@@ -9,7 +9,7 @@ const PUBLIC_PATHS = [
   '/admin/login',
   '/events',
   '/get-app',
-  '/afterglow',
+  '/event-reports',
   '/gallery',
   '/mobile-required',
 ];

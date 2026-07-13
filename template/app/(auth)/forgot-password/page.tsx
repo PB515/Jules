@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
 
         {sent ? (
           <p className="rounded-[var(--radius)] border border-success/40 bg-card p-3 text-sm text-success">
-            If that email is connected to Jules, a reset link is on its way.
+            If that email is connected to Synergy, a reset link is on its way.
           </p>
         ) : (
           <form action={formAction} className="flex flex-col gap-4">

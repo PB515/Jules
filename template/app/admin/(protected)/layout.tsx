@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex min-h-screen flex-1 bg-background">
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card sm:flex">
         <div className="border-b border-border px-5 py-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted">Jules</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted">Synergy</p>
           <p className="text-sm font-medium">Reactor Command Center</p>
         </div>
         <AdminNav role={admin.role} />

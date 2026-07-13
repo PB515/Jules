@@ -19,7 +19,7 @@ const NAV = [
   { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['owner', 'officer'] },
   { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['owner', 'officer'] },
   { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['owner', 'officer'] },
-  { href: '/admin/afterglow', label: 'Afterglow', icon: BookOpen, roles: ['owner', 'officer'] },
+  { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['owner', 'officer'] },
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['owner', 'officer'] },
   { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['owner'] },
   { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['owner'] },

@@ -14,7 +14,7 @@ import { Menu, X } from '@/lib/icons';
 const NAV = [
   { href: '/', label: 'Home' },
   { href: '/events', label: 'Events' },
-  { href: '/afterglow', label: 'Afterglow' },
+  { href: '/event-reports', label: 'Event Reports' },
   { href: '/gallery', label: 'Gallery' },
 ] as const;
 
