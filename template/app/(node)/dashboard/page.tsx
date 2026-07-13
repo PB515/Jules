@@ -6,8 +6,9 @@ import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
 import { PowerGrid } from '@/lib/components/power-grid';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
-import { ScanLine, Clock } from '@/lib/icons';
+import { ScanLine, Clock, Calendar, CircleCheck, CircleX } from '@/lib/icons';
 import Link from 'next/link';
+import { RegisterButton, CancelRegistrationButton } from './registration-client';
 import type { Tier } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Grid' };
@@ -21,11 +22,33 @@ interface ActivityRow {
   surges: { name: string } | null;
 }
 
+interface EventRow {
+  id: string;
+  name: string;
+  event_date: string;
+  end_date: string | null;
+}
+
+interface RegistrationRow {
+  id: string;
+  event_id: string;
+  registered_at: string;
+  attended_at: string | null;
+  events: { name: string; event_date: string; end_date: string | null } | null;
+}
+
 export default async function DashboardPage() {
   const student = await requireStudent();
   const supabase = await createClient();
 
-  const [{ data: totalsRows }, { data: activity }, { data: season }, { data: firstTransaction }] = await Promise.all([
+  const [
+    { data: totalsRows },
+    { data: activity },
+    { data: season },
+    { data: firstTransaction },
+    { data: candidateEvents },
+    { data: registrations },
+  ] = await Promise.all([
     supabase.rpc('my_totals'),
     supabase
       .from('joule_transactions')
@@ -44,19 +67,38 @@ export default async function DashboardPage() {
       .order('created_at', { ascending: true })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('events')
+      .select('id, name, event_date, end_date')
+      .neq('type', 'surge')
+      .order('event_date', { ascending: false })
+      .limit(30)
+      .returns<EventRow[]>(),
+    supabase
+      .from('event_registrations')
+      .select('id, event_id, registered_at, attended_at, events(name, event_date, end_date)')
+      .eq('student_id', student.id)
+      .order('registered_at', { ascending: false })
+      .returns<RegistrationRow[]>(),
   ]);
 
   const totals = totalsRows?.[0] ?? {
     season_joules: 0,
     lifetime_joules: 0,
     tier: 'ember' as Tier,
-    streak_days: 0,
+    streak: 0,
     status: 'active' as const,
   };
 
   const progress = tierProgress(totals.season_joules);
   const nextAt = nextTierAt(totals.season_joules);
   const litCount = activity?.length ?? 0;
+
+  const registeredEventIds = new Set((registrations ?? []).map((r) => r.event_id));
+  const upcomingEvents = (candidateEvents ?? [])
+    .filter((e) => !hasConcluded(e.end_date ?? e.event_date))
+    .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
+    .slice(0, 6);
 
   const daysLeft = season ? daysUntil(season.end_date) : null;
 
@@ -114,6 +156,64 @@ export default async function DashboardPage() {
       </Link>
 
       <section>
+        <h2 className="mb-2 text-sm font-medium text-muted">Upcoming events</h2>
+        {upcomingEvents.length === 0 ? (
+          <EmptyState icon={Calendar} title="Nothing on the calendar yet" />
+        ) : (
+          <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+            {upcomingEvents.map((e) => {
+              const registered = registeredEventIds.has(e.id);
+              return (
+                <li key={e.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate">{e.name}</p>
+                    <p className="text-xs text-tertiary">{new Date(e.event_date).toLocaleString()}</p>
+                  </div>
+                  {registered ? (
+                    <CancelRegistrationButton eventId={e.id} />
+                  ) : (
+                    <RegisterButton eventId={e.id} />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-sm font-medium text-muted">My registered events</h2>
+        {!registrations || registrations.length === 0 ? (
+          <EmptyState icon={Calendar} title="No registrations yet" message="Register for an upcoming event above." />
+        ) : (
+          <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+            {registrations.map((r) => {
+              const concluded = r.events ? hasConcluded(r.events.end_date ?? r.events.event_date) : false;
+              const status = r.attended_at
+                ? { label: 'Attended', icon: CircleCheck, className: 'text-success' }
+                : concluded
+                  ? { label: 'Missed', icon: CircleX, className: 'text-accent' }
+                  : { label: 'Registered', icon: Clock, className: 'text-muted' };
+              return (
+                <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate">{r.events?.name ?? 'Event'}</p>
+                    <p className="text-xs text-tertiary">
+                      {r.events ? new Date(r.events.event_date).toLocaleString() : ''}
+                    </p>
+                  </div>
+                  <span className={`flex shrink-0 items-center gap-1 text-xs font-medium ${status.className}`}>
+                    <status.icon className="size-3.5" aria-hidden />
+                    {status.label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section>
         <h2 className="mb-2 text-sm font-medium text-muted">Recent activity</h2>
         {!activity || activity.length === 0 ? (
           <EmptyState
@@ -159,4 +259,8 @@ function activityLabel(type: string): string {
 // the component body so it isn't flagged by the render-purity lint rule.
 function daysUntil(isoDate: string): number {
   return Math.max(0, Math.ceil((new Date(isoDate).getTime() - Date.now()) / 86_400_000));
+}
+
+function hasConcluded(isoDate: string): boolean {
+  return new Date(isoDate).getTime() < Date.now();
 }

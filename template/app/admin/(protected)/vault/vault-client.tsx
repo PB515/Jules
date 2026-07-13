@@ -16,7 +16,7 @@ interface StudentRow {
   college_email: string;
   phone: string | null;
   status: StudentStatus;
-  streak_days: number;
+  streak: number;
   season_joules: number;
   lifetime_joules: number;
   tier: Tier;
@@ -118,7 +118,7 @@ function StudentDetail({ student }: { student: StudentRow }) {
         <p>Email: {student.college_email}</p>
         <p>Phone: {student.phone ?? 'n/a'}</p>
         <p>Lifetime Joules: {student.lifetime_joules}</p>
-        <p>Streak: {student.streak_days} days</p>
+        <p>Streak: {student.streak} events</p>
       </div>
 
       {error ? <p className="text-accent">{error}</p> : null}

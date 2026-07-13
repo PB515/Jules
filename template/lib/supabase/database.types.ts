@@ -43,13 +43,11 @@ export interface Database {
       students: {
         Row: {
           id: string; name: string; college_email: string; phone: string | null;
-          status: StudentStatus; streak_days: number; last_active_date: string | null;
-          created_at: string;
+          status: StudentStatus; created_at: string;
         };
         Insert: {
           id: string; name: string; college_email: string; phone?: string | null;
-          status?: StudentStatus; streak_days?: number; last_active_date?: string | null;
-          created_at?: string;
+          status?: StudentStatus; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['students']['Insert']>;
         Relationships: [];
@@ -214,16 +212,27 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['gallery_images']['Insert']>;
         Relationships: [];
       };
+      event_registrations: {
+        Row: { id: string; event_id: string; student_id: string; registered_at: string; attended_at: string | null };
+        Insert: never; // only via register_for_event()
+        Update: never; // attended_at is only ever set by redeem_event_scan()
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
       keepalive: { Args: Record<string, never>; Returns: string };
       my_totals: {
         Args: Record<string, never>;
-        Returns: { season_joules: number; lifetime_joules: number; tier: Tier; streak_days: number; status: StudentStatus }[];
+        Returns: { season_joules: number; lifetime_joules: number; tier: Tier; streak: number; status: StudentStatus }[];
       };
       is_email_domain_allowed: { Args: { p_email: string }; Returns: boolean };
       complete_onboarding: { Args: { p_name: string; p_phone: string }; Returns: Database['public']['Tables']['students']['Row'] };
+      register_for_event: {
+        Args: { p_event_id: string };
+        Returns: Database['public']['Tables']['event_registrations']['Row'];
+      };
+      unregister_from_event: { Args: { p_event_id: string }; Returns: undefined };
       current_qr_token: { Args: { p_event_id: string }; Returns: { token: string; expires_at: string }[] };
       event_scan_metrics: { Args: { p_event_id: string }; Returns: { students_scanned: number; joules_distributed: number }[] };
       event_recent_scans: {
@@ -268,7 +277,7 @@ export interface Database {
         Args: Record<string, never>;
         Returns: {
           id: string; name: string; college_email: string; phone: string | null; status: StudentStatus;
-          streak_days: number; season_joules: number; lifetime_joules: number; tier: Tier;
+          streak: number; season_joules: number; lifetime_joules: number; tier: Tier;
         }[];
       };
       admin_adjust_joules: { Args: { p_student_id: string; p_amount: number; p_reason: string }; Returns: undefined };
