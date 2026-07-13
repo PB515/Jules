@@ -19,7 +19,7 @@ export type AdminRole = 'professor' | 'committee_member';
 export type EventType = 'standard_meeting' | 'expert_session' | 'volunteer_task' | 'surge';
 export type SurgeStatus = 'draft' | 'live' | 'complete';
 export type SeasonCadence = 'semester' | 'trimester' | 'annual' | 'custom';
-export type TransactionType = 'event_scan' | 'surge_correct_answer' | 'admin_manual_adjustment';
+export type TransactionType = 'event_scan' | 'surge_earned' | 'surge_participation' | 'admin_manual_adjustment';
 export type AuditAction = 'force_reset' | 'manual_joule_adjustment' | 'csv_import' | 'role_change';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
@@ -102,16 +102,30 @@ export interface Database {
         Row: {
           id: string; event_id: string | null; name: string; season_id: string | null; club_id: string;
           status: SurgeStatus; points_per_question: number;
+          participation_points_per_question: number; negative_points_per_wrong_answer: number;
           starts_at: string | null; ends_at: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
           id?: string; event_id?: string | null; name: string; season_id?: string | null; club_id: string;
           status?: SurgeStatus; points_per_question?: number;
+          participation_points_per_question?: number; negative_points_per_wrong_answer?: number;
           starts_at?: string | null; ends_at?: string | null;
           created_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['surges']['Insert']>;
+        Relationships: [];
+      };
+      quiz_groups: {
+        Row: { id: string; surge_id: string; name: string; created_by: string; created_at: string };
+        Insert: never; // only via create_quiz_group()
+        Update: never;
+        Relationships: [];
+      };
+      quiz_group_members: {
+        Row: { group_id: string; surge_id: string; student_id: string; joined_at: string };
+        Insert: never; // only via join_quiz_group()
+        Update: never;
         Relationships: [];
       };
       questions: {
@@ -254,6 +268,23 @@ export interface Database {
         Args: { p_question_id: string; p_selected_option: string; p_response_time_ms?: number | null };
         Returns: { correct: boolean; correct_option: SurgeOption; awarded: number }[];
       };
+      create_quiz_group: {
+        Args: { p_surge_id: string; p_name: string };
+        Returns: Database['public']['Tables']['quiz_groups']['Row'];
+      };
+      join_quiz_group: {
+        Args: { p_group_id: string };
+        Returns: Database['public']['Tables']['quiz_group_members']['Row'];
+      };
+      leave_quiz_group: { Args: { p_group_id: string }; Returns: undefined };
+      surge_answer_points: {
+        Args: {
+          p_correct: boolean; p_base_points: number; p_negative_points: number;
+          p_response_time_ms: number | null; p_time_limit_seconds: number;
+        };
+        Returns: number;
+      };
+      complete_surge: { Args: { p_surge_id: string }; Returns: undefined };
       surge_leaderboard: {
         Args: { p_surge_id: string };
         Returns: {

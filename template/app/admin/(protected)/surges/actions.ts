@@ -16,6 +16,8 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
   const name = String(formData.get('name') ?? '').trim();
   const clubId = String(formData.get('club_id') ?? '');
   const points = parseInt(String(formData.get('points_per_question') ?? '20'), 10);
+  const participationPoints = parseInt(String(formData.get('participation_points_per_question') ?? '5'), 10);
+  const negativePoints = parseInt(String(formData.get('negative_points_per_wrong_answer') ?? '0'), 10);
   if (!name) return { error: 'Name is required.' };
   if (!clubId) return { error: 'Pick the club this Surge belongs to.' };
 
@@ -37,6 +39,8 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
       name,
       club_id: clubId,
       points_per_question: Number.isFinite(points) && points > 0 ? points : 20,
+      participation_points_per_question: Number.isFinite(participationPoints) && participationPoints >= 0 ? participationPoints : 5,
+      negative_points_per_wrong_answer: Number.isFinite(negativePoints) && negativePoints >= 0 ? negativePoints : 0,
       season_id: activeSeason?.id ?? null,
       created_by: user?.id,
     })
@@ -50,8 +54,16 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
 export async function setSurgeStatusAction(surgeId: string, status: 'draft' | 'live' | 'complete') {
   await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
-  const { error } = await supabase.from('surges').update({ status }).eq('id', surgeId);
-  if (error) throw new Error(error.message);
+  // Marking a Surge complete finalizes pooled group scoring (decision 49) —
+  // routed through complete_surge() rather than a raw status update, so the
+  // participation/earned pools get computed and credited atomically.
+  if (status === 'complete') {
+    const { error } = await supabase.rpc('complete_surge', { p_surge_id: surgeId });
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from('surges').update({ status }).eq('id', surgeId);
+    if (error) throw new Error(error.message);
+  }
   revalidatePath(`/admin/surges/${surgeId}`);
 }
 

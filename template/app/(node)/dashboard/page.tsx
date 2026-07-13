@@ -231,7 +231,10 @@ export default async function DashboardPage() {
                     <p>{isFirstSpark ? 'Your first spark ⚡' : (row.events?.name ?? row.surges?.name ?? activityLabel(row.type))}</p>
                     <p className="text-xs text-tertiary">{new Date(row.created_at).toLocaleString()}</p>
                   </div>
-                  <span className="font-medium text-gold">+{row.amount} J</span>
+                  <span className={`font-medium ${row.amount >= 0 ? 'text-gold' : 'text-accent'}`}>
+                    {row.amount >= 0 ? '+' : ''}
+                    {row.amount} J
+                  </span>
                 </li>
               );
             })}
@@ -246,8 +249,10 @@ function activityLabel(type: string): string {
   switch (type) {
     case 'event_scan':
       return 'Event check-in';
-    case 'surge_correct_answer':
-      return 'Surge, correct answer';
+    case 'surge_earned':
+      return 'Surge, earned points';
+    case 'surge_participation':
+      return 'Surge, participation';
     case 'admin_manual_adjustment':
       return 'Manual adjustment';
     default:

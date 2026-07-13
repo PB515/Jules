@@ -2,13 +2,14 @@ import { createClient } from '@/lib/supabase/server';
 import { requireStudent } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { SurgeClient } from './surge-client';
+import { GroupRegistrationClient } from './group-registration-client';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Zap } from '@/lib/icons';
 
 export const metadata = { title: 'Surge' };
 
 export default async function SurgePage({ params }: { params: Promise<{ surgeId: string }> }) {
-  await requireStudent();
+  const student = await requireStudent();
   const { surgeId } = await params;
   const supabase = await createClient();
 
@@ -22,9 +23,35 @@ export default async function SurgePage({ params }: { params: Promise<{ surgeId:
   }
   if (surge.status === 'complete') redirect(`/surge/${surgeId}/matrix`);
   if (surge.status === 'draft') {
+    const [{ data: groups }, { data: members }] = await Promise.all([
+      supabase.from('quiz_groups').select('id, name').eq('surge_id', surgeId),
+      supabase
+        .from('quiz_group_members')
+        .select('group_id, student_id, students(name)')
+        .eq('surge_id', surgeId)
+        .returns<{ group_id: string; student_id: string; students: { name: string } | null }[]>(),
+    ]);
+
+    const myMembership = (members ?? []).find((m) => m.student_id === student.id);
+    const myGroup = myMembership
+      ? {
+          id: myMembership.group_id,
+          name: (groups ?? []).find((g) => g.id === myMembership.group_id)?.name ?? '',
+          members: (members ?? [])
+            .filter((m) => m.group_id === myMembership.group_id)
+            .map((m) => m.students?.name ?? '?'),
+        }
+      : null;
+    const openGroups = (groups ?? []).map((g) => ({
+      id: g.id,
+      name: g.name,
+      memberCount: (members ?? []).filter((m) => m.group_id === g.id).length,
+    }));
+
     return (
-      <div className="px-5 pt-8">
+      <div className="flex flex-col gap-6 px-5 pt-8">
         <EmptyState icon={Zap} title="Not live yet" message="This Surge hasn't started. Check back when it goes live." />
+        <GroupRegistrationClient surgeId={surgeId} myGroup={myGroup} openGroups={openGroups} />
       </div>
     );
   }

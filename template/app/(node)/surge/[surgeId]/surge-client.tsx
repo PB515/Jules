@@ -91,7 +91,10 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
         <span>
           Question {index + 1} / {questions.length}
         </span>
-        <span className="text-gold">+{totalAwarded} J so far</span>
+        <span className={totalAwarded >= 0 ? 'text-gold' : 'text-accent'}>
+          {totalAwarded >= 0 ? '+' : ''}
+          {totalAwarded} J so far
+        </span>
       </div>
 
       <EnergyBar key={questionKey} totalSeconds={q.time_limit_seconds} running={phase === 'answering'} onExpire={onExpire} />
@@ -128,8 +131,11 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
       </div>
 
       {phase === 'expired' ? <p className="text-center text-sm text-tertiary">Time&apos;s up</p> : null}
-      {phase === 'revealed' && awarded > 0 ? (
-        <p className="text-center text-sm text-gold">+{awarded} J</p>
+      {phase === 'revealed' && awarded !== 0 ? (
+        <p className={`text-center text-sm ${awarded > 0 ? 'text-gold' : 'text-accent'}`}>
+          {awarded > 0 ? '+' : ''}
+          {awarded} J
+        </p>
       ) : null}
     </div>
   );
