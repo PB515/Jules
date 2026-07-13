@@ -15,14 +15,16 @@ const JOULE_BY_TYPE: Record<string, number> = {
 };
 
 export async function createEventAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
 
   const name = String(formData.get('name') ?? '').trim();
+  const clubId = String(formData.get('club_id') ?? '');
   const type = String(formData.get('type') ?? '');
   const eventDate = String(formData.get('event_date') ?? '');
   const location = String(formData.get('location') ?? '').trim();
 
   if (!name || !type || !eventDate) return { error: 'Fill in name, type, and date.' };
+  if (!clubId) return { error: 'Pick the club this event belongs to.' };
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
 
   const supabase = await createClient();
@@ -34,6 +36,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
     .from('events')
     .insert({
       name,
+      club_id: clubId,
       type: type as 'standard_meeting' | 'expert_session' | 'volunteer_task',
       event_date: new Date(eventDate).toISOString(),
       location: location || null,

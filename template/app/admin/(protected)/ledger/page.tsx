@@ -6,7 +6,7 @@ import { EventTimeline } from './event-timeline';
 export const metadata = { title: 'System Ledger' };
 
 export default async function LedgerPage() {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
 
   const [{ data: monthly }, { data: events }, { data: totals }] = await Promise.all([

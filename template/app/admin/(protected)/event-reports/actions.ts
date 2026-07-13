@@ -9,7 +9,7 @@ export interface ActionResult {
 }
 
 export async function createEventReportAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const title = String(formData.get('title') ?? '').trim();
   const summary = String(formData.get('summary') ?? '').trim();
   const eventId = String(formData.get('event_id') ?? '');

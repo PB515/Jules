@@ -11,22 +11,22 @@ interface Admin {
   email: string;
   role: string;
 }
-interface EventOption {
+interface ClubOption {
   id: string;
   name: string;
 }
 
 const initialState: ActionResult = {};
 
-export function RosterSection({ admins, events }: { admins: Admin[]; events: EventOption[] }) {
+export function RosterSection({ admins, clubs }: { admins: Admin[]; clubs: ClubOption[] }) {
   const [open, setOpen] = useState(false);
-  const [role, setRole] = useState('officer');
+  const [role, setRole] = useState('committee_member');
   const [state, formAction, pending] = useActionState(createAdminAction, initialState);
 
   return (
     <div className="flex flex-col gap-3">
       {admins.length === 0 ? (
-        <EmptyState icon={Users} title="No admins yet" message="Add the first Officer or Volunteer below." />
+        <EmptyState icon={Users} title="No admins yet" message="Add the first Professor or Committee Member below." />
       ) : (
         <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
           {admins.map((a) => (
@@ -35,7 +35,9 @@ export function RosterSection({ admins, events }: { admins: Admin[]; events: Eve
                 <p>{a.name}</p>
                 <p className="text-xs text-tertiary">{a.email}</p>
               </div>
-              <span className="rounded-full border border-border px-2 py-0.5 text-xs capitalize text-muted">{a.role}</span>
+              <span className="rounded-full border border-border px-2 py-0.5 text-xs capitalize text-muted">
+                {a.role.replace('_', ' ')}
+              </span>
             </li>
           ))}
         </ul>
@@ -46,16 +48,15 @@ export function RosterSection({ admins, events }: { admins: Admin[]; events: Eve
           <input name="name" className="input" placeholder="Name" required />
           <input name="email" type="email" className="input" placeholder="admin email" required />
           <select name="role" className="input" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="owner">Owner</option>
-            <option value="officer">Officer</option>
-            <option value="volunteer">Volunteer</option>
+            <option value="professor">Professor</option>
+            <option value="committee_member">Committee Member</option>
           </select>
-          {role === 'volunteer' ? (
-            <select name="volunteer_event_id" className="input" required>
-              <option value="">Scope to event…</option>
-              {events.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name}
+          {role === 'committee_member' ? (
+            <select name="club_id" className="input" required>
+              <option value="">Scope to club…</option>
+              {clubs.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>

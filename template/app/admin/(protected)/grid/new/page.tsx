@@ -1,46 +1,18 @@
-'use client';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/session';
+import { NewEventForm } from './form';
 
-import { useActionState } from 'react';
-import { createEventAction, type ActionResult } from '../actions';
+export default async function NewEventPage() {
+  const admin = await requireAdmin(['professor', 'committee_member']);
+  const supabase = await createClient();
 
-const initialState: ActionResult = {};
+  // Same reasoning as the New Surge form: a Committee Member can only ever
+  // create an event for their own club (decision 45).
+  let query = supabase.from('clubs').select('id, name').order('name');
+  if (admin.role === 'committee_member' && admin.club_id) {
+    query = query.eq('id', admin.club_id);
+  }
+  const { data: clubs } = await query;
 
-export default function NewEventPage() {
-  const [state, formAction, pending] = useActionState(createEventAction, initialState);
-
-  return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-6 text-lg font-medium">New event</h1>
-      <form action={formAction} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Name</span>
-          <input name="name" className="input" required />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Type</span>
-          <select name="type" className="input" required>
-            <option value="standard_meeting">Standard meeting (10 J)</option>
-            <option value="expert_session">Expert session (25 J)</option>
-            <option value="volunteer_task">Volunteer task (50 J)</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Date &amp; time</span>
-          <input name="event_date" type="datetime-local" className="input" required />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Location (optional)</span>
-          <input name="location" className="input" />
-        </label>
-        {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
-        >
-          {pending ? 'Creating…' : 'Create event'}
-        </button>
-      </form>
-    </div>
-  );
+  return <NewEventForm clubs={clubs ?? []} />;
 }

@@ -15,7 +15,7 @@ export type Json =
   | Json[]
 
 export type StudentStatus = 'active' | 'locked';
-export type AdminRole = 'owner' | 'officer' | 'volunteer';
+export type AdminRole = 'professor' | 'committee_member';
 export type EventType = 'standard_meeting' | 'expert_session' | 'volunteer_task' | 'surge';
 export type SurgeStatus = 'draft' | 'live' | 'complete';
 export type SeasonCadence = 'semester' | 'trimester' | 'annual' | 'custom';
@@ -57,13 +57,19 @@ export interface Database {
       admins: {
         Row: {
           id: string; name: string; email: string; role: AdminRole;
-          volunteer_event_id: string | null; created_at: string;
+          club_id: string | null; created_at: string;
         };
         Insert: {
           id: string; name: string; email: string; role: AdminRole;
-          volunteer_event_id?: string | null; created_at?: string;
+          club_id?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['admins']['Insert']>;
+        Relationships: [];
+      };
+      clubs: {
+        Row: { id: string; name: string; slug: string; description: string | null; created_at: string };
+        Insert: { id?: string; name: string; slug: string; description?: string | null; created_at?: string };
+        Update: Partial<Database['public']['Tables']['clubs']['Insert']>;
         Relationships: [];
       };
       seasons: {
@@ -81,13 +87,13 @@ export interface Database {
       events: {
         Row: {
           id: string; name: string; type: EventType; event_date: string; end_date: string | null;
-          location: string | null; joule_value: number | null;
+          location: string | null; joule_value: number | null; club_id: string;
           geofence_lat: number | null; geofence_lng: number | null; geofence_radius_m: number;
           created_by: string | null; created_at: string;
         };
         Insert: {
           id?: string; name: string; type: EventType; event_date: string; end_date?: string | null;
-          location?: string | null; joule_value?: number | null;
+          location?: string | null; joule_value?: number | null; club_id: string;
           geofence_lat?: number | null; geofence_lng?: number | null; geofence_radius_m?: number;
           created_by?: string | null; created_at?: string;
         };
@@ -96,13 +102,13 @@ export interface Database {
       };
       surges: {
         Row: {
-          id: string; event_id: string | null; name: string; season_id: string | null;
+          id: string; event_id: string | null; name: string; season_id: string | null; club_id: string;
           status: SurgeStatus; points_per_question: number;
           starts_at: string | null; ends_at: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
-          id?: string; event_id?: string | null; name: string; season_id?: string | null;
+          id?: string; event_id?: string | null; name: string; season_id?: string | null; club_id: string;
           status?: SurgeStatus; points_per_question?: number;
           starts_at?: string | null; ends_at?: string | null;
           created_by?: string | null; created_at?: string;
@@ -268,10 +274,10 @@ export interface Database {
       admin_adjust_joules: { Args: { p_student_id: string; p_amount: number; p_reason: string }; Returns: undefined };
       admin_set_student_status: { Args: { p_student_id: string; p_status: StudentStatus }; Returns: undefined };
       admin_create_admin: {
-        Args: { p_user_id: string; p_name: string; p_email: string; p_role: AdminRole; p_volunteer_event_id?: string | null };
+        Args: { p_user_id: string; p_name: string; p_email: string; p_role: AdminRole; p_club_id?: string | null };
         Returns: Database['public']['Tables']['admins']['Row'];
       };
-      admin_set_role: { Args: { p_admin_id: string; p_role: AdminRole; p_volunteer_event_id?: string | null }; Returns: undefined };
+      admin_set_role: { Args: { p_admin_id: string; p_role: AdminRole; p_club_id?: string | null }; Returns: undefined };
       log_csv_import: { Args: { p_surge_id: string; p_details: Json }; Returns: undefined };
       host_create_round: { Args: { p_surge_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
       join_live_round: {

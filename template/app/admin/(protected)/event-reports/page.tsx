@@ -7,7 +7,7 @@ import { BookOpen, Plus } from '@/lib/icons';
 export const metadata = { title: 'Event Reports' };
 
 export default async function AdminEventReportsListPage() {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const [{ data: reports }, { data: events }] = await Promise.all([
     supabase.from('event_reports').select('id, title, created_at, event_id').order('created_at', { ascending: false }),

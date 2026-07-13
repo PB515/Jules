@@ -12,10 +12,12 @@ export interface ActionResult {
 }
 
 export async function createSurgeAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const name = String(formData.get('name') ?? '').trim();
+  const clubId = String(formData.get('club_id') ?? '');
   const points = parseInt(String(formData.get('points_per_question') ?? '20'), 10);
   if (!name) return { error: 'Name is required.' };
+  if (!clubId) return { error: 'Pick the club this Surge belongs to.' };
 
   const supabase = await createClient();
   const {
@@ -33,6 +35,7 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
     .from('surges')
     .insert({
       name,
+      club_id: clubId,
       points_per_question: Number.isFinite(points) && points > 0 ? points : 20,
       season_id: activeSeason?.id ?? null,
       created_by: user?.id,
@@ -45,7 +48,7 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function setSurgeStatusAction(surgeId: string, status: 'draft' | 'live' | 'complete') {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { error } = await supabase.from('surges').update({ status }).eq('id', surgeId);
   if (error) throw new Error(error.message);
@@ -66,7 +69,7 @@ export async function addQuestionAction(
     order_index: number;
   }
 ) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').insert({ surge_id: surgeId, ...q });
   if (error) throw new Error(error.message);
@@ -74,7 +77,7 @@ export async function addQuestionAction(
 }
 
 export async function updateQuestionAction(questionId: string, surgeId: string, patch: TablesUpdate<'questions'>) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').update(patch).eq('id', questionId);
   if (error) throw new Error(error.message);
@@ -82,7 +85,7 @@ export async function updateQuestionAction(questionId: string, surgeId: string, 
 }
 
 export async function deleteQuestionAction(questionId: string, surgeId: string) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').delete().eq('id', questionId);
   if (error) throw new Error(error.message);
@@ -90,7 +93,7 @@ export async function deleteQuestionAction(questionId: string, surgeId: string) 
 }
 
 export async function importQuestionsAction(surgeId: string, rows: ParsedRow[]) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
 
   const clean = rows.filter((r) => r.errors.length === 0);

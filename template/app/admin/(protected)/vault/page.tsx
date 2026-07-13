@@ -5,7 +5,7 @@ import { VaultClient } from './vault-client';
 export const metadata = { title: 'Student Data Vault' };
 
 export default async function VaultPage() {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   const supabase = await createClient();
   const { data: students } = await supabase.rpc('admin_student_totals');
 

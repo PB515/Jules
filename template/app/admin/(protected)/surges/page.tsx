@@ -13,12 +13,14 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export default async function SurgesListPage() {
-  await requireAdmin(['owner', 'officer']);
+  const admin = await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
-  const { data: surges } = await supabase
-    .from('surges')
-    .select('id, name, status, created_at')
-    .order('created_at', { ascending: false });
+  // A Committee Member only sees their own club's Surges; a Professor sees every club's.
+  let query = supabase.from('surges').select('id, name, status, created_at').order('created_at', { ascending: false });
+  if (admin.role === 'committee_member' && admin.club_id) {
+    query = query.eq('club_id', admin.club_id);
+  }
+  const { data: surges } = await query;
 
   return (
     <div className="mx-auto max-w-2xl p-6">

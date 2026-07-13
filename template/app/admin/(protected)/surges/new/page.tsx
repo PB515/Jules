@@ -1,34 +1,19 @@
-'use client';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/session';
+import { NewSurgeForm } from './form';
 
-import { useActionState } from 'react';
-import { createSurgeAction, type ActionResult } from '../actions';
+export default async function NewSurgePage() {
+  const admin = await requireAdmin(['professor', 'committee_member']);
+  const supabase = await createClient();
 
-const initialState: ActionResult = {};
+  // A Committee Member can only ever create a Surge for their own club — no
+  // point offering a picker with clubs they couldn't actually save against
+  // (the RLS policy would reject it anyway, decision 45).
+  let query = supabase.from('clubs').select('id, name').order('name');
+  if (admin.role === 'committee_member' && admin.club_id) {
+    query = query.eq('id', admin.club_id);
+  }
+  const { data: clubs } = await query;
 
-export default function NewSurgePage() {
-  const [state, formAction, pending] = useActionState(createSurgeAction, initialState);
-
-  return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-6 text-lg font-medium">New Surge</h1>
-      <form action={formAction} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Name</span>
-          <input name="name" className="input" placeholder="Winter Surge 2026" required />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Joules per correct answer</span>
-          <input name="points_per_question" type="number" min={1} defaultValue={20} className="input" />
-        </label>
-        {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
-        >
-          {pending ? 'Creating…' : 'Create Surge'}
-        </button>
-      </form>
-    </div>
-  );
+  return <NewSurgeForm clubs={clubs ?? []} />;
 }

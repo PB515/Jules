@@ -15,14 +15,14 @@ import Link from 'next/link';
 import { ScanLine, Zap, BarChart3, Users, Settings, MonitorPlay, BookOpen, ImageIcon } from '@/lib/icons';
 
 const NAV = [
-  { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['owner', 'officer', 'volunteer'] },
-  { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['owner', 'officer'] },
-  { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['owner', 'officer'] },
-  { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['owner', 'officer'] },
-  { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['owner', 'officer'] },
-  { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['owner', 'officer'] },
-  { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['owner'] },
-  { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['owner'] },
+  { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member'] },
+  { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['professor', 'committee_member'] },
+  { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['professor', 'committee_member'] },
+  { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['professor', 'committee_member'] },
+  { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['professor', 'committee_member'] },
+  { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member'] },
+  { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['professor'] },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['professor'] },
 ] as const;
 
 export function AdminNav({ role }: { role: string }) {

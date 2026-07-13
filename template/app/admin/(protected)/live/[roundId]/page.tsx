@@ -6,7 +6,7 @@ import { HostClient } from './host-client';
 export const metadata = { title: 'Live Round' };
 
 export default async function LiveRoundHostPage({ params }: { params: Promise<{ roundId: string }> }) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const { roundId } = await params;
   const supabase = await createClient();
 

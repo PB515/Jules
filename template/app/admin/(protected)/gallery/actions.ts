@@ -9,7 +9,7 @@ export interface ActionResult {
 }
 
 export async function uploadGalleryImageAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const file = formData.get('file');
   const caption = String(formData.get('caption') ?? '').trim();
   if (!(file instanceof File) || file.size === 0) return { error: 'Choose a photo to upload.' };

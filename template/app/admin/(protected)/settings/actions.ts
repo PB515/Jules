@@ -13,7 +13,7 @@ export interface ActionResult {
 }
 
 export async function updateAllowedDomainsAction(domains: string[]): Promise<ActionResult> {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   const cleaned = domains.map((d) => d.trim().toLowerCase()).filter(Boolean);
   if (cleaned.length === 0) return { error: 'At least one domain is required.' };
 
@@ -25,7 +25,7 @@ export async function updateAllowedDomainsAction(domains: string[]): Promise<Act
 }
 
 export async function createSeasonAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   const label = String(formData.get('label') ?? '').trim();
   const startDate = String(formData.get('start_date') ?? '');
   const endDate = String(formData.get('end_date') ?? '');
@@ -49,18 +49,18 @@ export async function createSeasonAction(_prev: ActionResult, formData: FormData
 /**
  * Creates a new admin: an auth user via the service-role Admin API (roster
  * signup isn't self-serve — spec has no admin-signup flow), then the admins
- * roster row via the owner-gated, audit-logged RPC.
+ * roster row via the Professor-gated, audit-logged RPC.
  */
 export async function createAdminAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const role = String(formData.get('role') ?? '') as AdminRole;
-  const volunteerEventId = String(formData.get('volunteer_event_id') ?? '') || null;
+  const clubId = String(formData.get('club_id') ?? '') || null;
 
   if (!name || !email || !role) return { error: 'Fill in name, email, and role.' };
-  if (!['owner', 'officer', 'volunteer'].includes(role)) return { error: 'Invalid role.' };
-  if (role === 'volunteer' && !volunteerEventId) return { error: 'Pick the event this volunteer is scoped to.' };
+  if (!['professor', 'committee_member'].includes(role)) return { error: 'Invalid role.' };
+  if (role === 'committee_member' && !clubId) return { error: 'Pick the club this Committee Member belongs to.' };
 
   const service = createServiceRoleClient();
   const tempPassword = randomBytes(9).toString('base64url');
@@ -77,7 +77,7 @@ export async function createAdminAction(_prev: ActionResult, formData: FormData)
     p_name: name,
     p_email: email,
     p_role: role,
-    p_volunteer_event_id: volunteerEventId,
+    p_club_id: role === 'committee_member' ? clubId : null,
   });
   if (rpcErr) return { error: rpcErr.message };
 
@@ -85,14 +85,31 @@ export async function createAdminAction(_prev: ActionResult, formData: FormData)
   return { tempPassword };
 }
 
-export async function setAdminRoleAction(adminId: string, role: AdminRole, volunteerEventId: string | null) {
-  await requireAdmin(['owner']);
+export async function setAdminRoleAction(adminId: string, role: AdminRole, clubId: string | null) {
+  await requireAdmin(['professor']);
   const supabase = await createClient();
   const { error } = await supabase.rpc('admin_set_role', {
     p_admin_id: adminId,
     p_role: role,
-    p_volunteer_event_id: volunteerEventId,
+    p_club_id: role === 'committee_member' ? clubId : null,
   });
   if (error) throw new Error(error.message);
   revalidatePath('/admin/settings');
+}
+
+export async function createClubAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin(['professor']);
+  const name = String(formData.get('name') ?? '').trim();
+  const slug = String(formData.get('slug') ?? '').trim().toLowerCase();
+  const description = String(formData.get('description') ?? '').trim();
+
+  if (!name || !slug) return { error: 'Fill in a name and slug.' };
+  if (!/^[a-z0-9-]+$/.test(slug)) return { error: 'Slug can only contain lowercase letters, numbers, and hyphens.' };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from('clubs').insert({ name, slug, description: description || null });
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin/settings');
+  return {};
 }

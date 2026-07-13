@@ -17,29 +17,18 @@ export default async function GridStationPage({
   const { event: eventParam } = await searchParams;
   const supabase = await createClient();
 
-  if (admin.role === 'volunteer') {
-    if (!admin.volunteer_event_id) {
-      return (
-        <div className="p-6">
-          <EmptyState icon={ScanLine} title="No event assigned" message="Ask an Officer or Owner to scope you to an event." />
-        </div>
-      );
-    }
-    const { data: event } = await supabase.from('events').select('*').eq('id', admin.volunteer_event_id).maybeSingle();
-    if (!event) return <div className="p-6"><EmptyState icon={ScanLine} title="Assigned event not found" /></div>;
-    return (
-      <div className="mx-auto max-w-lg p-6">
-        <StationClient eventId={event.id} eventName={event.name} jouleValue={event.joule_value} />
-      </div>
-    );
-  }
-
-  const { data: events } = await supabase
+  // A Committee Member only ever sees their own club's events here; a
+  // Professor sees every club's (club_id is platform-wide, decision 45).
+  let query = supabase
     .from('events')
     .select('id, name, type, event_date, joule_value')
     .neq('type', 'surge')
     .order('event_date', { ascending: false })
     .limit(30);
+  if (admin.role === 'committee_member' && admin.club_id) {
+    query = query.eq('club_id', admin.club_id);
+  }
+  const { data: events } = await query;
 
   if (!events || events.length === 0) {
     return (

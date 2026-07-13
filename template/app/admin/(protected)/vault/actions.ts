@@ -26,7 +26,7 @@ export interface ActionResult {
  * during a security retrospective; this check is the fix.
  */
 export async function forceResetAction(studentId: string): Promise<ActionResult> {
-  const admin = await requireAdmin(['owner']);
+  const admin = await requireAdmin(['professor']);
   const supabase = await createClient();
   const { data: student } = await supabase.from('students').select('id').eq('id', studentId).maybeSingle();
   if (!student) return { error: 'That account is not a student. Force Reset only applies to students.' };
@@ -48,7 +48,7 @@ export async function forceResetAction(studentId: string): Promise<ActionResult>
 }
 
 export async function adjustJoulesAction(studentId: string, amount: number, reason: string): Promise<ActionResult> {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   if (!Number.isFinite(amount) || amount === 0) return { error: 'Enter a non-zero amount.' };
   const supabase = await createClient();
   const { error } = await supabase.rpc('admin_adjust_joules', {
@@ -62,7 +62,7 @@ export async function adjustJoulesAction(studentId: string, amount: number, reas
 }
 
 export async function setStudentStatusAction(studentId: string, status: 'active' | 'locked'): Promise<ActionResult> {
-  await requireAdmin(['owner']);
+  await requireAdmin(['professor']);
   const supabase = await createClient();
   const { error } = await supabase.rpc('admin_set_student_status', { p_student_id: studentId, p_status: status });
   if (error) return { error: error.message };

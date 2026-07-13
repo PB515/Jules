@@ -9,7 +9,7 @@ export interface ActionResult {
 }
 
 export async function createLiveRoundAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const surgeId = String(formData.get('surge_id') ?? '');
   if (!surgeId) return { error: 'Pick a Surge to host.' };
 
@@ -21,7 +21,7 @@ export async function createLiveRoundAction(_prev: ActionResult, formData: FormD
 }
 
 export async function advanceRoundAction(roundId: string) {
-  await requireAdmin(['owner', 'officer']);
+  await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { error } = await supabase.rpc('host_advance_round', { p_round_id: roundId });
   if (error) throw new Error(error.message);
