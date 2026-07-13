@@ -4,13 +4,22 @@ import { NewEventReportForm } from './form';
 
 export const metadata = { title: 'New Event Report' };
 
+interface EventOption {
+  id: string;
+  name: string;
+  event_date: string;
+  location: string | null;
+  clubs: { name: string } | null;
+}
+
 export default async function NewEventReportPage() {
   await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();
   const { data: events } = await supabase
     .from('events')
-    .select('id, name, event_date')
-    .order('event_date', { ascending: false });
+    .select('id, name, event_date, location, clubs(name)')
+    .order('event_date', { ascending: false })
+    .returns<EventOption[]>();
 
   return (
     <div className="mx-auto max-w-lg p-6">

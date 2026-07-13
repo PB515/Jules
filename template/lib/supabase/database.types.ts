@@ -207,11 +207,19 @@ export interface Database {
       };
       event_reports: {
         Row: {
-          id: string; title: string; summary: string; highlights: string[]; event_id: string;
+          id: string; title: string; event_id: string; coordinator_name: string;
+          introduction: string; objectives: string[]; event_highlights: string;
+          outcomes: string[]; conclusion: string;
+          attachment_attendance_list: boolean; attachment_brochure: boolean;
+          attachment_geo_photos: boolean; attachment_media_coverage: boolean;
           uploaded_by: string | null; created_at: string;
         };
         Insert: {
-          id?: string; title: string; summary: string; highlights?: string[]; event_id: string;
+          id?: string; title: string; event_id: string; coordinator_name: string;
+          introduction: string; objectives?: string[]; event_highlights: string;
+          outcomes?: string[]; conclusion: string;
+          attachment_attendance_list?: boolean; attachment_brochure?: boolean;
+          attachment_geo_photos?: boolean; attachment_media_coverage?: boolean;
           uploaded_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['event_reports']['Insert']>;
@@ -342,7 +350,7 @@ export interface Database {
       };
       public_events: {
         Args: Record<string, never>;
-        Returns: { id: string; name: string; type: EventType; event_date: string; location: string | null }[];
+        Returns: { id: string; name: string; type: EventType; event_date: string; location: string | null; club_name: string | null }[];
       };
       public_event_stats: {
         Args: { p_event_id: string };
