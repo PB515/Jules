@@ -27,9 +27,8 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="h-7 w-auto" priority />
-            <span className="text-lg font-medium tracking-tight text-gold">{site.name}</span>
+          <Link href="/" className="text-lg font-medium tracking-tight text-gold">
+            {site.name}
           </Link>
 
           <nav className="hidden items-center gap-5 text-sm text-muted sm:flex">
@@ -91,7 +90,8 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">{children}</main>
 
-      <footer className="border-t border-border bg-card px-6 py-6 text-center text-xs text-tertiary">
+      <footer className="flex flex-col items-center gap-2 border-t border-border bg-card px-6 py-6 text-center text-xs text-tertiary">
+        <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="h-6 w-auto" />
         {site.name}: {site.tagline}
       </footer>
     </div>

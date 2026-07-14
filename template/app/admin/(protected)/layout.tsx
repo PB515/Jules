@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { requireAdmin } from '@/lib/auth/session';
 import { adminLogoutAction } from '@/app/(auth)/actions';
 import { AdminNav } from './admin-nav-client';
@@ -11,7 +10,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex min-h-screen flex-1 bg-background">
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card sm:flex">
         <div className="border-b border-border px-5 py-5">
-          <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="mb-2 h-6 w-auto" priority />
           <p className="text-xs uppercase tracking-[0.2em] text-muted">Synergy</p>
           <p className="text-sm font-medium">Reactor Command Center</p>
         </div>
@@ -29,10 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:hidden">
-          <div className="flex items-center gap-2.5">
-            <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="h-6 w-auto" priority />
-            <p className="text-sm font-medium">Reactor Command Center</p>
-          </div>
+          <p className="text-sm font-medium">Reactor Command Center</p>
           <form action={adminLogoutAction}>
             <button className="text-xs text-muted">Log out</button>
           </form>
