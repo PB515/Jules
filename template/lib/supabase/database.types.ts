@@ -87,12 +87,14 @@ export interface Database {
           id: string; name: string; type: EventType; event_date: string; end_date: string | null;
           location: string | null; joule_value: number | null; club_id: string;
           geofence_lat: number | null; geofence_lng: number | null; geofence_radius_m: number;
+          registration_form_url: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
           id?: string; name: string; type: EventType; event_date: string; end_date?: string | null;
           location?: string | null; joule_value?: number | null; club_id: string;
           geofence_lat?: number | null; geofence_lng?: number | null; geofence_radius_m?: number;
+          registration_form_url?: string | null;
           created_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['events']['Insert']>;
@@ -235,7 +237,10 @@ export interface Database {
         Relationships: [];
       };
       event_registrations: {
-        Row: { id: string; event_id: string; student_id: string; registered_at: string; attended_at: string | null };
+        Row: {
+          id: string; event_id: string; student_id: string; registered_at: string; attended_at: string | null;
+          location_at_registration: string | null;
+        };
         Insert: never; // only via register_for_event()
         Update: never; // attended_at is only ever set by redeem_event_scan()
         Relationships: [];
@@ -350,7 +355,10 @@ export interface Database {
       };
       public_events: {
         Args: Record<string, never>;
-        Returns: { id: string; name: string; type: EventType; event_date: string; location: string | null; club_name: string | null }[];
+        Returns: {
+          id: string; name: string; type: EventType; event_date: string; end_date: string | null;
+          location: string | null; joule_value: number | null; club_name: string | null;
+        }[];
       };
       public_event_stats: {
         Args: { p_event_id: string };

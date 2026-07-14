@@ -60,6 +60,8 @@ export {
   Smartphone,
   Download,
   BookOpen,
+  Pencil,
+  Bell,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';

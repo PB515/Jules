@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { ScanLine, Plus } from '@/lib/icons';
+import { ScanLine, Plus, Pencil } from '@/lib/icons';
 import { StationClient } from './station-client';
 import { EventPicker } from './event-picker';
 
@@ -52,6 +52,13 @@ export default async function GridStationPage({
     <div className="mx-auto flex max-w-lg flex-col gap-4 p-6">
       <div className="flex items-center justify-between gap-3">
         <EventPicker events={events} selected={selected.id} />
+        <Link
+          href={`/admin/grid/${selected.id}/edit`}
+          className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
+        >
+          <Pencil className="size-3.5" aria-hidden />
+          Edit
+        </Link>
         <Link
           href="/admin/grid/new"
           className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"

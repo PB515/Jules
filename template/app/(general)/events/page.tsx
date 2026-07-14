@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Calendar, MapPin } from '@/lib/icons';
@@ -56,21 +57,23 @@ function EventList({
   return (
     <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
       {events.map((e) => (
-        <li key={e.id} className="flex items-center justify-between px-4 py-3.5">
-          <div>
-            <p className="text-sm font-medium">{e.name}</p>
-            <p className="mt-0.5 text-xs text-tertiary">{TYPE_LABEL[e.type] ?? e.type}</p>
-            {e.location ? (
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-tertiary">
-                <MapPin className="size-3" aria-hidden />
-                {e.location}
-              </p>
-            ) : null}
-          </div>
-          <p className="flex items-center gap-1.5 text-xs text-muted">
-            <Calendar className="size-3.5" aria-hidden />
-            {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-          </p>
+        <li key={e.id}>
+          <Link href={`/events/${e.id}`} className="flex items-center justify-between px-4 py-3.5 hover:bg-background">
+            <div>
+              <p className="text-sm font-medium">{e.name}</p>
+              <p className="mt-0.5 text-xs text-tertiary">{TYPE_LABEL[e.type] ?? e.type}</p>
+              {e.location ? (
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-tertiary">
+                  <MapPin className="size-3" aria-hidden />
+                  {e.location}
+                </p>
+              ) : null}
+            </div>
+            <p className="flex items-center gap-1.5 text-xs text-muted">
+              <Calendar className="size-3.5" aria-hidden />
+              {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+            </p>
+          </Link>
         </li>
       ))}
     </ul>

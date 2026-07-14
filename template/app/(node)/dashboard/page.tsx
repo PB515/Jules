@@ -6,9 +6,8 @@ import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
 import { PowerGrid } from '@/lib/components/power-grid';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
-import { ScanLine, Clock, Calendar, CircleCheck, CircleX } from '@/lib/icons';
+import { ScanLine, Clock, Calendar, CircleCheck, CircleX, ChevronRight, Bell } from '@/lib/icons';
 import Link from 'next/link';
-import { RegisterButton, CancelRegistrationButton } from './registration-client';
 import type { Tier } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Grid' };
@@ -34,7 +33,14 @@ interface RegistrationRow {
   event_id: string;
   registered_at: string;
   attended_at: string | null;
-  events: { name: string; event_date: string; end_date: string | null } | null;
+  location_at_registration: string | null;
+  events: { name: string; event_date: string; end_date: string | null; location: string | null } | null;
+}
+
+interface Reminder {
+  key: string;
+  eventId: string;
+  message: string;
 }
 
 export default async function DashboardPage() {
@@ -76,7 +82,7 @@ export default async function DashboardPage() {
       .returns<EventRow[]>(),
     supabase
       .from('event_registrations')
-      .select('id, event_id, registered_at, attended_at, events(name, event_date, end_date)')
+      .select('id, event_id, registered_at, attended_at, location_at_registration, events(name, event_date, end_date, location)')
       .eq('student_id', student.id)
       .order('registered_at', { ascending: false })
       .returns<RegistrationRow[]>(),
@@ -101,6 +107,32 @@ export default async function DashboardPage() {
     .slice(0, 6);
 
   const daysLeft = season ? daysUntil(season.end_date) : null;
+
+  // Computed live, no push/cron infrastructure — only for registrations that
+  // haven't concluded and haven't already been attended.
+  const reminders: Reminder[] = [];
+  for (const r of registrations ?? []) {
+    if (!r.events || r.attended_at) continue;
+    if (hasConcluded(r.events.end_date ?? r.events.event_date)) continue;
+    if (isTomorrowUTC(r.events.event_date)) {
+      reminders.push({
+        key: `${r.id}-tomorrow`,
+        eventId: r.event_id,
+        message: `Tomorrow: ${r.events.name}${r.events.location ? ` at ${r.events.location}` : ''}`,
+      });
+    }
+    if (
+      r.location_at_registration &&
+      r.events.location &&
+      r.location_at_registration !== r.events.location
+    ) {
+      reminders.push({
+        key: `${r.id}-venue-change`,
+        eventId: r.event_id,
+        message: `Venue changed for ${r.events.name}, now at ${r.events.location}`,
+      });
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
@@ -155,6 +187,25 @@ export default async function DashboardPage() {
         Scan event QR
       </Link>
 
+      {reminders.length > 0 ? (
+        <section>
+          <h2 className="mb-2 text-sm font-medium text-muted">Reminders</h2>
+          <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+            {reminders.map((reminder) => (
+              <li key={reminder.key}>
+                <Link
+                  href={`/events/${reminder.eventId}`}
+                  className="flex items-start gap-2.5 px-4 py-3 text-sm hover:bg-background"
+                >
+                  <Bell className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden />
+                  {reminder.message}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section>
         <h2 className="mb-2 text-sm font-medium text-muted">Upcoming events</h2>
         {upcomingEvents.length === 0 ? (
@@ -164,16 +215,17 @@ export default async function DashboardPage() {
             {upcomingEvents.map((e) => {
               const registered = registeredEventIds.has(e.id);
               return (
-                <li key={e.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <div className="min-w-0">
-                    <p className="truncate">{e.name}</p>
-                    <p className="text-xs text-tertiary">{new Date(e.event_date).toLocaleString()}</p>
-                  </div>
-                  {registered ? (
-                    <CancelRegistrationButton eventId={e.id} />
-                  ) : (
-                    <RegisterButton eventId={e.id} />
-                  )}
+                <li key={e.id}>
+                  <Link href={`/events/${e.id}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-background">
+                    <div className="min-w-0">
+                      <p className="truncate">{e.name}</p>
+                      <p className="text-xs text-tertiary">{new Date(e.event_date).toLocaleString()}</p>
+                    </div>
+                    <span className="flex shrink-0 items-center gap-1 text-xs text-muted">
+                      {registered ? 'Registered' : 'View & register'}
+                      <ChevronRight className="size-3.5" aria-hidden />
+                    </span>
+                  </Link>
                 </li>
               );
             })}
@@ -195,17 +247,19 @@ export default async function DashboardPage() {
                   ? { label: 'Missed', icon: CircleX, className: 'text-accent' }
                   : { label: 'Registered', icon: Clock, className: 'text-muted' };
               return (
-                <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <div className="min-w-0">
-                    <p className="truncate">{r.events?.name ?? 'Event'}</p>
-                    <p className="text-xs text-tertiary">
-                      {r.events ? new Date(r.events.event_date).toLocaleString() : ''}
-                    </p>
-                  </div>
-                  <span className={`flex shrink-0 items-center gap-1 text-xs font-medium ${status.className}`}>
-                    <status.icon className="size-3.5" aria-hidden />
-                    {status.label}
-                  </span>
+                <li key={r.id}>
+                  <Link href={`/events/${r.event_id}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-background">
+                    <div className="min-w-0">
+                      <p className="truncate">{r.events?.name ?? 'Event'}</p>
+                      <p className="text-xs text-tertiary">
+                        {r.events ? new Date(r.events.event_date).toLocaleString() : ''}
+                      </p>
+                    </div>
+                    <span className={`flex shrink-0 items-center gap-1 text-xs font-medium ${status.className}`}>
+                      <status.icon className="size-3.5" aria-hidden />
+                      {status.label}
+                    </span>
+                  </Link>
                 </li>
               );
             })}
@@ -268,4 +322,15 @@ function daysUntil(isoDate: string): number {
 
 function hasConcluded(isoDate: string): boolean {
   return new Date(isoDate).getTime() < Date.now();
+}
+
+// UTC day-boundary comparison (not local time) so the reminder doesn't
+// flicker in or out depending on which timezone the server happens to
+// render in — same reasoning as formatDateUTC/formatTimeUTC.
+function isTomorrowUTC(isoDate: string): boolean {
+  const event = new Date(isoDate);
+  const now = new Date();
+  const eventDay = Date.UTC(event.getUTCFullYear(), event.getUTCMonth(), event.getUTCDate());
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return eventDay - today === 86_400_000;
 }

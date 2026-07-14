@@ -43,6 +43,10 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
           <span className="text-xs text-muted">Location (optional)</span>
           <input name="location" className="input" />
         </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Registration form link (optional)</span>
+          <input name="registration_form_url" type="url" className="input" placeholder="https://forms.gle/…" />
+        </label>
         {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
         <button
           type="submit"
