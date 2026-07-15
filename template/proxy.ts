@@ -38,13 +38,28 @@ function looksLikeMobile(userAgent: string): boolean {
   return /Android|iPhone|iPad|iPod/i.test(userAgent);
 }
 
+// DEV-TESTING-ONLY escape hatch for both gate layers (this one, and Layer 2's
+// display-mode check in app/(node)/pwa-gate.tsx) — lets a real browser tab
+// exercise Node routes without an actual installed PWA/phone, purely so this
+// can be verified live during development. Double-gated on purpose: even if
+// someone typed the query param on a real deployment, `NODE_ENV` is always
+// 'production' for any real `next build`/`next start`, which Vercel always
+// runs — so this can never be reachable outside `next dev`, regardless of any
+// other env misconfiguration. Never reference this from student-facing UI.
+const DEV_BYPASS_COOKIE = 'dev_mobile_bypass';
+function isDevMobileBypass(request: NextRequest): boolean {
+  if (process.env.NODE_ENV === 'production') return false;
+  return request.nextUrl.searchParams.get('devMobileBypass') === '1' || request.cookies.get(DEV_BYPASS_COOKIE)?.value === '1';
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const devBypass = isDevMobileBypass(request);
 
   // A soft gate, not a security boundary (same posture as the QR geofence
   // check) — a user-agent is self-reported and easy to fake from dev tools.
   // It stops the ordinary case (a student opens the link on a laptop) cold.
-  if (isNodePath(pathname) && !looksLikeMobile(request.headers.get('user-agent') ?? '')) {
+  if (isNodePath(pathname) && !looksLikeMobile(request.headers.get('user-agent') ?? '') && !devBypass) {
     const url = request.nextUrl.clone();
     url.pathname = '/mobile-required';
     url.search = '';
@@ -55,6 +70,14 @@ export async function proxy(request: NextRequest) {
   // getUser (lib/supabase/middleware.ts), so route-protection logic below
   // reads a trustworthy `user`.
   const { supabaseResponse, user } = await updateSession(request);
+
+  // Once the bypass is triggered via the query param, remember it in a
+  // (non-HttpOnly, so Layer 2's client-side check can read it too) cookie so
+  // it survives normal in-app navigation without repeating the param on every
+  // link — dev-only per isDevMobileBypass's own NODE_ENV gate above.
+  if (devBypass && request.nextUrl.searchParams.get('devMobileBypass') === '1') {
+    supabaseResponse.cookies.set(DEV_BYPASS_COOKIE, '1', { path: '/', httpOnly: false, sameSite: 'lax' });
+  }
 
   if (isPublic(pathname)) return supabaseResponse;
 
