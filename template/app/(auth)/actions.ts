@@ -75,8 +75,14 @@ export async function loginAction(_prev: ActionResult, formData: FormData): Prom
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: 'Incorrect email or password.' };
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error || !data.user) return { error: 'Incorrect email or password.' };
+
+  const { data: student } = await supabase.from('students').select('id').eq('id', data.user.id).maybeSingle();
+  if (!student) {
+    await supabase.auth.signOut();
+    return { error: 'This account has no student access. Admins log in at /admin/login.' };
+  }
 
   redirect(safeNext(formData.get('next')));
 }

@@ -21,24 +21,32 @@ export default async function GridStationPage({
   // Professor sees every club's (club_id is platform-wide, decision 45).
   let query = supabase
     .from('events')
-    .select('id, name, type, event_date, joule_value')
+    .select('id, name, type, event_date, end_date, joule_value')
     .neq('type', 'surge')
     .order('event_date', { ascending: false })
-    .limit(30);
+    .limit(60);
   if (admin.role === 'committee_member' && admin.club_id) {
     query = query.eq('club_id', admin.club_id);
   }
-  const { data: events } = await query;
+  const { data: allEvents } = await query;
 
-  if (!events || events.length === 0) {
+  // Once an event has concluded there's nothing left to scan for — with 50-60
+  // real events on the calendar, leaving them all in this picker forever makes
+  // finding the one that's actually active or upcoming impractical. The data
+  // itself is untouched; this only narrows what the Scan Station's own picker
+  // shows (same "concluded" definition the student Dashboard already uses).
+  const events = (allEvents ?? []).filter((e) => !hasConcluded(e.end_date ?? e.event_date));
+
+  if (events.length === 0) {
     return (
       <div className="p-6">
         <EmptyState
           icon={ScanLine}
-          title="No events yet"
+          title={allEvents && allEvents.length > 0 ? 'No active or upcoming events' : 'No events yet'}
+          message={allEvents && allEvents.length > 0 ? 'Every event on the calendar has already concluded.' : undefined}
           action={
             <Link href="/admin/grid/new" className="text-sm text-gold">
-              Create the first event
+              Create an event
             </Link>
           }
         />
@@ -70,4 +78,8 @@ export default async function GridStationPage({
       <StationClient eventId={selected.id} eventName={selected.name} jouleValue={selected.joule_value} />
     </div>
   );
+}
+
+function hasConcluded(isoDate: string): boolean {
+  return new Date(isoDate).getTime() < Date.now();
 }

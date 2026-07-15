@@ -74,20 +74,22 @@ export default async function GeneralHomePage() {
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
             {upcoming.map((e) => (
-              <li key={e.id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium">{e.name}</p>
-                  {e.location ? (
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-tertiary">
-                      <MapPin className="size-3" aria-hidden />
-                      {e.location}
-                    </p>
-                  ) : null}
-                </div>
-                <p className="flex items-center gap-1.5 text-xs text-muted">
-                  <Calendar className="size-3.5" aria-hidden />
-                  {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                </p>
+              <li key={e.id}>
+                <Link href={`/events/${e.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-background">
+                  <div>
+                    <p className="text-sm font-medium">{e.name}</p>
+                    {e.location ? (
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-tertiary">
+                        <MapPin className="size-3" aria-hidden />
+                        {e.location}
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="flex items-center gap-1.5 text-xs text-muted">
+                    <Calendar className="size-3.5" aria-hidden />
+                    {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </p>
+                </Link>
               </li>
             ))}
           </ul>
