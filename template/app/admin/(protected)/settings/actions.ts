@@ -97,6 +97,81 @@ export async function setAdminRoleAction(adminId: string, role: AdminRole, clubI
   revalidatePath('/admin/settings');
 }
 
+export interface BulkStudentRow {
+  name: string;
+  email: string;
+  tempPassword?: string;
+  error?: string;
+}
+export interface BulkStudentResult {
+  error?: string;
+  results?: BulkStudentRow[];
+}
+
+/**
+ * Bulk-provisions student accounts directly (no self-signup expected — the
+ * institution pre-creates all 300+ accounts and hands out credentials via a
+ * CSV, confirmed with the user). Each line is "Name, email"; per line this
+ * mirrors createAdminAction's own pattern (service-role createUser for the
+ * auth account, then the profile row) rather than complete_onboarding(),
+ * which only ever runs in the new user's OWN auth.uid() context — an admin
+ * acting on someone else's behalf has no such context to use.
+ */
+export async function bulkCreateStudentsAction(_prev: BulkStudentResult, formData: FormData): Promise<BulkStudentResult> {
+  await requireAdmin(['professor']);
+  const raw = String(formData.get('roster') ?? '').trim();
+  if (!raw) return { error: 'Paste at least one name and email, one per line.' };
+
+  const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (lines.length > 500) return { error: 'Paste 500 or fewer at a time.' };
+
+  const supabase = await createClient();
+  const service = createServiceRoleClient();
+  const results: BulkStudentRow[] = [];
+
+  for (const line of lines) {
+    const [namePart, emailPart] = line.split(',').map((s) => s?.trim());
+    const name = namePart ?? '';
+    const email = (emailPart ?? '').toLowerCase();
+    if (!name || !email) {
+      results.push({ name: namePart ?? '', email: emailPart ?? '', error: 'Expected "Name, email" per line.' });
+      continue;
+    }
+
+    const { data: allowed } = await supabase.rpc('is_email_domain_allowed', { p_email: email });
+    if (!allowed) {
+      results.push({ name, email, error: 'Email domain not in the allowed list.' });
+      continue;
+    }
+
+    const tempPassword = randomBytes(9).toString('base64url');
+    const { data: created, error: createErr } = await service.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+    });
+    if (createErr || !created.user) {
+      results.push({ name, email, error: createErr?.message ?? 'Could not create account.' });
+      continue;
+    }
+
+    const { error: insertErr } = await service.from('students').insert({
+      id: created.user.id,
+      name,
+      college_email: email,
+    });
+    if (insertErr) {
+      results.push({ name, email, error: insertErr.message });
+      continue;
+    }
+
+    results.push({ name, email, tempPassword });
+  }
+
+  revalidatePath('/admin/settings');
+  return { results };
+}
+
 export async function createClubAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin(['professor']);
   const name = String(formData.get('name') ?? '').trim();

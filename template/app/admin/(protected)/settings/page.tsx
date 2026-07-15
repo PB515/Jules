@@ -4,6 +4,7 @@ import { DomainsEditor } from './domains-editor';
 import { SeasonsSection } from './seasons-section';
 import { RosterSection } from './roster-section';
 import { ClubsSection } from './clubs-section';
+import { BulkStudentsSection } from './bulk-students-section';
 
 export const metadata = { title: 'Institution Settings' };
 
@@ -50,6 +51,15 @@ export default async function SettingsPage() {
         <h2 className="mb-1 text-sm font-medium text-muted">Admin roster</h2>
         <p className="mb-3 text-xs text-tertiary">Role changes are audit-logged.</p>
         <RosterSection admins={admins ?? []} clubs={clubs ?? []} />
+      </section>
+
+      <section>
+        <h2 className="mb-1 text-sm font-medium text-muted">Bulk-create student accounts</h2>
+        <p className="mb-3 text-xs text-tertiary">
+          No self-signup expected. Create every student&apos;s account here and send them the CSV yourself. Each
+          student can change their password after logging in.
+        </p>
+        <BulkStudentsSection />
       </section>
     </div>
   );

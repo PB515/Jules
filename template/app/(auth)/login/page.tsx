@@ -66,11 +66,8 @@ function LoginForm() {
           <Link href="/forgot-password" className="text-gold">
             Lost connection?
           </Link>
-          <p>
-            New to Synergy?{' '}
-            <Link href="/signup" className="text-gold">
-              Connect now
-            </Link>
+          <p className="text-center text-xs text-tertiary">
+            New here? Your account is created by your club. Check your email or WhatsApp for your login details.
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { requireStudent } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { ProfileForm } from './profile-form';
+import { ChangePasswordForm } from './change-password-form';
 import { logoutAction } from '@/app/(auth)/actions';
 import { Flame, LogOut } from '@/lib/icons';
 import type { Tier } from '@/lib/supabase/database.types';
@@ -34,6 +35,8 @@ export default async function ProfilePage() {
         <p className="text-muted">College email</p>
         <p className="mt-1">{student.college_email}</p>
       </section>
+
+      <ChangePasswordForm />
 
       <form action={logoutAction}>
         <button
