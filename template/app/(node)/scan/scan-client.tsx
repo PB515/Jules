@@ -1,14 +1,18 @@
 'use client';
 /**
  * Scan event QR (spec §6/§9). The QR the admin displays encodes a deep link
- * (`/scan?e=<event>&t=<token>`) rather than needing an in-app camera decoder —
- * a student's native camera app opens it directly, no extra dependency. A
- * manual fallback (pick event + paste code) covers testing / camera issues.
+ * (`/scan?e=<event>&t=<token>`) — opening it in the phone's own camera app
+ * lands here and auto-redeems via the effect below. "Scan with camera" gives
+ * the same result from inside the app itself (CameraScanner decodes the
+ * live feed and hands e/t to the same `redeem()`), for whenever a student's
+ * camera app doesn't offer a one-tap "open link" affordance. A manual
+ * fallback (pick event + paste code) covers both cases failing.
  */
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { CircleCheck, CircleX, ScanLine } from '@/lib/icons';
+import { CircleCheck, CircleX, ScanLine, Camera } from '@/lib/icons';
 import { TierBadge } from '@/lib/components/tier-badge';
+import { CameraScanner } from './camera-scanner';
 import type { Tier } from '@/lib/supabase/database.types';
 
 interface ScannableEvent {
@@ -36,6 +40,7 @@ export function ScanClient({
   const [eventId, setEventId] = useState(initialEventId);
   const [token, setToken] = useState(initialToken);
   const [result, setResult] = useState<Result>({ state: 'idle' });
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const redeem = useCallback(async (e: string, t: string) => {
     if (!e || !t) return;
@@ -97,13 +102,46 @@ export function ScanClient({
     );
   }
 
+  if (cameraOpen) {
+    return (
+      <div className="flex flex-col gap-5">
+        <CameraScanner
+          onScan={(e, t) => {
+            setCameraOpen(false);
+            setEventId(e);
+            setToken(t);
+            redeem(e, t);
+          }}
+          onClose={() => setCameraOpen(false)}
+        />
+        {result.state === 'error' ? (
+          <div className="flex items-center gap-2 rounded-[var(--radius)] border border-accent/40 bg-card p-3 text-sm text-accent">
+            <CircleX className="size-4 shrink-0" aria-hidden />
+            {result.message}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center">
         <ScanLine className="size-10 text-tertiary" aria-hidden />
         <p className="text-sm text-muted">
-          Point your camera app at the event&apos;s QR code. It opens straight into this check-in.
+          Point your camera app at the event&apos;s QR code, or scan it right here in the app.
         </p>
+        <button
+          type="button"
+          onClick={() => {
+            setResult({ state: 'idle' });
+            setCameraOpen(true);
+          }}
+          className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-4 py-2.5 text-sm font-medium text-gold-foreground"
+        >
+          <Camera className="size-4" aria-hidden />
+          Scan with camera
+        </button>
       </div>
 
       {result.state === 'error' ? (

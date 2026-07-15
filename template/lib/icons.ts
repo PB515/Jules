@@ -62,6 +62,7 @@ export {
   BookOpen,
   Pencil,
   Bell,
+  Camera,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';
