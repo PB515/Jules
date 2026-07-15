@@ -388,6 +388,18 @@ export interface Database {
         Args: { p_season_id: string; p_limit?: number; p_offset?: number };
         Returns: { student_id: string; name: string; total_amount: number; rank: number; total_count: number }[];
       };
+      admin_dashboard_summary: {
+        Args: Record<string, never>;
+        Returns: { total_students: number; total_clubs: number; total_events: number; total_lifetime_joules: number }[];
+      };
+      admin_tier_distribution: {
+        Args: Record<string, never>;
+        Returns: { tier: string; student_count: number }[];
+      };
+      admin_club_engagement: {
+        Args: Record<string, never>;
+        Returns: { club_id: string; club_name: string; total_joules: number; total_attendees: number }[];
+      };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
