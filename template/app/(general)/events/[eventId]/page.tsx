@@ -40,9 +40,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
   }
 
   const concluded = hasConcluded(event.end_date ?? event.event_date);
+  const coverUrl = event.cover_image_path
+    ? supabase.storage.from('event-covers').getPublicUrl(event.cover_image_path).data.publicUrl
+    : null;
 
   return (
     <article className="mx-auto flex max-w-2xl flex-col gap-6">
+      {coverUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image domain config needed
+        <img src={coverUrl} alt="" className="aspect-video w-full rounded-[var(--radius)] object-cover" />
+      ) : null}
       <div>
         <h1 className="text-2xl font-medium">{event.name}</h1>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-tertiary">

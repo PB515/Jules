@@ -188,3 +188,27 @@ export async function createClubAction(_prev: ActionResult, formData: FormData):
   revalidatePath('/admin/settings');
   return {};
 }
+
+export async function updateClubSocialLinksAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin(['professor']);
+  const clubId = String(formData.get('club_id') ?? '');
+  const instagramUrl = String(formData.get('instagram_url') ?? '').trim();
+  const linkedinUrl = String(formData.get('linkedin_url') ?? '').trim();
+  const xUrl = String(formData.get('x_url') ?? '').trim();
+
+  if (!clubId) return { error: 'Missing club.' };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('clubs')
+    .update({
+      instagram_url: instagramUrl || null,
+      linkedin_url: linkedinUrl || null,
+      x_url: xUrl || null,
+    })
+    .eq('id', clubId);
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin/settings');
+  return {};
+}

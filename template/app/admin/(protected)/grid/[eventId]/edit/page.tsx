@@ -14,5 +14,9 @@ export default async function EditEventPage({ params }: { params: Promise<{ even
   // Committee Member editing a URL for another club's event should not see it.
   if (admin.role === 'committee_member' && admin.club_id && event.club_id !== admin.club_id) notFound();
 
-  return <EditEventForm event={event} />;
+  const coverImageUrl = event.cover_image_path
+    ? supabase.storage.from('event-covers').getPublicUrl(event.cover_image_path).data.publicUrl
+    : null;
+
+  return <EditEventForm event={event} coverImageUrl={coverImageUrl} />;
 }

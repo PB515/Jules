@@ -14,6 +14,17 @@ const JOULE_BY_TYPE: Record<string, number> = {
   volunteer_task: 50,
 };
 
+async function uploadCoverImage(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData): Promise<{ path?: string; error?: string }> {
+  const file = formData.get('cover_image');
+  if (!(file instanceof File) || file.size === 0) return {};
+
+  const ext = file.name.split('.').pop() ?? 'jpg';
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from('event-covers').upload(path, file);
+  if (error) return { error: error.message };
+  return { path };
+}
+
 export async function createEventAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin(['professor', 'committee_member']);
 
@@ -33,6 +44,9 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
     data: { user },
   } = await supabase.auth.getUser();
 
+  const cover = await uploadCoverImage(supabase, formData);
+  if (cover.error) return { error: cover.error };
+
   const { data, error } = await supabase
     .from('events')
     .insert({
@@ -42,6 +56,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
       event_date: new Date(eventDate).toISOString(),
       location: location || null,
       registration_form_url: registrationFormUrl || null,
+      cover_image_path: cover.path ?? null,
       joule_value: JOULE_BY_TYPE[type],
       created_by: user?.id,
     })
@@ -69,6 +84,9 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
 
   const supabase = await createClient();
 
+  const cover = await uploadCoverImage(supabase, formData);
+  if (cover.error) return { error: cover.error };
+
   // A Committee Member may only edit their own club's events — a Professor
   // (club_id null) can edit any (same scoping the Grid Station list itself
   // already applies, decision 45's club-scoping rule).
@@ -78,6 +96,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     event_date: new Date(eventDate).toISOString(),
     location: location || null,
     registration_form_url: registrationFormUrl || null,
+    ...(cover.path ? { cover_image_path: cover.path } : {}),
     joule_value: JOULE_BY_TYPE[type],
   }).eq('id', eventId);
   if (admin.role === 'committee_member' && admin.club_id) {

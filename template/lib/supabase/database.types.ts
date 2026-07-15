@@ -65,8 +65,16 @@ export interface Database {
         Relationships: [];
       };
       clubs: {
-        Row: { id: string; name: string; slug: string; description: string | null; created_at: string };
-        Insert: { id?: string; name: string; slug: string; description?: string | null; created_at?: string };
+        Row: {
+          id: string; name: string; slug: string; description: string | null;
+          instagram_url: string | null; linkedin_url: string | null; x_url: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string; name: string; slug: string; description?: string | null;
+          instagram_url?: string | null; linkedin_url?: string | null; x_url?: string | null;
+          created_at?: string;
+        };
         Update: Partial<Database['public']['Tables']['clubs']['Insert']>;
         Relationships: [];
       };
@@ -87,14 +95,14 @@ export interface Database {
           id: string; name: string; type: EventType; event_date: string; end_date: string | null;
           location: string | null; joule_value: number | null; club_id: string;
           geofence_lat: number | null; geofence_lng: number | null; geofence_radius_m: number;
-          registration_form_url: string | null;
+          registration_form_url: string | null; cover_image_path: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
           id?: string; name: string; type: EventType; event_date: string; end_date?: string | null;
           location?: string | null; joule_value?: number | null; club_id: string;
           geofence_lat?: number | null; geofence_lng?: number | null; geofence_radius_m?: number;
-          registration_form_url?: string | null;
+          registration_form_url?: string | null; cover_image_path?: string | null;
           created_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['events']['Insert']>;
@@ -212,16 +220,16 @@ export interface Database {
           id: string; title: string; event_id: string; coordinator_name: string;
           introduction: string; objectives: string[]; event_highlights: string;
           outcomes: string[]; conclusion: string;
-          attachment_attendance_list: boolean; attachment_brochure: boolean;
-          attachment_geo_photos: boolean; attachment_media_coverage: boolean;
+          attachment_attendance_list_paths: string[]; attachment_brochure_paths: string[];
+          attachment_geo_photos_paths: string[]; attachment_media_coverage_paths: string[];
           uploaded_by: string | null; created_at: string;
         };
         Insert: {
           id?: string; title: string; event_id: string; coordinator_name: string;
           introduction: string; objectives?: string[]; event_highlights: string;
           outcomes?: string[]; conclusion: string;
-          attachment_attendance_list?: boolean; attachment_brochure?: boolean;
-          attachment_geo_photos?: boolean; attachment_media_coverage?: boolean;
+          attachment_attendance_list_paths?: string[]; attachment_brochure_paths?: string[];
+          attachment_geo_photos_paths?: string[]; attachment_media_coverage_paths?: string[];
           uploaded_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['event_reports']['Insert']>;
@@ -353,16 +361,32 @@ export interface Database {
           time_limit_seconds: number; correct_option: SurgeOption | null; phase: LivePhase; question_index: number;
         }[];
       };
+      public_clubs: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string; name: string; slug: string; description: string | null;
+          instagram_url: string | null; linkedin_url: string | null; x_url: string | null;
+        }[];
+      };
       public_events: {
         Args: Record<string, never>;
         Returns: {
           id: string; name: string; type: EventType; event_date: string; end_date: string | null;
           location: string | null; joule_value: number | null; club_name: string | null;
+          cover_image_path: string | null;
         }[];
       };
       public_event_stats: {
         Args: { p_event_id: string };
-        Returns: { total_attendees: number; total_joules: number }[];
+        Returns: { total_attendees: number; total_joules: number; total_registered: number }[];
+      };
+      public_seasons: {
+        Args: Record<string, never>;
+        Returns: { id: string; label: string; start_date: string; end_date: string }[];
+      };
+      public_season_leaderboard: {
+        Args: { p_season_id: string; p_limit?: number; p_offset?: number };
+        Returns: { student_id: string; name: string; total_amount: number; rank: number; total_count: number }[];
       };
     };
     Enums: { [_ in never]: never };

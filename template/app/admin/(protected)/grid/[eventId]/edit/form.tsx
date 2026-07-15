@@ -15,7 +15,7 @@ function toDatetimeLocalValue(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function EditEventForm({ event }: { event: Tables<'events'> }) {
+export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'>; coverImageUrl: string | null }) {
   const [state, formAction, pending] = useActionState(editEventAction, initialState);
 
   return (
@@ -58,6 +58,14 @@ export function EditEventForm({ event }: { event: Tables<'events'> }) {
             placeholder="https://forms.gle/…"
             defaultValue={event.registration_form_url ?? ''}
           />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Cover image (optional)</span>
+          {coverImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image domain config needed
+            <img src={coverImageUrl} alt="" className="h-32 w-full rounded-[var(--radius)] object-cover" />
+          ) : null}
+          <input name="cover_image" type="file" accept="image/*" className="input" />
         </label>
         {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
         <button

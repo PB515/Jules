@@ -12,6 +12,8 @@ const PUBLIC_PATHS = [
   '/event-reports',
   '/api/event-reports',
   '/gallery',
+  '/clubs',
+  '/leaderboard',
   '/mobile-required',
 ];
 

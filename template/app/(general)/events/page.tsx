@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { Calendar, MapPin } from '@/lib/icons';
+import { Calendar, BookOpen } from '@/lib/icons';
 
 export const metadata = { title: 'Events' };
 
@@ -11,15 +11,35 @@ const TYPE_LABEL: Record<string, string> = {
   volunteer_task: 'Volunteer Task',
 };
 
+interface EventCardData {
+  id: string;
+  name: string;
+  type: string;
+  event_date: string;
+  club_name: string | null;
+  coverUrl: string | null;
+}
+
 export default async function EventsPage() {
   const supabase = await createClient();
   const { data: events } = await supabase.rpc('public_events');
 
+  const withUrls: EventCardData[] = (events ?? []).map((e) => ({
+    id: e.id,
+    name: e.name,
+    type: e.type,
+    event_date: e.event_date,
+    club_name: e.club_name,
+    coverUrl: e.cover_image_path
+      ? supabase.storage.from('event-covers').getPublicUrl(e.cover_image_path).data.publicUrl
+      : null,
+  }));
+
   const now = new Date();
-  const upcoming = (events ?? [])
+  const upcoming = withUrls
     .filter((e) => new Date(e.event_date) >= now)
     .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
-  const past = (events ?? [])
+  const past = withUrls
     .filter((e) => new Date(e.event_date) < now)
     .sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime());
 
@@ -35,47 +55,44 @@ export default async function EventsPage() {
         {upcoming.length === 0 ? (
           <EmptyState icon={Calendar} title="Nothing scheduled yet" message="Check back soon for the next event." />
         ) : (
-          <EventList events={upcoming} />
+          <EventCardGrid events={upcoming} />
         )}
       </section>
 
       {past.length > 0 ? (
         <section>
           <h2 className="mb-3 text-sm font-medium text-muted">Past</h2>
-          <EventList events={past} />
+          <EventCardGrid events={past} />
         </section>
       ) : null}
     </div>
   );
 }
 
-function EventList({
-  events,
-}: {
-  events: { id: string; name: string; type: string; event_date: string; location: string | null }[];
-}) {
+function EventCardGrid({ events }: { events: EventCardData[] }) {
   return (
-    <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((e) => (
-        <li key={e.id}>
-          <Link href={`/events/${e.id}`} className="flex items-center justify-between px-4 py-3.5 hover:bg-background">
-            <div>
-              <p className="text-sm font-medium">{e.name}</p>
-              <p className="mt-0.5 text-xs text-tertiary">{TYPE_LABEL[e.type] ?? e.type}</p>
-              {e.location ? (
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-tertiary">
-                  <MapPin className="size-3" aria-hidden />
-                  {e.location}
-                </p>
-              ) : null}
-            </div>
-            <p className="flex items-center gap-1.5 text-xs text-muted">
-              <Calendar className="size-3.5" aria-hidden />
-              {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-            </p>
-          </Link>
-        </li>
+        <Link
+          key={e.id}
+          href={`/events/${e.id}`}
+          className="flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card transition-colors hover:border-gold/50"
+        >
+          <div className="flex aspect-video items-center justify-center bg-background">
+            {e.coverUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image domain config needed
+              <img src={e.coverUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <BookOpen className="size-8 text-tertiary" aria-hidden />
+            )}
+          </div>
+          <div className="flex flex-col gap-1 p-4">
+            <p className="text-sm font-medium">{e.name}</p>
+            {e.club_name ? <p className="text-xs text-tertiary">{e.club_name}</p> : null}
+            <p className="text-xs text-tertiary">{TYPE_LABEL[e.type] ?? e.type}</p>
+          </div>
+        </Link>
       ))}
-    </ul>
+    </div>
   );
 }

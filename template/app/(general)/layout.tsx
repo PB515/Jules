@@ -16,6 +16,8 @@ const NAV = [
   { href: '/', label: 'Home' },
   { href: '/events', label: 'Events' },
   { href: '/event-reports', label: 'Event Reports' },
+  { href: '/clubs', label: 'Clubs' },
+  { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/gallery', label: 'Gallery' },
 ] as const;
 
@@ -92,7 +94,12 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
 
       <footer className="flex flex-col items-center gap-2 border-t border-border bg-card px-6 py-6 text-center text-xs text-tertiary">
         <Image src="/brand/adani-university-logo.png" alt="Adani University" width={110} height={59} className="h-6 w-auto" />
-        {site.name}: {site.tagline}
+        <p>
+          {site.name}: {site.tagline}
+        </p>
+        <Link href="/clubs" className="text-gold">
+          Browse clubs
+        </Link>
       </footer>
     </div>
   );

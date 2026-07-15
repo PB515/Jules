@@ -8,6 +8,23 @@ export interface ActionResult {
   error?: string;
 }
 
+async function uploadAttachmentImages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  formData: FormData,
+  fieldName: string
+): Promise<{ paths: string[]; error?: string }> {
+  const files = formData.getAll(fieldName).filter((f): f is File => f instanceof File && f.size > 0);
+  const paths: string[] = [];
+  for (const file of files) {
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('event-report-attachments').upload(path, file);
+    if (error) return { paths, error: error.message };
+    paths.push(path);
+  }
+  return { paths };
+}
+
 export async function createEventReportAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin(['professor', 'committee_member']);
   const eventId = String(formData.get('event_id') ?? '');
@@ -17,10 +34,6 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
   const conclusion = String(formData.get('conclusion') ?? '').trim();
   const objectives = formData.getAll('objectives').map((o) => String(o).trim()).filter(Boolean);
   const outcomes = formData.getAll('outcomes').map((o) => String(o).trim()).filter(Boolean);
-  const attachmentAttendanceList = formData.get('attachment_attendance_list') === 'on';
-  const attachmentBrochure = formData.get('attachment_brochure') === 'on';
-  const attachmentGeoPhotos = formData.get('attachment_geo_photos') === 'on';
-  const attachmentMediaCoverage = formData.get('attachment_media_coverage') === 'on';
 
   if (!eventId) return { error: 'Pick the event this report is about.' };
   if (!coordinatorName || !introduction || !eventHighlights || !conclusion) {
@@ -38,6 +51,15 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
   const { data: event } = await supabase.from('events').select('name').eq('id', eventId).maybeSingle();
   if (!event) return { error: 'Event not found.' };
 
+  const [attendanceList, brochure, geoPhotos, mediaCoverage] = await Promise.all([
+    uploadAttachmentImages(supabase, formData, 'attachment_attendance_list'),
+    uploadAttachmentImages(supabase, formData, 'attachment_brochure'),
+    uploadAttachmentImages(supabase, formData, 'attachment_geo_photos'),
+    uploadAttachmentImages(supabase, formData, 'attachment_media_coverage'),
+  ]);
+  const uploadError = attendanceList.error ?? brochure.error ?? geoPhotos.error ?? mediaCoverage.error;
+  if (uploadError) return { error: uploadError };
+
   const { error } = await supabase.from('event_reports').insert({
     title: event.name,
     event_id: eventId,
@@ -47,10 +69,10 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
     event_highlights: eventHighlights,
     outcomes,
     conclusion,
-    attachment_attendance_list: attachmentAttendanceList,
-    attachment_brochure: attachmentBrochure,
-    attachment_geo_photos: attachmentGeoPhotos,
-    attachment_media_coverage: attachmentMediaCoverage,
+    attachment_attendance_list_paths: attendanceList.paths,
+    attachment_brochure_paths: brochure.paths,
+    attachment_geo_photos_paths: geoPhotos.paths,
+    attachment_media_coverage_paths: mediaCoverage.paths,
     uploaded_by: user?.id,
   });
   if (error) return { error: error.message };

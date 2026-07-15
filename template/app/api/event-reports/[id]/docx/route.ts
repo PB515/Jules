@@ -72,10 +72,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       : [new Paragraph({ text: '' })];
 
   const attachmentLines: string[] = [];
-  if (report.attachment_attendance_list) attachmentLines.push('Attendance List attached');
-  if (report.attachment_brochure) attachmentLines.push('Event Brochure/Flyer/e-invitation');
-  if (report.attachment_geo_photos) attachmentLines.push('Geo-tagged photographs');
-  if (report.attachment_media_coverage) attachmentLines.push('Social media/Print media coverage (if any)');
+  if (report.attachment_attendance_list_paths.length > 0) attachmentLines.push('Attendance List attached');
+  if (report.attachment_brochure_paths.length > 0) attachmentLines.push('Event Brochure/Flyer/e-invitation');
+  if (report.attachment_geo_photos_paths.length > 0) attachmentLines.push('Geo-tagged photographs');
+  if (report.attachment_media_coverage_paths.length > 0) attachmentLines.push('Social media/Print media coverage (if any)');
 
   const mastheadTable = new Table({
     width: { size: 9000, type: WidthType.DXA },

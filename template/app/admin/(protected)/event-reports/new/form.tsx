@@ -20,6 +20,7 @@ const initialState: ActionResult = {};
 interface EventStats {
   total_attendees: number;
   total_joules: number;
+  total_registered: number;
 }
 interface EventOption {
   id: string;
@@ -146,6 +147,10 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
       {stats ? (
         <div className="flex gap-6 rounded-[var(--radius)] border border-border bg-card px-4 py-3 text-sm">
           <div>
+            <p className="text-lg font-medium">{stats.total_registered}</p>
+            <p className="text-xs text-tertiary">registered (auto-pulled)</p>
+          </div>
+          <div>
             <p className="text-lg font-medium">{stats.total_attendees}</p>
             <p className="text-xs text-tertiary">attendees (auto-pulled)</p>
           </div>
@@ -197,23 +202,23 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
         <textarea name="conclusion" className="input min-h-24" placeholder="A short closing paragraph..." required />
       </label>
 
-      <fieldset className="flex flex-col gap-2 rounded-[var(--radius)] border border-border bg-card p-4">
-        <legend className="px-1 text-xs text-muted">Attachments</legend>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="attachment_attendance_list" className="size-4" />
-          Attendance List attached
+      <fieldset className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-card p-4">
+        <legend className="px-1 text-xs text-muted">Attachments (upload real photos, not just a checklist)</legend>
+        <label className="flex flex-col gap-1 text-sm">
+          Attendance List
+          <input type="file" name="attachment_attendance_list" accept="image/*" multiple className="input" />
         </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="attachment_brochure" className="size-4" />
+        <label className="flex flex-col gap-1 text-sm">
           Event Brochure/Flyer/e-invitation
+          <input type="file" name="attachment_brochure" accept="image/*" multiple className="input" />
         </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="attachment_geo_photos" className="size-4" />
+        <label className="flex flex-col gap-1 text-sm">
           Geo-tagged photographs
+          <input type="file" name="attachment_geo_photos" accept="image/*" multiple className="input" />
         </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="attachment_media_coverage" className="size-4" />
+        <label className="flex flex-col gap-1 text-sm">
           Social media/Print media coverage (if any)
+          <input type="file" name="attachment_media_coverage" accept="image/*" multiple className="input" />
         </label>
       </fieldset>
 
