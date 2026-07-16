@@ -13,12 +13,14 @@ export default async function LiveRoundHostPage({ params }: { params: Promise<{ 
   const { data: round } = await supabase.from('live_rounds').select('*').eq('id', roundId).maybeSingle();
   if (!round) notFound();
 
-  const { data: surge } = await supabase.from('surges').select('name, points_per_question').eq('id', round.surge_id).single();
-  const { data: questions } = await supabase
-    .from('questions')
-    .select('id, text, option_a, option_b, option_c, option_d, correct_option, time_limit_seconds')
-    .eq('surge_id', round.surge_id)
-    .order('order_index');
+  const [{ data: surge }, { data: questions }] = await Promise.all([
+    supabase.from('surges').select('name, points_per_question').eq('id', round.surge_id).single(),
+    supabase
+      .from('questions')
+      .select('id, text, option_a, option_b, option_c, option_d, correct_option, time_limit_seconds')
+      .eq('surge_id', round.surge_id)
+      .order('order_index'),
+  ]);
 
   return (
     <HostClient

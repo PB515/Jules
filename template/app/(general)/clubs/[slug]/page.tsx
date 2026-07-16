@@ -9,11 +9,12 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const supabase = await createClient();
 
-  const { data: clubs } = await supabase.rpc('public_clubs');
+  const [{ data: clubs }, { data: events }] = await Promise.all([
+    supabase.rpc('public_clubs'),
+    supabase.rpc('public_events'),
+  ]);
   const club = (clubs ?? []).find((c) => c.slug === slug);
   if (!club) notFound();
-
-  const { data: events } = await supabase.rpc('public_events');
   const clubEvents = (events ?? [])
     .filter((e) => e.club_name === club.name && new Date(e.event_date) >= new Date())
     .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())

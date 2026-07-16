@@ -15,8 +15,20 @@ export default async function LeaderboardPage({
 }) {
   const { season: seasonParam, page: pageParam } = await searchParams;
   const supabase = await createClient();
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
 
-  const { data: seasons } = await supabase.rpc('public_seasons');
+  // When a season is already known from the URL (e.g. Previous/Next or the
+  // season picker), the leaderboard query doesn't need to wait on the
+  // seasons list at all — fire both in parallel. Only the first-ever visit
+  // (no ?season= yet) has a real dependency: which season is "latest" can
+  // only be known once the seasons list itself comes back.
+  const [{ data: seasons }, { data: leaderboardIfKnownSeason }] = await Promise.all([
+    supabase.rpc('public_seasons'),
+    seasonParam
+      ? supabase.rpc('public_season_leaderboard', { p_season_id: seasonParam, p_limit: PAGE_SIZE, p_offset: offset })
+      : Promise.resolve({ data: null }),
+  ]);
 
   if (!seasons || seasons.length === 0) {
     return (
@@ -28,14 +40,9 @@ export default async function LeaderboardPage({
   }
 
   const selectedId = seasonParam ?? seasons[0].id;
-  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
-
-  const { data: leaderboard } = await supabase.rpc('public_season_leaderboard', {
-    p_season_id: selectedId,
-    p_limit: PAGE_SIZE,
-    p_offset: offset,
-  });
+  const { data: leaderboard } = seasonParam
+    ? { data: leaderboardIfKnownSeason }
+    : await supabase.rpc('public_season_leaderboard', { p_season_id: selectedId, p_limit: PAGE_SIZE, p_offset: offset });
   const rows = leaderboard ?? [];
   const totalCount = rows[0]?.total_count ?? 0;
   const rangeStart = rows.length > 0 ? offset + 1 : 0;

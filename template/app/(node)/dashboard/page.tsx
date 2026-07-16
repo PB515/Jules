@@ -3,6 +3,7 @@ import { requireStudent } from '@/lib/auth/session';
 import { CountUp } from '@/lib/components/count-up';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
+import { OnboardingTour } from '@/lib/components/onboarding-tour';
 import { PowerGrid } from '@/lib/components/power-grid';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
@@ -136,6 +137,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
+      <OnboardingTour />
       <TierUpCelebration tier={totals.tier} />
 
       <div>

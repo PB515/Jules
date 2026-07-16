@@ -32,11 +32,13 @@ export default async function MatrixPage({ params }: { params: Promise<{ surgeId
     );
   }
 
-  const { data: leaderboard } = await supabase.rpc('surge_leaderboard', { p_surge_id: surgeId });
+  const [{ data: leaderboard }, { data: totalsRows }] = await Promise.all([
+    supabase.rpc('surge_leaderboard', { p_surge_id: surgeId }),
+    supabase.rpc('my_totals'),
+  ]);
   const rows = leaderboard ?? [];
   const top10 = rows.slice(0, 10);
   const mine = rows.find((r) => r.student_id === student.id) ?? null;
-  const { data: totalsRows } = await supabase.rpc('my_totals');
   const myTier = totalsRows?.[0]?.tier ?? 'ember';
 
   return (
