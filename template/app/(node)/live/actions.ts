@@ -8,15 +8,19 @@ export interface ActionResult {
   error?: string;
 }
 
-export async function joinLiveRoundAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function resolveRoomCodeAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireStudent();
   const roomCode = String(formData.get('room_code') ?? '').trim();
-  const teamName = String(formData.get('team_name') ?? '').trim();
-  if (!roomCode || !teamName) return { error: 'Enter the room code and a team name.' };
+  if (!roomCode) return { error: 'Enter the room code.' };
 
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc('join_live_round', { p_room_code: roomCode, p_team_name: teamName });
-  if (error || !data) return { error: error?.message ?? 'Could not join that room.' };
+  const { data: round } = await supabase
+    .from('live_rounds')
+    .select('id, phase')
+    .eq('room_code', roomCode.toUpperCase())
+    .maybeSingle();
+  if (!round) return { error: 'Room not found.' };
+  if (round.phase === 'complete') return { error: 'This round has already ended.' };
 
-  redirect(`/live/${data.round_id}`);
+  redirect(`/live/${round.id}`);
 }

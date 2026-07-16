@@ -38,8 +38,15 @@ export function RevealScoreboard({ rows, scale = 'full' }: { rows: RevealRow[]; 
       if (i >= reversed.length) clearInterval(interval);
     }, 370);
     return () => clearInterval(interval);
+    // Depends on rows.length (not just []) — a cold page load into the
+    // `complete` phase mounts this with rows still empty (the parent's own
+    // async scoreboard fetch hasn't resolved yet); without this dependency
+    // the animation locks in visibleCount=0 forever once that fetch does
+    // resolve and rows becomes non-empty, same cold-load gap class as
+    // decision 26. Scoped to .length, not the array/reversed identity, so
+    // it doesn't restart on every unrelated parent re-render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [rows.length]);
 
   const visibleReversed = reversed.slice(0, visibleCount);
   const visibleSorted = [...visibleReversed].reverse();

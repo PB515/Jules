@@ -42,6 +42,7 @@ export function HostClient({
 }) {
   const [round, setRound] = useState(initialRound);
   const [teamCount, setTeamCount] = useState(0);
+  const [memberCount, setMemberCount] = useState(0);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
   const [advancing, setAdvancing] = useState(false);
@@ -60,8 +61,17 @@ export function HostClient({
     setTeamCount(count ?? 0);
   }, [supabase, initialRound.id]);
 
+  const refreshMemberCount = useCallback(async () => {
+    const { count } = await supabase
+      .from('live_round_team_members')
+      .select('student_id', { count: 'exact', head: true })
+      .eq('round_id', initialRound.id);
+    setMemberCount(count ?? 0);
+  }, [supabase, initialRound.id]);
+
   useEffect(() => {
     refreshTeamCount();
+    refreshMemberCount();
     refreshScoreboard();
 
     const channel = supabase
@@ -79,6 +89,11 @@ export function HostClient({
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'live_round_teams', filter: `round_id=eq.${initialRound.id}` },
         () => setTeamCount((c) => c + 1)
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'live_round_team_members', filter: `round_id=eq.${initialRound.id}` },
+        () => setMemberCount((c) => c + 1)
       )
       .on(
         'postgres_changes',
@@ -132,7 +147,9 @@ export function HostClient({
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 p-8 text-center">
       <div className="text-xs uppercase tracking-[0.2em] text-accent">{surgeName} · Live Round</div>
 
-      {round.phase === 'lobby' ? <LobbyView roomCode={round.room_code} teamCount={teamCount} /> : null}
+      {round.phase === 'lobby' ? (
+        <LobbyView roomCode={round.room_code} teamCount={teamCount} memberCount={memberCount} />
+      ) : null}
 
       {round.phase === 'question' && q ? (
         <QuestionView
@@ -141,7 +158,7 @@ export function HostClient({
           total={questions.length}
           startedAt={round.question_started_at}
           answeredCount={answeredCount}
-          teamCount={teamCount}
+          memberCount={memberCount}
         />
       ) : null}
 
@@ -154,7 +171,7 @@ export function HostClient({
       {round.phase !== 'complete' ? (
         <button
           onClick={advance}
-          disabled={advancing || (round.phase === 'lobby' && teamCount === 0)}
+          disabled={advancing || (round.phase === 'lobby' && memberCount === 0)}
           className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-8 py-3 text-sm font-medium text-gold-foreground disabled:opacity-50"
         >
           {advancing ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
@@ -173,11 +190,19 @@ export function HostClient({
   );
 }
 
-function LobbyView({ roomCode, teamCount }: { roomCode: string; teamCount: number }) {
+function LobbyView({
+  roomCode,
+  teamCount,
+  memberCount,
+}: {
+  roomCode: string;
+  teamCount: number;
+  memberCount: number;
+}) {
   const joinLink = `${site.url}/live?code=${roomCode}`;
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-sm text-muted">Teams join at /live with this code, or scan to join</p>
+      <p className="text-sm text-muted">Students form or join a team at /live with this code, or scan to join</p>
       <div className="rounded-[var(--radius)] bg-white p-3">
         <QRCode value={joinLink} size={140} />
       </div>
@@ -185,7 +210,7 @@ function LobbyView({ roomCode, teamCount }: { roomCode: string; teamCount: numbe
         {roomCode}
       </div>
       <p className="text-lg text-foreground">
-        {teamCount} team{teamCount === 1 ? '' : 's'} joined
+        {teamCount} team{teamCount === 1 ? '' : 's'}, {memberCount} student{memberCount === 1 ? '' : 's'} joined
       </p>
     </div>
   );
@@ -197,14 +222,14 @@ function QuestionView({
   total,
   startedAt,
   answeredCount,
-  teamCount,
+  memberCount,
 }: {
   q: Question;
   index: number;
   total: number;
   startedAt: string | null;
   answeredCount: number;
-  teamCount: number;
+  memberCount: number;
 }) {
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
@@ -237,7 +262,7 @@ function QuestionView({
         ))}
       </div>
       <p className="text-lg text-gold">
-        {answeredCount} / {teamCount} teams answered
+        {answeredCount} / {memberCount} students answered
       </p>
     </div>
   );

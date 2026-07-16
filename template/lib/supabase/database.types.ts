@@ -201,14 +201,20 @@ export interface Database {
         Relationships: [];
       };
       live_round_teams: {
-        Row: { id: string; round_id: string; student_id: string; team_name: string; joined_at: string };
-        Insert: never; // only via join_live_round()
+        Row: { id: string; round_id: string; created_by: string; team_name: string; joined_at: string };
+        Insert: never; // only via create_live_team()
+        Update: never;
+        Relationships: [];
+      };
+      live_round_team_members: {
+        Row: { team_id: string; round_id: string; student_id: string; joined_at: string };
+        Insert: never; // only via create_live_team() / join_live_team()
         Update: never;
         Relationships: [];
       };
       live_round_answers: {
         Row: {
-          id: string; round_id: string; team_id: string; question_id: string;
+          id: string; round_id: string; team_id: string; student_id: string; question_id: string;
           selected_option: SurgeOption; correct: boolean; response_time_ms: number | null; created_at: string;
         };
         Insert: never; // only via submit_live_answer()
@@ -341,10 +347,16 @@ export interface Database {
       admin_set_role: { Args: { p_admin_id: string; p_role: AdminRole; p_club_id?: string | null }; Returns: undefined };
       log_csv_import: { Args: { p_surge_id: string; p_details: Json }; Returns: undefined };
       host_create_round: { Args: { p_surge_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
-      join_live_round: {
+      create_live_team: {
         Args: { p_room_code: string; p_team_name: string };
         Returns: Database['public']['Tables']['live_round_teams']['Row'];
       };
+      join_live_team: {
+        Args: { p_team_id: string };
+        Returns: Database['public']['Tables']['live_round_team_members']['Row'];
+      };
+      leave_live_team: { Args: { p_team_id: string }; Returns: undefined };
+      complete_live_round: { Args: { p_round_id: string }; Returns: undefined };
       host_advance_round: { Args: { p_round_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
       submit_live_answer: {
         Args: { p_round_id: string; p_question_id: string; p_selected_option: string; p_response_time_ms?: number | null };

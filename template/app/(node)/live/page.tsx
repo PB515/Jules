@@ -1,8 +1,9 @@
 'use client';
 /**
  * Live Round join screen — enter the room code shown on the classroom
- * projector + a team name. "One phone per team": whoever submits this form
- * is the team's device for the whole round; their account earns the Joules.
+ * projector. Teams are now real multi-student groups (create or join one on
+ * the next screen), not "one phone per team" — this step only resolves the
+ * room code to a round.
  *
  * Also accepts a `?code=` query param (from scanning the host lobby's QR,
  * decision 43) to pre-fill the room code field — same Suspense-wrapped
@@ -11,7 +12,7 @@
 import { Suspense, useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MonitorPlay } from '@/lib/icons';
-import { joinLiveRoundAction, type ActionResult } from './actions';
+import { resolveRoomCodeAction, type ActionResult } from './actions';
 
 const initialState: ActionResult = {};
 
@@ -24,7 +25,7 @@ export default function LiveJoinPage() {
 }
 
 function LiveJoinForm() {
-  const [state, formAction, pending] = useActionState(joinLiveRoundAction, initialState);
+  const [state, formAction, pending] = useActionState(resolveRoomCodeAction, initialState);
   const params = useSearchParams();
   const codeFromQr = params.get('code')?.toUpperCase() ?? '';
 
@@ -46,7 +47,6 @@ function LiveJoinForm() {
           className="input text-center text-2xl tracking-[0.3em] uppercase"
           required
         />
-        <input name="team_name" placeholder="Team name" className="input text-center" required />
         {state?.error ? (
           <p role="alert" className="text-sm text-accent">
             {state.error}
@@ -57,7 +57,7 @@ function LiveJoinForm() {
           disabled={pending}
           className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
         >
-          {pending ? 'Joining…' : 'Join'}
+          {pending ? 'Continuing…' : 'Continue'}
         </button>
       </form>
     </main>
