@@ -5,6 +5,7 @@ import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { EnergyField } from '@/lib/components/energy-field';
 import { HeroAtom } from '@/lib/components/hero-atom';
+import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { ArrowRight, Calendar, MapPin } from '@/lib/icons';
 
 export const metadata = { title: 'Home' };
@@ -25,7 +26,7 @@ export default async function GeneralHomePage() {
 
       <section className="relative isolate flex flex-col items-center gap-4 py-10 text-center">
         <HeroAtom className="absolute inset-0 -z-10 opacity-10" />
-        <p className="text-xs uppercase tracking-[0.3em] text-gold">Energy Management Club</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-gold">Faculty of Management Sciences</p>
         <h1 className="max-w-2xl text-4xl leading-tight font-medium">{site.tagline}</h1>
         <p className="max-w-xl text-muted">{site.description}</p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
@@ -38,14 +39,9 @@ export default async function GeneralHomePage() {
               Continue to the Command Center
             </Link>
           ) : (
-            <>
-              <Link href="/get-app" className="flex items-center gap-1.5 rounded-[var(--radius)] bg-gold px-5 py-2.5 text-sm font-medium text-gold-foreground">
-                I&apos;m a student <ArrowRight className="size-4" aria-hidden />
-              </Link>
-              <Link href="/admin/login" className="rounded-[var(--radius)] border border-border px-5 py-2.5 text-sm text-muted hover:text-foreground">
-                I&apos;m an admin
-              </Link>
-            </>
+            <Link href="/get-app" className="flex items-center gap-1.5 rounded-[var(--radius)] bg-gold px-5 py-2.5 text-sm font-medium text-gold-foreground">
+              I&apos;m a student <ArrowRight className="size-4" aria-hidden />
+            </Link>
           )}
         </div>
       </section>
@@ -53,12 +49,14 @@ export default async function GeneralHomePage() {
       <section>
         <h2 className="mb-2 text-lg font-medium">The idea</h2>
         <p className="max-w-3xl text-sm leading-relaxed text-muted">
-          Synergy bridges the Joule, the SI unit of energy, with Shakti, the primordial energy that the
-          Vishwambhari Stuti describes as present in every atom of the universe. Every meeting, expert
-          session, volunteer task, and live quiz across every club is a spark of that energy. Members are
-          atoms of the program, generating Joules through engagement, climbing through standing energy
-          states (Ember, Volt, Current, Plasma), and building one shared permanent record of participation
-          in Catalyst Records, a single points system shared across every club, not one per club.
+          The FMS Students Clubs and Conduits are more than student organizations. They&apos;re a vibrant
+          community where ambitious minds converge to explore, learn, and grow professionally. Every meeting,
+          expert session, volunteer task, and live quiz across every club earns Joules, building one shared,
+          permanent record of participation in Catalyst Records, a single points system shared across every
+          club, not one per club. Members climb through standing tiers (Ember, Volt, Current, Plasma) as they
+          engage: networking with peers, faculty, alumni, and industry professionals; building leadership
+          skills through hands-on event management; and gaining real industry insight through guest lectures,
+          case studies, and site visits.
         </p>
       </section>
 
@@ -85,9 +83,10 @@ export default async function GeneralHomePage() {
                       </p>
                     ) : null}
                   </div>
-                  <p className="flex items-center gap-1.5 text-xs text-muted">
-                    <Calendar className="size-3.5" aria-hidden />
-                    {new Date(e.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  <p className="flex items-center gap-1.5 text-xs">
+                    <Calendar className="size-3.5 text-muted" aria-hidden />
+                    <span className="text-muted">{formatDateUTC(e.event_date)}</span>
+                    <span className="font-medium text-accent">{formatTimeUTC(e.event_date)}</span>
                   </p>
                 </Link>
               </li>

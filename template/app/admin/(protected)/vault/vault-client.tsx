@@ -3,12 +3,15 @@
  * Student Data Vault (spec §7) — Owner only. Search, Force Reset (temp
  * password, audit-logged), manual Joule adjustment, lock/unlock.
  */
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { Search, Lock, Unlock, KeyRound } from '@/lib/icons';
-import { adjustJoulesAction, forceResetAction, setStudentStatusAction } from './actions';
-import type { Tier, StudentStatus } from '@/lib/supabase/database.types';
+import { BarRow } from '@/lib/patterns/bar-row';
+import { StreakChain } from '@/lib/components/streak-chain';
+import { SOURCE_LABEL } from '@/lib/jules/student-activity';
+import { Search, Lock, Unlock, KeyRound, Loader2 } from '@/lib/icons';
+import { adjustJoulesAction, forceResetAction, getStudentActivityForVaultAction, setStudentStatusAction } from './actions';
+import type { Tier, StudentStatus, TransactionType } from '@/lib/supabase/database.types';
 
 interface StudentRow {
   id: string;
@@ -76,12 +79,30 @@ export function VaultClient({ students }: { students: StudentRow[] }) {
   );
 }
 
+interface ActivitySummary {
+  attendance: { attended: number; missed: number; upcoming: number };
+  pointsBySource: Partial<Record<TransactionType, number>>;
+  soloQuizCount: number;
+  groupQuizCount: number;
+}
+
 function StudentDetail({ student }: { student: StudentRow }) {
   const [isPending, startTransition] = useTransition();
   const [tempPassword, setTempPassword] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
+  const [activity, setActivity] = useState<ActivitySummary | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getStudentActivityForVaultAction(student.id).then((data) => {
+      if (!cancelled) setActivity(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [student.id]);
 
   function doForceReset() {
     if (!confirm(`Issue a temporary password for ${student.name}?`)) return;
@@ -118,8 +139,70 @@ function StudentDetail({ student }: { student: StudentRow }) {
         <p>Email: {student.college_email}</p>
         <p>Phone: {student.phone ?? 'n/a'}</p>
         <p>Lifetime Joules: {student.lifetime_joules}</p>
-        <p>Streak: {student.streak} events</p>
+        <div className="flex items-center gap-1.5">
+          <span>Streak:</span>
+          <StreakChain count={student.streak} />
+        </div>
       </div>
+
+      {activity ? (
+        <div className="flex flex-col gap-4 rounded-[var(--radius)] border border-border bg-card p-4">
+          <h3 className="text-xs font-medium text-muted">My activity</h3>
+
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-tertiary">Event attendance</p>
+            <BarRow
+              label="Attended"
+              value={activity.attendance.attended}
+              max={Math.max(1, activity.attendance.attended, activity.attendance.missed, activity.attendance.upcoming)}
+              color="var(--success)"
+            />
+            <BarRow
+              label="Missed"
+              value={activity.attendance.missed}
+              max={Math.max(1, activity.attendance.attended, activity.attendance.missed, activity.attendance.upcoming)}
+              color="var(--accent)"
+            />
+            <BarRow
+              label="Upcoming"
+              value={activity.attendance.upcoming}
+              max={Math.max(1, activity.attendance.attended, activity.attendance.missed, activity.attendance.upcoming)}
+              color="var(--border-muted)"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-tertiary">Joules by source</p>
+            {Object.keys(activity.pointsBySource).length === 0 ? (
+              <p className="text-xs text-tertiary">No Joules earned yet.</p>
+            ) : (
+              (Object.keys(SOURCE_LABEL) as TransactionType[])
+                .filter((type) => activity.pointsBySource[type] !== undefined)
+                .map((type) => (
+                  <BarRow
+                    key={type}
+                    label={SOURCE_LABEL[type]}
+                    value={activity.pointsBySource[type] ?? 0}
+                    max={Math.max(1, ...Object.values(activity.pointsBySource).map((v) => Math.abs(v ?? 0)))}
+                    color="var(--gold)"
+                  />
+                ))
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-tertiary">Quiz participation</span>
+            <span className="text-muted">
+              {activity.soloQuizCount} solo · {activity.groupQuizCount} group
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-xs text-tertiary">
+          <Loader2 className="size-3.5 animate-spin" aria-hidden />
+          Loading activity…
+        </div>
+      )}
 
       {error ? <p className="text-accent">{error}</p> : null}
       {tempPassword ? (

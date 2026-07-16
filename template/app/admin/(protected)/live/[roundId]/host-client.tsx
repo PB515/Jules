@@ -6,6 +6,7 @@
  * instantly without polling — this is the "live" in Live Round.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Crown, Check, Loader2 } from '@/lib/icons';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
@@ -341,6 +342,12 @@ function FinalView({ scoreboard }: { scoreboard: ScoreRow[] }) {
         scale="full"
         rows={scoreboard.map((r) => ({ key: r.team_id, label: r.team_name, amount: r.total_amount, rank: r.rank }))}
       />
+      <Link
+        href="/admin/live/new"
+        className="mx-auto rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
+      >
+        Start another Live Round
+      </Link>
     </div>
   );
 }

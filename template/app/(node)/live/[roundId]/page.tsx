@@ -48,7 +48,7 @@ export default async function LiveRoundPlayPage({ params }: { params: Promise<{ 
 
     return (
       <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-12 text-center">
-        <TeamFormationClient roundId={roundId} roomCode={round.room_code} openTeams={openTeams} />
+        <TeamFormationClient roundId={roundId} roomCode={round.room_code} openTeams={openTeams} studentName={student.name} />
       </main>
     );
   }
@@ -61,6 +61,7 @@ export default async function LiveRoundPlayPage({ params }: { params: Promise<{ 
   return (
     <TeamClient
       roundId={roundId}
+      teamId={membership.team_id}
       initialRound={round}
       teamName={membership.live_round_teams?.team_name ?? ''}
       pointsPerQuestion={surge?.points_per_question ?? 20}

@@ -5,10 +5,30 @@ import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { requireAdmin } from '@/lib/auth/session';
 import { revalidatePath } from 'next/cache';
+import { getStudentActivitySummary } from '@/lib/jules/student-activity';
 
 export interface ActionResult {
   error?: string;
   tempPassword?: string;
+}
+
+/**
+ * The same "My activity" breakdown shown on the student's own Profile page
+ * (event attendance, Joules by source, quiz participation), fetched
+ * on-demand per row rather than for every student up front. Relies on the
+ * existing staff-wide SELECT policies on event_registrations/
+ * joule_transactions — no new RPC needed, same reasoning as the Profile page.
+ */
+export async function getStudentActivityForVaultAction(studentId: string) {
+  await requireAdmin(['professor']);
+  const supabase = await createClient();
+  const summary = await getStudentActivitySummary(supabase, studentId);
+  return {
+    attendance: summary.attendance,
+    pointsBySource: Object.fromEntries(summary.pointsBySource),
+    soloQuizCount: summary.soloQuizCount,
+    groupQuizCount: summary.groupQuizCount,
+  };
 }
 
 /**

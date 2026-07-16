@@ -5,8 +5,11 @@ import { TierBadge } from '@/lib/components/tier-badge';
 import { TierUpCelebration } from '@/lib/components/tier-up-celebration';
 import { OnboardingTour } from '@/lib/components/onboarding-tour';
 import { PowerGrid } from '@/lib/components/power-grid';
+import { StreakChain } from '@/lib/components/streak-chain';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
+import { getStudentActivitySummary } from '@/lib/jules/student-activity';
+import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { ScanLine, Clock, Calendar, CircleCheck, CircleX, ChevronRight, Bell } from '@/lib/icons';
 import Link from 'next/link';
 import type { Tier } from '@/lib/supabase/database.types';
@@ -51,6 +54,7 @@ export default async function DashboardPage() {
   const [
     { data: totalsRows },
     { data: activity },
+    activitySummary,
     { data: season },
     { data: firstTransaction },
     { data: candidateEvents },
@@ -64,6 +68,7 @@ export default async function DashboardPage() {
       .order('created_at', { ascending: false })
       .limit(10)
       .returns<ActivityRow[]>(),
+    getStudentActivitySummary(supabase, student.id),
     supabase.from('seasons').select('*').lte('start_date', new Date().toISOString()).gte('end_date', new Date().toISOString()).maybeSingle(),
     // Only way to know if a row in the latest-10 feed above is truly the
     // student's first-ever transaction, not just the oldest of the last 10.
@@ -99,7 +104,11 @@ export default async function DashboardPage() {
 
   const progress = tierProgress(totals.season_joules);
   const nextAt = nextTierAt(totals.season_joules);
-  const litCount = activity?.length ?? 0;
+  // "Logged" here means genuinely attended (event check-ins or quiz
+  // participation), not a raw recent-transactions count — that older
+  // measure conflated manual Joule adjustments with real activity and was
+  // capped at 10 by the Recent Activity feed's own query limit above.
+  const litCount = activitySummary.attendance.attended + activitySummary.soloQuizCount + activitySummary.groupQuizCount;
 
   const registeredEventIds = new Set((registrations ?? []).map((r) => r.event_id));
   const upcomingEvents = (candidateEvents ?? [])
@@ -171,6 +180,13 @@ export default async function DashboardPage() {
         {daysLeft !== null ? (
           <p className="mt-1 text-xs text-tertiary">Season ends in {daysLeft} days</p>
         ) : null}
+
+        <div className="mt-4 border-t border-border pt-4">
+          <p className="text-xs text-muted">Streak</p>
+          <div className="mt-2">
+            <StreakChain count={totals.streak} />
+          </div>
+        </div>
       </section>
 
       <section>
@@ -221,7 +237,9 @@ export default async function DashboardPage() {
                   <Link href={`/events/${e.id}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-background">
                     <div className="min-w-0">
                       <p className="truncate">{e.name}</p>
-                      <p className="text-xs text-tertiary">{new Date(e.event_date).toLocaleString()}</p>
+                      <p className="text-xs text-tertiary">
+                        {formatDateUTC(e.event_date)} <span className="font-medium text-accent">{formatTimeUTC(e.event_date)}</span>
+                      </p>
                     </div>
                     <span className="flex shrink-0 items-center gap-1 text-xs text-muted">
                       {registered ? 'Registered' : 'View & register'}
@@ -254,7 +272,13 @@ export default async function DashboardPage() {
                     <div className="min-w-0">
                       <p className="truncate">{r.events?.name ?? 'Event'}</p>
                       <p className="text-xs text-tertiary">
-                        {r.events ? new Date(r.events.event_date).toLocaleString() : ''}
+                        {r.events ? (
+                          <>
+                            {formatDateUTC(r.events.event_date)} <span className="font-medium text-accent">{formatTimeUTC(r.events.event_date)}</span>
+                          </>
+                        ) : (
+                          ''
+                        )}
                       </p>
                     </div>
                     <span className={`flex shrink-0 items-center gap-1 text-xs font-medium ${status.className}`}>

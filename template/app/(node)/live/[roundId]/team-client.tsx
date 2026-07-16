@@ -5,13 +5,15 @@
  * feedback, then the shared scoreboard once the host reveals it. Realtime
  * (not polling) drives every phase change.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { EnergyBar } from '@/lib/components/energy-bar';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
-import { Check, X, Crown } from '@/lib/icons';
+import { leaveLiveTeamAction } from './team-actions';
+import { Check, X, Crown, Trophy, Home } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
 type Round = Database['public']['Tables']['live_rounds']['Row'];
@@ -21,12 +23,14 @@ type Option = 'A' | 'B' | 'C' | 'D';
 
 export function TeamClient({
   roundId,
+  teamId,
   initialRound,
   teamName,
   pointsPerQuestion,
   totalQuestions,
 }: {
   roundId: string;
+  teamId: string;
   initialRound: Round;
   teamName: string;
   pointsPerQuestion: number;
@@ -37,8 +41,21 @@ export function TeamClient({
   const [selected, setSelected] = useState<Option | null>(null);
   const [awarded, setAwarded] = useState<number | null>(null);
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
+  const [isLeaving, startLeave] = useTransition();
   const supabase = useRef(createClient()).current;
   const isLastQuestion = round.question_index + 1 >= totalQuestions;
+
+  function leaveTeam() {
+    setLeaveError(null);
+    startLeave(async () => {
+      try {
+        await leaveLiveTeamAction(roundId, teamId);
+      } catch (e) {
+        setLeaveError(e instanceof Error ? e.message : 'Something went wrong.');
+      }
+    });
+  }
 
   const loadQuestion = useCallback(async () => {
     const { data } = await supabase.rpc('live_round_question', { p_round_id: roundId });
@@ -166,6 +183,15 @@ export function TeamClient({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <p className="text-lg font-medium">You&apos;re in!</p>
           <p className="text-sm text-tertiary">Waiting for the host to start the round…</p>
+          {leaveError ? <p className="text-sm text-accent">{leaveError}</p> : null}
+          <button
+            type="button"
+            disabled={isLeaving}
+            onClick={leaveTeam}
+            className="mt-2 text-sm text-muted underline disabled:opacity-60"
+          >
+            {isLeaving ? 'Leaving…' : 'Not your team? Leave'}
+          </button>
         </div>
       ) : null}
 
@@ -286,6 +312,22 @@ export function TeamClient({
               highlight: r.team_name === teamName,
             }))}
           />
+          <div className="mt-2 flex flex-col gap-2">
+            <Link
+              href="/leaderboard"
+              className="flex items-center justify-center gap-1.5 rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground"
+            >
+              <Trophy className="size-4" aria-hidden />
+              View Leaderboard
+            </Link>
+            <Link
+              href="/dashboard"
+              className="flex items-center justify-center gap-1.5 rounded-[var(--radius)] border border-border py-3 text-sm text-muted"
+            >
+              <Home className="size-4" aria-hidden />
+              Back to Grid
+            </Link>
+          </div>
         </div>
       ) : null}
     </main>

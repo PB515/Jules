@@ -20,10 +20,12 @@ export function TeamFormationClient({
   roundId,
   roomCode,
   openTeams,
+  studentName,
 }: {
   roundId: string;
   roomCode: string;
   openTeams: OpenTeam[];
+  studentName: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const [creating, setCreating] = useState(false);
@@ -104,13 +106,23 @@ export function TeamFormationClient({
           </div>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => setCreating(true)}
-          className="rounded-[var(--radius)] border border-dashed border-border py-2.5 text-sm text-muted hover:text-gold"
-        >
-          + Start a team
-        </button>
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => run(() => createLiveTeamAction(roundId, roomCode, studentName))}
+            className="rounded-[var(--radius)] bg-gold py-2.5 text-sm font-medium text-gold-foreground disabled:opacity-60"
+          >
+            {isPending ? 'Joining…' : 'Go solo'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setCreating(true)}
+            className="rounded-[var(--radius)] border border-dashed border-border py-2.5 text-sm text-muted hover:text-gold"
+          >
+            + Start a team
+          </button>
+        </div>
       )}
     </div>
   );

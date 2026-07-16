@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { adminLoginAction, type ActionResult } from '@/app/(auth)/actions';
 
@@ -37,6 +38,9 @@ export default function AdminLoginPage() {
             {pending ? 'Connecting…' : 'Enter'}
           </button>
         </form>
+        <Link href="/" className="mt-6 block text-center text-sm text-muted hover:text-foreground">
+          ← Back to site
+        </Link>
       </div>
     </main>
   );

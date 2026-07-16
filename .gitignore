@@ -33,3 +33,6 @@ Thumbs.db
 # Claude Code local settings + transient files (machine-specific)
 .claude/settings.local.json
 .claude/*.lock
+
+# Real credentials — never committed, local reference only
+docs/runbooks/demo-credentials.md

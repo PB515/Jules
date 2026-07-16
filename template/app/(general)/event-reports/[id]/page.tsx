@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { Users, Zap, Calendar, MapPinned, BookOpen, CircleCheck, Download } from '@/lib/icons';
@@ -15,6 +16,7 @@ const ATTACHMENT_GROUPS: { key: string; label: string }[] = [
 export default async function EventReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const admin = await getAdmin();
 
   const { data: report } = await supabase.from('event_reports').select('*').eq('id', id).maybeSingle();
   if (!report) {
@@ -65,13 +67,15 @@ export default async function EventReportPage({ params }: { params: Promise<{ id
         {report.coordinator_name ? (
           <p className="mt-1 text-xs text-tertiary">Coordinator: {report.coordinator_name}</p>
         ) : null}
-        <a
-          href={`/api/event-reports/${report.id}/docx`}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 py-1.5 text-xs text-muted hover:text-gold"
-        >
-          <Download className="size-3.5" aria-hidden />
-          Download Word report
-        </a>
+        {admin ? (
+          <a
+            href={`/api/event-reports/${report.id}/docx`}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 py-1.5 text-xs text-muted hover:text-gold"
+          >
+            <Download className="size-3.5" aria-hidden />
+            Download Word report
+          </a>
+        ) : null}
       </div>
 
       {eventStats ? (

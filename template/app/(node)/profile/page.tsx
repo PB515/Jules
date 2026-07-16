@@ -6,65 +6,24 @@ import { ChangePasswordForm } from './change-password-form';
 import { logoutAction } from '@/app/(auth)/actions';
 import { LogOut } from '@/lib/icons';
 import { StreakChain } from '@/lib/components/streak-chain';
+import { BarRow } from '@/lib/patterns/bar-row';
+import { getStudentActivitySummary, SOURCE_LABEL } from '@/lib/jules/student-activity';
 import type { Tier, TransactionType } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Profile' };
-
-const SOURCE_LABEL: Record<TransactionType, string> = {
-  event_scan: 'Event check-ins',
-  surge_earned: 'Surge, earned',
-  surge_participation: 'Surge, participation',
-  admin_manual_adjustment: 'Manual adjustment',
-};
-
-interface RegistrationAttendanceRow {
-  attended_at: string | null;
-  events: { event_date: string; end_date: string | null } | null;
-}
 
 export default async function ProfilePage() {
   const student = await requireStudent();
   const supabase = await createClient();
 
-  const [{ data: totalsRows }, { data: registrations }, { data: transactions }, { data: groupMemberships }] =
-    await Promise.all([
-      supabase.rpc('my_totals'),
-      supabase
-        .from('event_registrations')
-        .select('attended_at, events(event_date, end_date)')
-        .eq('student_id', student.id)
-        .returns<RegistrationAttendanceRow[]>(),
-      supabase.from('joule_transactions').select('type, amount, surge_id').eq('student_id', student.id),
-      supabase.from('quiz_group_members').select('surge_id').eq('student_id', student.id),
-    ]);
+  const [{ data: totalsRows }, { attendance, pointsBySource, soloQuizCount, groupQuizCount }] = await Promise.all([
+    supabase.rpc('my_totals'),
+    getStudentActivitySummary(supabase, student.id),
+  ]);
   const totals = totalsRows?.[0] ?? { season_joules: 0, lifetime_joules: 0, tier: 'ember' as Tier, streak: 0 };
 
-  const attendance = { attended: 0, missed: 0, upcoming: 0 };
-  for (const r of registrations ?? []) {
-    if (r.attended_at) {
-      attendance.attended += 1;
-    } else if (r.events && hasConcluded(r.events.end_date ?? r.events.event_date)) {
-      attendance.missed += 1;
-    } else {
-      attendance.upcoming += 1;
-    }
-  }
   const attendanceMax = Math.max(1, attendance.attended, attendance.missed, attendance.upcoming);
-
-  const pointsBySource = new Map<TransactionType, number>();
-  for (const t of transactions ?? []) {
-    pointsBySource.set(t.type, (pointsBySource.get(t.type) ?? 0) + t.amount);
-  }
   const pointsMax = Math.max(1, ...Array.from(pointsBySource.values()).map((v) => Math.abs(v)));
-
-  const groupSurgeIds = new Set((groupMemberships ?? []).map((g) => g.surge_id));
-  const quizSurgeIds = new Set((transactions ?? []).filter((t) => t.surge_id).map((t) => t.surge_id as string));
-  let soloQuizCount = 0;
-  let groupQuizCount = 0;
-  for (const surgeId of quizSurgeIds) {
-    if (groupSurgeIds.has(surgeId)) groupQuizCount += 1;
-    else soloQuizCount += 1;
-  }
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-8">
@@ -156,23 +115,3 @@ function Stat({ label, value, icon }: { label: string; value: string; icon?: Rea
   );
 }
 
-function BarRow({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="w-28 shrink-0 text-xs text-tertiary">{label}</span>
-      <div className="h-2.5 flex-1 rounded-full bg-background">
-        <div
-          className="h-2.5 rounded-full"
-          style={{ width: `${(Math.abs(value) / max) * 100}%`, background: color }}
-        />
-      </div>
-      <span className="w-10 text-right text-xs text-tertiary">{value}</span>
-    </div>
-  );
-}
-
-// Plain helper (not a component) — keeps the impure Date.now() call outside
-// the component body so it isn't flagged by the render-purity lint rule.
-function hasConcluded(isoDate: string): boolean {
-  return new Date(isoDate).getTime() < Date.now();
-}

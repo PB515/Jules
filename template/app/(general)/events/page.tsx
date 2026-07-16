@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Calendar } from '@/lib/icons';
 import { EventCoverPlaceholder } from '@/lib/components/event-cover-placeholder';
+import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 
 export const metadata = { title: 'Events' };
 
@@ -91,6 +92,10 @@ function EventCardGrid({ events }: { events: EventCardData[] }) {
             <p className="text-sm font-medium">{e.name}</p>
             {e.club_name ? <p className="text-xs text-tertiary">{e.club_name}</p> : null}
             <p className="text-xs text-tertiary">{TYPE_LABEL[e.type] ?? e.type}</p>
+            <p className="mt-1 text-xs">
+              <span className="text-tertiary">{formatDateUTC(e.event_date)}</span>{' '}
+              <span className="font-medium text-accent">{formatTimeUTC(e.event_date)}</span>
+            </p>
           </div>
         </Link>
       ))}
