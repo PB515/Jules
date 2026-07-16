@@ -12,6 +12,7 @@ import { Crown, Check, Loader2 } from '@/lib/icons';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
+import { getQuizMilestone, MILESTONE_LABEL, type QuizMilestone } from '@/lib/jules/quiz-milestones';
 import { site } from '@/lib/site';
 import type { Database, LivePhase } from '@/lib/supabase/database.types';
 import QRCode from 'react-qr-code';
@@ -121,14 +122,15 @@ export function HostClient({
 
   const q = questions[round.question_index];
   const isLast = round.question_index + 1 >= questions.length;
+  const milestone = getQuizMilestone(round.question_index, questions.length);
 
-  // The final question's reveal gets a suspense beat (drumroll, dimmed/
+  // Milestone questions' reveal gets a suspense beat (drumroll, dimmed/
   // pulsing hold) before showing the same reveal data every other question
   // shows instantly — a client-side pacing effect only, not a new DB phase.
   const [suspense, setSuspense] = useState(false);
   useEffect(() => {
-    if (round.phase !== 'reveal' || !isLast) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/isLast, same pattern as lib/components/count-up.tsx
+    if (round.phase !== 'reveal' || !milestone) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/milestone, same pattern as lib/components/count-up.tsx
       setSuspense(false);
       return;
     }
@@ -140,9 +142,12 @@ export function HostClient({
     setSuspense(true);
     playSound('drumroll');
     vibrate([80, 60, 80, 60, 80, 60, 200]);
-    const t = setTimeout(() => setSuspense(false), 1500);
+    // Matches the real drumroll.mp3's own length (~6.45s) so the suspense
+    // hold doesn't visually cut off before the sound finishes — was 1500ms
+    // for the original short placeholder tone.
+    const t = setTimeout(() => setSuspense(false), 6500);
     return () => clearTimeout(t);
-  }, [round.phase, isLast]);
+  }, [round.phase, milestone]);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 p-8 text-center">
@@ -164,7 +169,7 @@ export function HostClient({
       ) : null}
 
       {(round.phase === 'reveal' || round.phase === 'leaderboard') && q ? (
-        <RevealView q={q} points={pointsPerQuestion} phase={round.phase} scoreboard={scoreboard} suspense={suspense} />
+        <RevealView q={q} points={pointsPerQuestion} phase={round.phase} scoreboard={scoreboard} suspense={suspense} milestone={milestone} />
       ) : null}
 
       {round.phase === 'complete' ? <FinalView scoreboard={scoreboard} /> : null}
@@ -275,12 +280,14 @@ function RevealView({
   phase,
   scoreboard,
   suspense,
+  milestone,
 }: {
   q: Question;
   points: number;
   phase: LivePhase;
   scoreboard: ScoreRow[];
   suspense: boolean;
+  milestone: QuizMilestone | null;
 }) {
   const options: [Option, string][] = [
     ['A', q.option_a],
@@ -293,7 +300,7 @@ function RevealView({
     return (
       <div className="flex w-full flex-col items-center gap-4 py-16 text-center">
         <p className="animate-pulse text-lg font-medium text-gold">Revealing the answer&hellip;</p>
-        <p className="text-sm text-tertiary">Final question</p>
+        <p className="text-sm text-tertiary">{milestone ? MILESTONE_LABEL[milestone] : null}</p>
       </div>
     );
   }

@@ -13,6 +13,7 @@ import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
 import { leaveLiveTeamAction } from './team-actions';
+import { getQuizMilestone, MILESTONE_LABEL } from '@/lib/jules/quiz-milestones';
 import { Check, X, Crown, Trophy, Home } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -44,7 +45,7 @@ export function TeamClient({
   const [leaveError, setLeaveError] = useState<string | null>(null);
   const [isLeaving, startLeave] = useTransition();
   const supabase = useRef(createClient()).current;
-  const isLastQuestion = round.question_index + 1 >= totalQuestions;
+  const milestone = getQuizMilestone(round.question_index, totalQuestions);
 
   function leaveTeam() {
     setLeaveError(null);
@@ -146,17 +147,17 @@ export function TeamClient({
   // Quiet per-question feedback (skipped on the final question, which gets
   // the bigger drumroll + winner treatment below instead).
   useEffect(() => {
-    if (awarded === null || isLastQuestion) return;
+    if (awarded === null || milestone) return;
     playSound(awarded > 0 ? 'correct' : 'incorrect');
     vibrate(30);
-  }, [awarded, isLastQuestion]);
+  }, [awarded, milestone]);
 
   // Same suspense-before-reveal beat as the host screen (see host-client.tsx)
   // — kept in sync deliberately: same duration, same vibration pattern.
   const [suspense, setSuspense] = useState(false);
   useEffect(() => {
-    if (round.phase !== 'reveal' || !isLastQuestion) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/isLastQuestion, same pattern as lib/components/count-up.tsx
+    if (round.phase !== 'reveal' || !milestone) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync deriving from changed round.phase/milestone, same pattern as lib/components/count-up.tsx
       setSuspense(false);
       return;
     }
@@ -168,9 +169,11 @@ export function TeamClient({
     setSuspense(true);
     playSound('drumroll');
     vibrate([80, 60, 80, 60, 80, 60, 200]);
-    const t = setTimeout(() => setSuspense(false), 1500);
+    // Matches the real drumroll.mp3's own length (~6.45s), same as the host
+    // screen — kept in sync deliberately (see host-client.tsx).
+    const t = setTimeout(() => setSuspense(false), 6500);
     return () => clearTimeout(t);
-  }, [round.phase, isLastQuestion]);
+  }, [round.phase, milestone]);
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
@@ -238,7 +241,7 @@ export function TeamClient({
       {round.phase === 'reveal' && question && suspense ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
           <p className="animate-pulse text-lg font-medium text-gold">Revealing the answer&hellip;</p>
-          <p className="text-sm text-tertiary">Final question</p>
+          <p className="text-sm text-tertiary">{milestone ? MILESTONE_LABEL[milestone] : null}</p>
         </div>
       ) : null}
 

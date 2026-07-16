@@ -32,7 +32,9 @@ export function TierUpCelebration({ tier }: { tier: Tier }) {
     if (previousRank !== -1 && tierRank(tier) > previousRank) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot kickoff, same pattern as launch-splash.tsx
       setCelebrating(true);
-      const t = setTimeout(() => setCelebrating(false), 3200);
+      // Matches the real tier-up.mp3's own length (~5.5s) — was 3200ms for
+      // the original short placeholder tone.
+      const t = setTimeout(() => setCelebrating(false), 5600);
       return () => clearTimeout(t);
     }
   }, [tier]);
