@@ -5,6 +5,7 @@ import { getStudent } from '@/lib/auth/session';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { Calendar, Clock, MapPin, Zap, ScanLine, CircleCheck } from '@/lib/icons';
 import { RegisterButton, CancelRegistrationButton } from './registration-client';
+import { EventCoverPlaceholder } from '@/lib/components/event-cover-placeholder';
 
 export const metadata = { title: 'Event' };
 
@@ -49,7 +50,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
       {coverUrl ? (
         // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image domain config needed
         <img src={coverUrl} alt="" className="aspect-video w-full rounded-[var(--radius)] object-cover" />
-      ) : null}
+      ) : (
+        <div className="flex aspect-video w-full items-center justify-center rounded-[var(--radius)] border border-border bg-card">
+          <EventCoverPlaceholder className="h-full w-full" />
+        </div>
+      )}
       <div>
         <h1 className="text-2xl font-medium">{event.name}</h1>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-tertiary">

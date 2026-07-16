@@ -31,7 +31,28 @@ export default async function CatalystPage({
     );
   }
 
-  const selectedId = seasonParam ?? seasons[0].id;
+  // Only worth letting a student switch seasons once 2+ of them actually have
+  // real activity — with a fresh install (or only the placeholder calendar,
+  // decision 9) there's usually exactly one season anyone has ever earned a
+  // Joule in, and a dropdown with nothing meaningful behind the other option
+  // reads as clutter, not a useful control.
+  const activityCounts = await Promise.all(
+    seasons.map(async (s) => {
+      const { count } = await supabase
+        .from('joule_transactions')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', s.start_date)
+        .lte('created_at', s.end_date);
+      return (count ?? 0) > 0;
+    })
+  );
+  const seasonsWithActivity = activityCounts.filter(Boolean).length;
+  const showPicker = seasonsWithActivity > 1;
+
+  const now = new Date();
+  const activeSeason = seasons.find((s) => now >= new Date(s.start_date) && now <= new Date(s.end_date));
+  const defaultSeasonId = activeSeason?.id ?? seasons[0].id;
+  const selectedId = seasonParam ?? defaultSeasonId;
   const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -54,7 +75,9 @@ export default async function CatalystPage({
         <h1 className="text-xl font-medium">Catalyst Records</h1>
       </div>
 
-      <SeasonPicker seasons={seasons.map((s) => ({ id: s.id, label: s.label }))} selected={selectedId} />
+      {showPicker ? (
+        <SeasonPicker seasons={seasons.map((s) => ({ id: s.id, label: s.label }))} selected={selectedId} />
+      ) : null}
 
       {/* Static — no reveal animation (spec §6): a settled record, not a live moment. */}
       {rows.length === 0 ? (

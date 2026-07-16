@@ -4,7 +4,8 @@ import { TierBadge } from '@/lib/components/tier-badge';
 import { ProfileForm } from './profile-form';
 import { ChangePasswordForm } from './change-password-form';
 import { logoutAction } from '@/app/(auth)/actions';
-import { Flame, LogOut } from '@/lib/icons';
+import { LogOut } from '@/lib/icons';
+import { StreakChain } from '@/lib/components/streak-chain';
 import type { Tier, TransactionType } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Profile' };
@@ -71,9 +72,14 @@ export default async function ProfilePage() {
 
       <ProfileForm name={student.name} phone={student.phone ?? ''} />
 
-      <section className="grid grid-cols-2 gap-3">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Stat label="Lifetime Joules" value={totals.lifetime_joules.toLocaleString()} />
-        <Stat label="Streak" value={`${totals.streak} events`} icon={<Flame className="size-4 text-accent" />} />
+        <div className="rounded-[var(--radius)] border border-border bg-card p-4">
+          <p className="text-xs text-muted">Streak</p>
+          <div className="mt-2">
+            <StreakChain count={totals.streak} />
+          </div>
+        </div>
       </section>
 
       <section className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card p-4">

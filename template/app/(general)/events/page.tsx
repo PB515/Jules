@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { Calendar, BookOpen } from '@/lib/icons';
+import { Calendar } from '@/lib/icons';
+import { EventCoverPlaceholder } from '@/lib/components/event-cover-placeholder';
 
 export const metadata = { title: 'Events' };
 
@@ -83,7 +84,7 @@ function EventCardGrid({ events }: { events: EventCardData[] }) {
               // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image domain config needed
               <img src={e.coverUrl} alt="" className="h-full w-full object-cover" />
             ) : (
-              <BookOpen className="size-8 text-tertiary" aria-hidden />
+              <EventCoverPlaceholder className="h-full w-full" />
             )}
           </div>
           <div className="flex flex-col gap-1 p-4">
