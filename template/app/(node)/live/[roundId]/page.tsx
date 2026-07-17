@@ -8,7 +8,7 @@ export const metadata = { title: 'Live Round' };
 
 interface MembershipRow {
   team_id: string;
-  live_round_teams: { team_name: string } | null;
+  live_round_teams: { team_name: string; created_by: string } | null;
 }
 
 export default async function LiveRoundPlayPage({ params }: { params: Promise<{ roundId: string }> }) {
@@ -21,7 +21,7 @@ export default async function LiveRoundPlayPage({ params }: { params: Promise<{ 
 
   const { data: membership } = await supabase
     .from('live_round_team_members')
-    .select('team_id, live_round_teams(team_name)')
+    .select('team_id, live_round_teams(team_name, created_by)')
     .eq('round_id', roundId)
     .eq('student_id', student.id)
     .maybeSingle()
@@ -64,6 +64,7 @@ export default async function LiveRoundPlayPage({ params }: { params: Promise<{ 
       teamId={membership.team_id}
       initialRound={round}
       teamName={membership.live_round_teams?.team_name ?? ''}
+      isLeader={membership.live_round_teams?.created_by === student.id}
       pointsPerQuestion={surge?.points_per_question ?? 20}
       totalQuestions={totalQuestions ?? 0}
     />

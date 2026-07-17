@@ -27,6 +27,7 @@ export function TeamClient({
   teamId,
   initialRound,
   teamName,
+  isLeader,
   pointsPerQuestion,
   totalQuestions,
 }: {
@@ -34,6 +35,7 @@ export function TeamClient({
   teamId: string;
   initialRound: Round;
   teamName: string;
+  isLeader: boolean;
   pointsPerQuestion: number;
   totalQuestions: number;
 }) {
@@ -108,7 +110,11 @@ export function TeamClient({
 
   const choose = useCallback(
     async (opt: Option) => {
-      if (!question || selected) return;
+      // Only the team captain (whoever created the team) can submit an
+      // answer — submit_live_answer enforces this server-side too, but
+      // checking here avoids a pointless round-trip for the common case of
+      // a teammate tapping an option on their own phone.
+      if (!isLeader || !question || selected) return;
       setSelected(opt);
       const start = performance.now();
       const { data, error } = await supabase.rpc('submit_live_answer', {
@@ -119,7 +125,7 @@ export function TeamClient({
       });
       if (!error && data?.[0]) setAwarded(data[0].awarded);
     },
-    [question, selected, supabase, roundId]
+    [isLeader, question, selected, supabase, roundId]
   );
 
   const options: [Option, string][] = question
@@ -218,6 +224,9 @@ export function TeamClient({
         <div className="flex flex-1 flex-col gap-6">
           <EnergyBar key={question.id} totalSeconds={remainingSeconds || question.time_limit_seconds} running={!selected} onExpire={() => {}} />
           <h2 className="text-lg leading-snug font-medium">{question.text}</h2>
+          {!isLeader ? (
+            <p className="text-center text-xs text-tertiary">Your team captain is answering for the team.</p>
+          ) : null}
           <div className="flex flex-1 flex-col gap-3">
             {options.map(([key, label]) => {
               const isSelected = selected === key;
@@ -225,11 +234,12 @@ export function TeamClient({
                 <button
                   key={key}
                   onClick={() => choose(key)}
-                  disabled={!!selected}
+                  disabled={!isLeader || !!selected}
                   className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-sm transition-colors disabled:cursor-default"
                   style={{
                     borderColor: isSelected ? 'var(--gold)' : 'var(--border)',
                     background: isSelected ? 'var(--tier-volt-bg)' : 'var(--card)',
+                    opacity: isLeader ? 1 : 0.6,
                   }}
                 >
                   <span>
@@ -240,7 +250,7 @@ export function TeamClient({
               );
             })}
           </div>
-          {selected ? (
+          {isLeader && selected ? (
             <p className="text-center text-sm text-tertiary">Locked in, waiting for the host&hellip;</p>
           ) : null}
         </div>

@@ -48,6 +48,7 @@ export function HostClient({
   const [answeredCount, setAnsweredCount] = useState(0);
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
   const [advancing, setAdvancing] = useState(false);
+  const [advanceError, setAdvanceError] = useState<string | null>(null);
   const supabase = useRef(createClient()).current;
 
   const refreshScoreboard = useCallback(async () => {
@@ -88,14 +89,20 @@ export function HostClient({
         }
       )
       .on(
+        // Re-queries the real count rather than incrementing/decrementing
+        // local state — a leave (or a solo team auto-deleting once empty,
+        // decision 60) fires a DELETE that a plain INSERT-only counter never
+        // saw, so the displayed count could only ever go up. Listening on
+        // '*' and refetching keeps this correct regardless of which way the
+        // membership changed.
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'live_round_teams', filter: `round_id=eq.${initialRound.id}` },
-        () => setTeamCount((c) => c + 1)
+        { event: '*', schema: 'public', table: 'live_round_teams', filter: `round_id=eq.${initialRound.id}` },
+        refreshTeamCount
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'live_round_team_members', filter: `round_id=eq.${initialRound.id}` },
-        () => setMemberCount((c) => c + 1)
+        { event: '*', schema: 'public', table: 'live_round_team_members', filter: `round_id=eq.${initialRound.id}` },
+        refreshMemberCount
       )
       .on(
         'postgres_changes',
@@ -112,10 +119,16 @@ export function HostClient({
 
   const advance = useCallback(async () => {
     setAdvancing(true);
+    setAdvanceError(null);
     const { data, error } = await supabase.rpc('host_advance_round', { p_round_id: initialRound.id });
     if (!error && data) {
       setRound(data as Round);
       setAnsweredCount(0);
+    } else if (error) {
+      // Previously failed silently here — a failed host_advance_round (e.g.
+      // complete_live_round erroring on the final transition) left the
+      // button looking like it did nothing at all. Surface it instead.
+      setAdvanceError(error.message);
     }
     setAdvancing(false);
   }, [supabase, initialRound.id]);
@@ -173,6 +186,8 @@ export function HostClient({
       ) : null}
 
       {round.phase === 'complete' ? <FinalView scoreboard={scoreboard} /> : null}
+
+      {advanceError ? <p className="text-sm text-accent">{advanceError}</p> : null}
 
       {round.phase !== 'complete' ? (
         <button

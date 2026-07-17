@@ -50,6 +50,10 @@ export function TeamFormationClient({
         Room {roomCode}
       </div>
       <p className="text-sm text-tertiary">Team up with classmates, or play solo.</p>
+      <p className="text-xs text-tertiary">
+        Whoever starts a team is its captain and answers for everyone. Other members share the team&apos;s
+        points but don&apos;t answer themselves.
+      </p>
       {error ? <p className="text-sm text-accent">{error}</p> : null}
 
       {openTeams.length > 0 ? (

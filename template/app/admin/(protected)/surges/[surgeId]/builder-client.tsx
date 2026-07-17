@@ -13,6 +13,7 @@ import {
   importQuestionsAction,
   setSurgeStatusAction,
   updateQuestionAction,
+  updateSurgeScoringAction,
 } from '../actions';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Upload, Plus, Trash2, Check, AlertCircle } from '@/lib/icons';
@@ -61,11 +62,81 @@ export function BuilderClient({ surge, questions }: { surge: Surge; questions: Q
         </div>
       </div>
 
+      {status === 'draft' ? <ScoringEditor surge={surge} /> : null}
       {status === 'draft' ? <CsvImport surgeId={surge.id} /> : null}
       {status === 'draft' ? <ManualAdd surgeId={surge.id} nextOrder={questions.length} /> : null}
 
       <QuestionList surgeId={surge.id} questions={questions} editable={status === 'draft'} />
     </div>
+  );
+}
+
+function ScoringEditor({ surge }: { surge: Surge }) {
+  const [points, setPoints] = useState(surge.points_per_question);
+  const [participation, setParticipation] = useState(surge.participation_points_per_question);
+  const [negative, setNegative] = useState(surge.negative_points_per_wrong_answer);
+  const [isPending, startTransition] = useTransition();
+  const [saved, setSaved] = useState(false);
+
+  function save() {
+    setSaved(false);
+    startTransition(async () => {
+      await updateSurgeScoringAction(surge.id, {
+        points_per_question: points,
+        participation_points_per_question: participation,
+        negative_points_per_wrong_answer: negative,
+      });
+      setSaved(true);
+    });
+  }
+
+  return (
+    <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+      <h2 className="mb-3 text-sm font-medium">Scoring</h2>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Points per correct answer</span>
+          <input
+            type="number"
+            className="input"
+            value={points}
+            onChange={(e) => setPoints(parseInt(e.target.value, 10) || 0)}
+            min={0}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Participation points/question</span>
+          <input
+            type="number"
+            className="input"
+            value={participation}
+            onChange={(e) => setParticipation(parseInt(e.target.value, 10) || 0)}
+            min={0}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Negative points per wrong answer</span>
+          <input
+            type="number"
+            className="input"
+            value={negative}
+            onChange={(e) => setNegative(parseInt(e.target.value, 10) || 0)}
+            min={0}
+          />
+        </label>
+      </div>
+      <p className="mt-2 text-xs text-tertiary">0 negative points means negative marking is off.</p>
+      <div className="mt-3 flex items-center gap-3">
+        <button
+          onClick={save}
+          disabled={isPending}
+          className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+        >
+          {isPending ? 'Saving…' : 'Save scoring'}
+        </button>
+        {saved && !isPending ? <span className="text-xs text-success">Saved</span> : null}
+      </div>
+    </section>
   );
 }
 

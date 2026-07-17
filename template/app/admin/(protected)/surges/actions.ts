@@ -51,6 +51,24 @@ export async function createSurgeAction(_prev: ActionResult, formData: FormData)
   redirect(`/admin/surges/${data.id}`);
 }
 
+export async function updateSurgeScoringAction(
+  surgeId: string,
+  scoring: { points_per_question: number; participation_points_per_question: number; negative_points_per_wrong_answer: number }
+) {
+  await requireAdmin(['professor', 'committee_member']);
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('surges')
+    .update({
+      points_per_question: scoring.points_per_question,
+      participation_points_per_question: scoring.participation_points_per_question,
+      negative_points_per_wrong_answer: scoring.negative_points_per_wrong_answer,
+    })
+    .eq('id', surgeId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/surges/${surgeId}`);
+}
+
 export async function setSurgeStatusAction(surgeId: string, status: 'draft' | 'live' | 'complete') {
   await requireAdmin(['professor', 'committee_member']);
   const supabase = await createClient();

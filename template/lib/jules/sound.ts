@@ -5,16 +5,33 @@
  *
  * The 6 files in public/sounds/*.mp3 are the club's own real recordings,
  * replacing the original synthesized placeholder tones.
+ *
+ * iOS specifically keeps a lock-screen "Now Playing" widget alive for as
+ * long as it considers a page's media session active — reported live as
+ * sound never fully going away after a quiz ends, only clearing once the
+ * PWA itself was uninstalled. These cached <audio> elements never got an
+ * explicit "this session is over" signal, so WebKit had nothing telling it
+ * to retire the session. Each play now explicitly clears
+ * navigator.mediaSession back to 'none' once that clip ends (or is
+ * interrupted by the next one), which is the actual signal iOS looks for.
  */
 export type SoundName = 'tick' | 'correct' | 'incorrect' | 'drumroll' | 'winner' | 'tier-up';
 
 const cache = new Map<SoundName, HTMLAudioElement>();
 let primed = false;
 
+function clearMediaSession() {
+  if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+  navigator.mediaSession.playbackState = 'none';
+  navigator.mediaSession.metadata = null;
+}
+
 function getAudio(name: SoundName): HTMLAudioElement {
   let audio = cache.get(name);
   if (!audio) {
     audio = new Audio(`/sounds/${name}.mp3`);
+    audio.addEventListener('ended', clearMediaSession);
+    audio.addEventListener('pause', clearMediaSession);
     cache.set(name, audio);
   }
   return audio;
