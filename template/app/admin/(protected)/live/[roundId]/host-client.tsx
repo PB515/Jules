@@ -319,7 +319,7 @@ function RevealView({
                   className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-lg"
                   style={
                     isCorrect
-                      ? { borderColor: 'var(--gold)', background: 'var(--tier-volt-bg)' }
+                      ? { borderColor: 'var(--success)', background: 'var(--card)' }
                       : { borderColor: 'var(--border)', background: 'var(--card)' }
                   }
                 >
@@ -327,7 +327,7 @@ function RevealView({
                     <span className="mr-2 text-tertiary">{key}.</span>
                     {label}
                   </span>
-                  {isCorrect ? <Check className="size-5 text-gold" aria-hidden /> : null}
+                  {isCorrect ? <Check className="size-5 text-success" aria-hidden /> : null}
                 </div>
               );
             })}

@@ -85,8 +85,13 @@ export function TeamClient({
         (payload) => {
           const next = payload.new as Round;
           setRound(next);
-          setSelected(null);
-          setAwarded(null);
+          // Only clear the pick/award when a fresh question actually starts —
+          // clearing it on the question->reveal transition too would erase
+          // which option the team picked before the reveal screen can use it.
+          if (next.phase === 'question') {
+            setSelected(null);
+            setAwarded(null);
+          }
           loadQuestion();
           if (next.phase === 'reveal' || next.phase === 'leaderboard' || next.phase === 'complete') {
             loadScoreboard();
@@ -144,13 +149,18 @@ export function TeamClient({
     return () => clearInterval(id);
   }, [question, round.question_started_at]);
 
-  // Quiet per-question feedback (skipped on the final question, which gets
-  // the bigger drumroll + winner treatment below instead).
+  // Quiet per-question feedback — gated on the host's real "Reveal answer"
+  // click (round.phase actually becoming 'reveal'), not on the moment the
+  // team submits an answer. awarded is set as soon as the RPC responds
+  // (still mid-question), so without this gate the sound/vibration would
+  // give away right/wrong before the host, or the rest of the room, has
+  // seen anything — skipped on the final question, which gets the bigger
+  // drumroll + winner treatment below instead.
   useEffect(() => {
-    if (awarded === null || milestone) return;
+    if (round.phase !== 'reveal' || awarded === null || milestone) return;
     playSound(awarded > 0 ? 'correct' : 'incorrect');
     vibrate(30);
-  }, [awarded, milestone]);
+  }, [round.phase, awarded, milestone]);
 
   // Same suspense-before-reveal beat as the host screen (see host-client.tsx)
   // — kept in sync deliberately: same duration, same vibration pattern.
@@ -231,9 +241,7 @@ export function TeamClient({
             })}
           </div>
           {selected ? (
-            <p className="text-center text-sm text-tertiary">
-              {awarded === null ? 'Locked in, waiting for the host…' : awarded > 0 ? `+${awarded} J!` : 'Not quite.'}
-            </p>
+            <p className="text-center text-sm text-tertiary">Locked in, waiting for the host&hellip;</p>
           ) : null}
         </div>
       ) : null}
@@ -258,7 +266,7 @@ export function TeamClient({
                   className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-sm"
                   style={
                     isCorrect
-                      ? { borderColor: 'var(--gold)', background: 'var(--tier-volt-bg)' }
+                      ? { borderColor: 'var(--success)', background: 'var(--card)' }
                       : isWrongSelected
                         ? { borderColor: 'var(--accent)', background: 'var(--tier-current-bg)' }
                         : { borderColor: 'var(--border)', background: 'var(--card)' }
@@ -268,12 +276,17 @@ export function TeamClient({
                     <span className="mr-2 text-tertiary">{key}.</span>
                     {label}
                   </span>
-                  {isCorrect ? <Check className="size-4 text-gold" aria-hidden /> : null}
+                  {isCorrect ? <Check className="size-4 text-success" aria-hidden /> : null}
                   {isWrongSelected ? <X className="size-4 text-accent" aria-hidden /> : null}
                 </div>
               );
             })}
           </div>
+          {awarded !== null ? (
+            <p className={`text-center text-sm ${awarded > 0 ? 'text-success' : 'text-accent'}`}>
+              {awarded > 0 ? `+${awarded} J!` : 'Not quite.'}
+            </p>
+          ) : null}
         </div>
       ) : null}
 

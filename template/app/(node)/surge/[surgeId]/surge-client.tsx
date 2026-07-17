@@ -108,7 +108,7 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
           const isWrongSelected = phase === 'revealed' && isSelected && correctOption !== key;
 
           let style: React.CSSProperties = { borderColor: 'var(--border)', background: 'var(--card)' };
-          if (isCorrect) style = { borderColor: 'var(--gold)', background: 'var(--tier-volt-bg)' };
+          if (isCorrect) style = { borderColor: 'var(--success)', background: 'var(--card)' };
           else if (isWrongSelected) style = { borderColor: 'var(--accent)', background: 'var(--tier-current-bg)' };
 
           return (
@@ -123,7 +123,7 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
                 <span className="mr-2 text-tertiary">{key}.</span>
                 {label}
               </span>
-              {isCorrect ? <Check className="size-4 text-gold" aria-hidden /> : null}
+              {isCorrect ? <Check className="size-4 text-success" aria-hidden /> : null}
               {isWrongSelected ? <X className="size-4 text-accent" aria-hidden /> : null}
             </button>
           );
@@ -132,7 +132,7 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
 
       {phase === 'expired' ? <p className="text-center text-sm text-tertiary">Time&apos;s up</p> : null}
       {phase === 'revealed' && awarded !== 0 ? (
-        <p className={`text-center text-sm ${awarded > 0 ? 'text-gold' : 'text-accent'}`}>
+        <p className={`text-center text-sm ${awarded > 0 ? 'text-success' : 'text-accent'}`}>
           {awarded > 0 ? '+' : ''}
           {awarded} J
         </p>
