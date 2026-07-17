@@ -31,14 +31,25 @@ export default function GetAppPage() {
 
       <InstallButton />
 
+      <div className="w-full rounded-[var(--radius)] border border-accent/40 bg-card p-4 text-left text-xs text-accent">
+        Opened this link from WhatsApp, Instagram, or another app? Tap the <strong>••• (or Safari icon)</strong>{' '}
+        at the bottom or top-right first to open it in your real browser, not the in-app one. &quot;Add to
+        Home Screen&quot; only shows up there.
+      </div>
+
       <div className="w-full space-y-4 text-left text-sm text-muted">
         <div>
           <p className="mb-1 font-medium text-foreground">Android (Chrome)</p>
-          <p>Open the link above, then tap the install button, or the menu (⋮) → &quot;Add to Home screen&quot;.</p>
+          <p>Open the link above in Chrome, then tap the install button above, or the menu (⋮) → &quot;Add to Home screen&quot;.</p>
         </div>
         <div>
           <p className="mb-1 font-medium text-foreground">iPhone (Safari)</p>
-          <p>Open the link above, tap the Share icon, then &quot;Add to Home Screen&quot;.</p>
+          <p>
+            Open the link above in Safari (there&apos;s no install button on iPhone, that&apos;s expected). Tap the{' '}
+            <strong>Share icon</strong>{' '}
+            in the bottom toolbar (the square with an arrow pointing up), scroll down, then tap &quot;Add to
+            Home Screen&quot;.
+          </p>
         </div>
       </div>
     </div>

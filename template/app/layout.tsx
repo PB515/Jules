@@ -19,6 +19,16 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-192.png",
   },
+  other: {
+    // Next 16's `appleWebApp.capable` only emits the modern
+    // `mobile-web-app-capable` tag. Older iOS/Safari versions only honor
+    // the legacy apple-prefixed tag to treat a home-screen shortcut as a
+    // real standalone app (hiding Safari's chrome) instead of a bookmark —
+    // without it, `navigator.standalone` can stay false even after "Add to
+    // Home Screen", which would make pwa-gate.tsx never pass on those
+    // devices. Emitted explicitly so both old and new iOS are covered.
+    "apple-mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
