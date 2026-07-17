@@ -63,6 +63,8 @@ export {
   Pencil,
   Bell,
   Camera,
+  Target,
+  Gift,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';

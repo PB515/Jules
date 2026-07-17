@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { createClubAction, updateClubSocialLinksAction, type ActionResult } from './actions';
+import { createClubAction, updateClubDetailsAction, type ActionResult } from './actions';
+import { BulletListField } from '@/lib/patterns/bullet-list-field';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Users, Pencil } from '@/lib/icons';
 
@@ -13,6 +14,9 @@ interface Club {
   instagram_url: string | null;
   linkedin_url: string | null;
   x_url: string | null;
+  mentor_name: string | null;
+  gain: string[];
+  activities: string[];
 }
 
 const initialState: ActionResult = {};
@@ -40,14 +44,14 @@ export function ClubsSection({ clubs }: { clubs: Club[] }) {
                   <button
                     type="button"
                     onClick={() => setEditingId(editingId === c.id ? null : c.id)}
-                    aria-label={`Edit ${c.name} social links`}
+                    aria-label={`Edit ${c.name} details`}
                     className="flex size-7 items-center justify-center rounded-[var(--radius)] border border-border text-muted hover:text-gold"
                   >
                     <Pencil className="size-3.5" aria-hidden />
                   </button>
                 </div>
               </div>
-              {editingId === c.id ? <ClubSocialLinksForm club={c} onDone={() => setEditingId(null)} /> : null}
+              {editingId === c.id ? <ClubDetailsForm club={c} onDone={() => setEditingId(null)} /> : null}
             </li>
           ))}
         </ul>
@@ -77,15 +81,35 @@ export function ClubsSection({ clubs }: { clubs: Club[] }) {
   );
 }
 
-function ClubSocialLinksForm({ club, onDone }: { club: Club; onDone: () => void }) {
-  const [state, formAction, pending] = useActionState(updateClubSocialLinksAction, initialState);
+function ClubDetailsForm({ club, onDone }: { club: Club; onDone: () => void }) {
+  const [state, formAction, pending] = useActionState(updateClubDetailsAction, initialState);
+  const [gain, setGain] = useState(club.gain.length > 0 ? club.gain : ['']);
+  const [activities, setActivities] = useState(club.activities.length > 0 ? club.activities : ['']);
 
   return (
-    <form action={formAction} className="flex flex-col gap-2 rounded-[var(--radius)] border border-border bg-background p-3">
+    <form action={formAction} className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-background p-3">
       <input type="hidden" name="club_id" value={club.id} />
-      <input name="instagram_url" type="url" className="input" placeholder="Instagram URL" defaultValue={club.instagram_url ?? ''} />
-      <input name="linkedin_url" type="url" className="input" placeholder="LinkedIn URL" defaultValue={club.linkedin_url ?? ''} />
-      <input name="x_url" type="url" className="input" placeholder="X (Twitter) URL" defaultValue={club.x_url ?? ''} />
+
+      <label className="flex flex-col gap-1">
+        <span className="text-xs text-muted">Focus (shown on the club&apos;s public page)</span>
+        <textarea name="description" className="input min-h-16 text-xs" defaultValue={club.description ?? ''} />
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-xs text-muted">Faculty mentor</span>
+        <input name="mentor_name" className="input text-xs" defaultValue={club.mentor_name ?? ''} placeholder="e.g. Dr. Namita Pragya" />
+      </label>
+
+      <BulletListField label="What You Gain" name="gain" placeholder="e.g. Direct exposure to industry through guest lectures" items={gain} setItems={setGain} />
+      <BulletListField label="Activities" name="activities" placeholder="e.g. Speaker series with industry leaders" items={activities} setItems={setActivities} />
+
+      <div className="flex flex-col gap-2 border-t border-border pt-3">
+        <span className="text-xs text-muted">Social links</span>
+        <input name="instagram_url" type="url" className="input text-xs" placeholder="Instagram URL" defaultValue={club.instagram_url ?? ''} />
+        <input name="linkedin_url" type="url" className="input text-xs" placeholder="LinkedIn URL" defaultValue={club.linkedin_url ?? ''} />
+        <input name="x_url" type="url" className="input text-xs" placeholder="X (Twitter) URL" defaultValue={club.x_url ?? ''} />
+      </div>
+
       {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
       <div className="flex gap-2">
         <button

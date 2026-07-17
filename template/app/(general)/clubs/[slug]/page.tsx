@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { Instagram, Linkedin, ExternalLink, Users, Calendar, MapPin } from '@/lib/icons';
 import { EmptyState } from '@/lib/patterns/empty-state';
+import { CardTrio } from './card-trio';
+import { RulesAccordion } from './rules-accordion';
 
 export const metadata = { title: 'Club' };
 
@@ -37,8 +39,10 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-2xl font-medium">{club.name}</h1>
-        {club.description ? <p className="mt-2 text-sm text-muted">{club.description}</p> : null}
+        {club.mentor_name ? <p className="mt-1 text-sm text-tertiary">Faculty mentor: {club.mentor_name}</p> : null}
       </div>
+
+      <CardTrio focus={club.description} gain={club.gain} activities={club.activities} />
 
       {socials.length > 0 ? (
         <div className="flex gap-3">
@@ -110,6 +114,8 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
           </div>
         </section>
       ) : null}
+
+      <RulesAccordion />
     </div>
   );
 }

@@ -16,7 +16,10 @@ export default async function SettingsPage() {
     supabase.from('institution_settings').select('*').eq('id', true).maybeSingle(),
     supabase.from('seasons').select('*').order('start_date', { ascending: false }),
     supabase.from('admins').select('id, name, email, role').order('name'),
-    supabase.from('clubs').select('id, name, slug, description, instagram_url, linkedin_url, x_url').order('name'),
+    supabase
+      .from('clubs')
+      .select('id, name, slug, description, instagram_url, linkedin_url, x_url, mentor_name, gain, activities')
+      .order('name'),
   ]);
 
   return (

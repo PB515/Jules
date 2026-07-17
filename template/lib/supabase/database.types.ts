@@ -68,11 +68,13 @@ export interface Database {
         Row: {
           id: string; name: string; slug: string; description: string | null;
           instagram_url: string | null; linkedin_url: string | null; x_url: string | null;
+          mentor_name: string | null; gain: string[]; activities: string[];
           created_at: string;
         };
         Insert: {
           id?: string; name: string; slug: string; description?: string | null;
           instagram_url?: string | null; linkedin_url?: string | null; x_url?: string | null;
+          mentor_name?: string | null; gain?: string[]; activities?: string[];
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['clubs']['Insert']>;
@@ -378,6 +380,7 @@ export interface Database {
         Returns: {
           id: string; name: string; slug: string; description: string | null;
           instagram_url: string | null; linkedin_url: string | null; x_url: string | null;
+          mentor_name: string | null; gain: string[]; activities: string[];
         }[];
       };
       public_events: {
