@@ -84,6 +84,7 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
   const [stats, setStats] = useState<EventStats | null>(null);
   const [, startTransition] = useTransition();
   const [selectedEvent, setSelectedEvent] = useState<EventOption | null>(null);
+  const [coordinators, setCoordinators] = useState(['']);
   const [objectives, setObjectives] = useState(['']);
   const [outcomes, setOutcomes] = useState(['']);
 
@@ -161,10 +162,13 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
         </div>
       ) : null}
 
-      <label className="flex flex-col gap-1.5">
-        <span className="text-xs text-muted">Coordinator</span>
-        <input name="coordinator_name" className="input" placeholder="Dr. Riya Mehta" required />
-      </label>
+      <BulletListField
+        label="Coordinators"
+        name="coordinators"
+        placeholder="e.g. Dr. Riya Mehta (President)"
+        items={coordinators}
+        setItems={setCoordinators}
+      />
 
       <label className="flex flex-col gap-1.5">
         <span className="text-xs text-muted">Introduction</span>

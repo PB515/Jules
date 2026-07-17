@@ -64,8 +64,10 @@ export default async function EventReportPage({ params }: { params: Promise<{ id
             {event.club_name ? <span>Organised by {event.club_name}</span> : null}
           </div>
         ) : null}
-        {report.coordinator_name ? (
-          <p className="mt-1 text-xs text-tertiary">Coordinator: {report.coordinator_name}</p>
+        {report.coordinators.length > 0 ? (
+          <p className="mt-1 text-xs text-tertiary">
+            {report.coordinators.length > 1 ? 'Coordinators' : 'Coordinator'}: {report.coordinators.join(', ')}
+          </p>
         ) : null}
         {admin ? (
           <a

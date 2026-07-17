@@ -28,7 +28,7 @@ async function uploadAttachmentImages(
 export async function createEventReportAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin(['professor', 'committee_member']);
   const eventId = String(formData.get('event_id') ?? '');
-  const coordinatorName = String(formData.get('coordinator_name') ?? '').trim();
+  const coordinators = formData.getAll('coordinators').map((c) => String(c).trim()).filter(Boolean);
   const introduction = String(formData.get('introduction') ?? '').trim();
   const eventHighlights = String(formData.get('event_highlights') ?? '').trim();
   const conclusion = String(formData.get('conclusion') ?? '').trim();
@@ -36,8 +36,8 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
   const outcomes = formData.getAll('outcomes').map((o) => String(o).trim()).filter(Boolean);
 
   if (!eventId) return { error: 'Pick the event this report is about.' };
-  if (!coordinatorName || !introduction || !eventHighlights || !conclusion) {
-    return { error: 'Fill in the coordinator, introduction, event highlights, and conclusion.' };
+  if (coordinators.length === 0 || !introduction || !eventHighlights || !conclusion) {
+    return { error: 'Fill in at least one coordinator, the introduction, event highlights, and conclusion.' };
   }
 
   const supabase = await createClient();
@@ -63,7 +63,7 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
   const { error } = await supabase.from('event_reports').insert({
     title: event.name,
     event_id: eventId,
-    coordinator_name: coordinatorName,
+    coordinators,
     introduction,
     objectives,
     event_highlights: eventHighlights,

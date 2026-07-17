@@ -223,7 +223,7 @@ export interface Database {
       };
       event_reports: {
         Row: {
-          id: string; title: string; event_id: string; coordinator_name: string;
+          id: string; title: string; event_id: string; coordinators: string[];
           introduction: string; objectives: string[]; event_highlights: string;
           outcomes: string[]; conclusion: string;
           attachment_attendance_list_paths: string[]; attachment_brochure_paths: string[];
@@ -231,7 +231,7 @@ export interface Database {
           uploaded_by: string | null; created_at: string;
         };
         Insert: {
-          id?: string; title: string; event_id: string; coordinator_name: string;
+          id?: string; title: string; event_id: string; coordinators?: string[];
           introduction: string; objectives?: string[]; event_highlights: string;
           outcomes?: string[]; conclusion: string;
           attachment_attendance_list_paths?: string[]; attachment_brochure_paths?: string[];
