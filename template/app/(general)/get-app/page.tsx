@@ -6,6 +6,8 @@ import QRCode from 'react-qr-code';
 export const metadata = { title: 'Get the App' };
 
 export default function GetAppPage() {
+  const link = `${site.url}/get-app`;
+
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-8 py-6 text-center">
       <Smartphone className="size-10 text-gold" aria-hidden />
@@ -19,12 +21,12 @@ export default function GetAppPage() {
       </div>
 
       <div className="rounded-[var(--radius)] bg-white p-3">
-        <QRCode value={site.url} size={140} />
+        <QRCode value={link} size={140} />
       </div>
 
       <div className="w-full rounded-[var(--radius)] border border-border bg-card p-5 text-left">
         <p className="mb-1 text-xs uppercase tracking-wide text-tertiary">The link to open on your phone</p>
-        <p className="font-mono text-sm break-all text-gold">{site.url}</p>
+        <p className="font-mono text-sm break-all text-gold">{link}</p>
       </div>
 
       <InstallButton />
