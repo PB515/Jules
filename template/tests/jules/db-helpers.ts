@@ -73,6 +73,38 @@ export async function asUserRollback<T>(
   }
 }
 
+/**
+ * Run queries as a specific authenticated user, in a transaction that
+ * actually COMMITS on success (rolls back only on error). Unlike
+ * asUserRollback, this leaves a real, persistent side effect — needed to
+ * test genuine concurrent-conflict behavior (e.g. two simultaneous inserts
+ * racing a unique constraint), where the constraint-losing side must
+ * actually observe the winner's committed row, not an uncommitted one.
+ * Each call needs its own dedicated `pg.Client` connection (a single
+ * connection can't run two transactions at once) — the caller is
+ * responsible for explicit fixture cleanup afterward via serviceClient().
+ */
+export async function asUserCommit<T>(
+  client: pg.Client,
+  userId: string,
+  fn: (client: pg.Client) => Promise<T>
+): Promise<T> {
+  await client.query('begin');
+  try {
+    await client.query('select set_config($1, $2, true)', [
+      'request.jwt.claims',
+      JSON.stringify({ sub: userId, role: 'authenticated' }),
+    ]);
+    await client.query('set local role authenticated');
+    const result = await fn(client);
+    await client.query('commit');
+    return result;
+  } catch (err) {
+    await client.query('rollback').catch(() => {});
+    throw err;
+  }
+}
+
 /** A short, unique-enough suffix for fixture names/emails/slugs per test run. */
 export function testId(): string {
   return `t${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;

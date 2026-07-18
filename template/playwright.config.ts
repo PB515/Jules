@@ -33,9 +33,15 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: 'list',
+  // Turbopack dev-server first-compile latency on a route no test has hit
+  // yet can push a single assertion past the 5s default — bumped globally
+  // rather than patched per-assertion (observed directly this session: a
+  // team-formation button stuck on "Creating..." for >5s on first hit).
+  expect: { timeout: 15_000 },
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    actionTimeout: 15_000,
   },
   webServer: {
     command: 'npm run dev -- -p 3000',
