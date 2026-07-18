@@ -46,6 +46,12 @@ export default defineConfig({
   projects: [
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
+      // No auth needed — public pages, service-worker/cache behavior, etc.
+      name: 'public',
+      testMatch: /.*\.public\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'professor',
       // Scoped by filename suffix, not just directory — a spec file matching
       // every project would run under every role's storageState, including
