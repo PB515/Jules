@@ -79,14 +79,14 @@ test.describe('Professor live registrations view', () => {
 
   test('a new registration appears live, with zero manual reload', async ({ page }) => {
     await page.goto(`/admin/grid/${eventId}/registrations`);
-    await expect(page.getByText('0 registered')).toBeVisible();
+    await expect(page.getByTestId('stat-registered')).toContainText('0');
     await expect(page.getByText('No registrations yet')).toBeVisible();
 
     // A student registers elsewhere, while the professor's page is already
     // open — the real thing this feature exists to prove.
     await asUserCommit(db, studentId, (c) => c.query('select * from register_for_event($1)', [eventId]));
 
-    await expect(page.getByText('1 registered')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('stat-registered')).toContainText('1', { timeout: 10_000 });
     await expect(page.getByText('Demo Volt')).toBeVisible();
     await expect(page.getByText('jules.demo.volt@gmail.com')).toBeVisible();
   });
@@ -97,12 +97,34 @@ test.describe('Professor live registrations view', () => {
     await asUserCommit(db, studentId, (c) => c.query('select * from register_for_event($1)', [eventId]));
 
     await page.goto(`/admin/grid/${eventId}/registrations`);
-    await expect(page.getByText('1 registered')).toBeVisible();
+    await expect(page.getByTestId('stat-registered')).toContainText('1');
     await expect(page.getByText('Demo Volt')).toBeVisible();
 
     await asUserCommit(db, studentId, (c) => c.query('select unregister_from_event($1)', [eventId]));
 
-    await expect(page.getByText('0 registered')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('stat-registered')).toContainText('0', { timeout: 10_000 });
     await expect(page.getByText('No registrations yet')).toBeVisible();
+  });
+
+  test('CSV export produces a file with the real registration data', async ({ page }) => {
+    await asUserCommit(db, studentId, (c) => c.query('select * from register_for_event($1)', [eventId]));
+
+    await page.goto(`/admin/grid/${eventId}/registrations`);
+    await expect(page.getByTestId('stat-registered')).toContainText('1');
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Export CSV' }).click();
+    const download = await downloadPromise;
+
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) chunks.push(chunk as Buffer);
+    const csv = Buffer.concat(chunks).toString('utf-8');
+
+    expect(csv).toContain('Name,Email,Phone,Registered At (UTC),Attended At (UTC)');
+    expect(csv).toContain('Demo Volt');
+    expect(csv).toContain('jules.demo.volt@gmail.com');
+
+    await asUserCommit(db, studentId, (c) => c.query('select unregister_from_event($1)', [eventId]));
   });
 });

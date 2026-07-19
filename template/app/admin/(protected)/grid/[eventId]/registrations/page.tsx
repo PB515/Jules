@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
+import { getEventRegistrations } from '@/lib/jules/event-registrations';
 import { RegistrationsClient } from './registrations-client';
 
 export const metadata = { title: 'Registrations' };
@@ -18,26 +19,7 @@ export default async function RegistrationsPage({ params }: { params: Promise<{ 
   const { data: event } = await supabase.from('events').select('id, name, event_date, location').eq('id', eventId).maybeSingle();
   if (!event) notFound();
 
-  const { data: registrations } = await supabase
-    .from('event_registrations')
-    .select('id, registered_at, attended_at, students(name, college_email, phone)')
-    .eq('event_id', eventId)
-    .order('registered_at', { ascending: false });
+  const initialRegistrations = await getEventRegistrations(supabase, eventId);
 
-  return (
-    <RegistrationsClient
-      eventId={event.id}
-      eventName={event.name}
-      initialRegistrations={
-        (registrations ?? []).map((r) => ({
-          id: r.id,
-          registered_at: r.registered_at,
-          attended_at: r.attended_at,
-          name: r.students?.name ?? 'Unknown',
-          college_email: r.students?.college_email ?? '',
-          phone: r.students?.phone ?? null,
-        })) ?? []
-      }
-    />
-  );
+  return <RegistrationsClient eventId={event.id} eventName={event.name} initialRegistrations={initialRegistrations} />;
 }
