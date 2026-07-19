@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { ScanLine, Plus, Pencil } from '@/lib/icons';
+import { ScanLine, Plus, Pencil, Users } from '@/lib/icons';
 import { StationClient } from './station-client';
 import { EventPicker } from './event-picker';
 
@@ -67,6 +67,15 @@ export default async function GridStationPage({
           <Pencil className="size-3.5" aria-hidden />
           Edit
         </Link>
+        {admin.role === 'professor' ? (
+          <Link
+            href={`/admin/grid/${selected.id}/registrations`}
+            className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
+          >
+            <Users className="size-3.5" aria-hidden />
+            Registrations
+          </Link>
+        ) : null}
         <Link
           href="/admin/grid/new"
           className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"

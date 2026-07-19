@@ -259,7 +259,22 @@ export interface Database {
         };
         Insert: never; // only via register_for_event()
         Update: never; // attended_at is only ever set by redeem_event_scan()
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'event_registrations_student_id_fkey';
+            columns: ['student_id'];
+            isOneToOne: false;
+            referencedRelation: 'students';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_registrations_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: { [_ in never]: never };
