@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
 }
 
-export function InstallButton() {
+export function InstallButton({ label = 'Install Synergy' }: { label?: string }) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function InstallButton() {
       className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
     >
       <Download className="size-4" aria-hidden />
-      Install Synergy
+      {label}
     </button>
   );
 }

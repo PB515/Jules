@@ -7,6 +7,7 @@ const PUBLIC_PATHS = [
   '/forgot-password',
   '/reset-password',
   '/admin/login',
+  '/admin/get-app',
   '/events',
   '/get-app',
   '/event-reports',
@@ -28,7 +29,7 @@ function isPublic(pathname: string): boolean {
   if (pathname === '/') return true;
   if (pathname.startsWith('/api/health')) return true;
   if (pathname.startsWith('/icons/')) return true;
-  if (pathname === '/manifest.webmanifest' || pathname === '/sw.js') return true;
+  if (pathname === '/manifest.webmanifest' || pathname === '/admin/manifest.webmanifest' || pathname === '/sw.js') return true;
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 

@@ -12,7 +12,7 @@
  */
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ScanLine, Zap, BarChart3, Users, Settings, MonitorPlay, BookOpen, ImageIcon } from '@/lib/icons';
+import { ScanLine, Zap, BarChart3, Users, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone } from '@/lib/icons';
 
 const NAV = [
   { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member'] },
@@ -23,6 +23,7 @@ const NAV = [
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member'] },
   { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['professor'] },
   { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['professor'] },
+  { href: '/admin/get-app', label: 'Get the App', icon: Smartphone, roles: ['professor', 'committee_member'] },
 ] as const;
 
 export function AdminNav({ role }: { role: string }) {

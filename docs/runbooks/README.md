@@ -9,5 +9,6 @@
 | [`migrations.md`](migrations.md) | Using `tooling/migrate`; the file format; never edit an applied migration; `db:check` as a CI gate; drift recovery. |
 | [`platform-constraints.md`](platform-constraints.md) | Vercel 4.5 MB body limit → browser→Storage upload; production alias vs deployment-hash URLs; stale dev CSS; `.next` build-vs-dev corruption; email domain verification; Supabase key rename. |
 | [`free-tier-uptime.md`](free-tier-uptime.md) | Free Supabase pauses after 7 days idle → outage. The shipped keep-alive (migration + `/api/health` + daily GitHub cron) + the better options (Neon auto-resume / Pro / VPS). |
+| [`testing-lessons.md`](testing-lessons.md) | Playwright/Vitest gotchas hit building and using `template/tests/jules/`: the realtime SUBSCRIBED catch-up-refetch rule, shared-fixture test races, storageState cookie leakage, Turbopack first-compile latency, Supabase Auth rate limits, and the "prove a test has teeth" discipline. |
 
 Tooling that backs these: `tooling/env-validate` and `tooling/deploy-check` (Slice 3), `tooling/migrate` (Slice 1).

@@ -3,20 +3,20 @@ import { Smartphone } from '@/lib/icons';
 import { InstallButton } from '@/lib/components/install-button';
 import QRCode from 'react-qr-code';
 
-export const metadata = { title: 'Get the App' };
+export const metadata = { title: 'Get the Staff App' };
 
-export default function GetAppPage() {
-  const link = `${site.url}/get-app`;
+export default function AdminGetAppPage() {
+  const link = `${site.url}/admin/get-app`;
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-8 py-6 text-center">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-8 px-6 py-12 text-center">
       <Smartphone className="size-10 text-gold" aria-hidden />
       <div>
-        <h1 className="text-2xl font-medium">Get Synergy on your phone</h1>
+        <h1 className="text-2xl font-medium">Get {site.name} Staff on your phone</h1>
         <p className="mt-2 text-sm text-muted">
-          The student side of Synergy, your Grid, QR check-ins, Surges, and Live Round, only runs as an
-          installed app on your phone. This keeps quizzes fair and focused, one device, nothing else
-          open.
+          Watch event registrations update live, and write Event Reports on the go, an installed app
+          you can open straight from your home screen. Everything here also works fine in a laptop
+          browser, install is optional, not required.
         </p>
       </div>
 
@@ -29,13 +29,7 @@ export default function GetAppPage() {
         <p className="font-mono text-sm break-all text-gold">{link}</p>
       </div>
 
-      <InstallButton />
-
-      <div className="w-full rounded-[var(--radius)] border border-accent/40 bg-card p-4 text-left text-xs text-accent">
-        Opened this link from WhatsApp, Instagram, or another app? Tap the <strong>••• (or Safari icon)</strong>{' '}
-        at the bottom or top-right first to open it in your real browser, not the in-app one. &quot;Add to
-        Home Screen&quot; only shows up there.
-      </div>
+      <InstallButton label={`Install ${site.name} Staff`} />
 
       <div className="w-full space-y-4 text-left text-sm text-muted">
         <div>
