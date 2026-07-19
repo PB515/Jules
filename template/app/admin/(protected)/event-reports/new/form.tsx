@@ -9,7 +9,7 @@
  * gaps, report is ready" ask. Attendance/Joules stay auto-pulled from
  * public_event_stats(), same as before.
  */
-import { useActionState, useState, useTransition } from 'react';
+import { useActionState, useEffect, useState, useTransition } from 'react';
 import { createEventReportAction, type ActionResult } from '../actions';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { createClient } from '@/lib/supabase/client';
@@ -30,7 +30,7 @@ interface EventOption {
   clubs: { name: string } | null;
 }
 
-export function NewEventReportForm({ events }: { events: EventOption[] }) {
+export function NewEventReportForm({ events, defaultEventId }: { events: EventOption[]; defaultEventId?: string }) {
   const [state, formAction, pending] = useActionState(createEventReportAction, initialState);
   const [stats, setStats] = useState<EventStats | null>(null);
   const [, startTransition] = useTransition();
@@ -53,6 +53,16 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
     });
   }
 
+  // ?event=<id> deep link (Phase 2: "hand a Committee Member a direct link
+  // to the exact event," so they don't have to hunt for it in the picker) —
+  // a plain <select defaultValue> wouldn't also trigger the stats fetch, so
+  // this mirrors onEventChange's own logic once on mount.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync from a prop, same pattern as lib/components/count-up.tsx
+    if (defaultEventId && events.some((e) => e.id === defaultEventId)) onEventChange(defaultEventId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultEventId]);
+
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5">
@@ -61,7 +71,7 @@ export function NewEventReportForm({ events }: { events: EventOption[] }) {
           name="event_id"
           className="input"
           required
-          defaultValue=""
+          defaultValue={defaultEventId ?? ''}
           onChange={(e) => onEventChange(e.target.value)}
         >
           <option value="" disabled>

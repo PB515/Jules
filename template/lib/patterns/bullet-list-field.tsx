@@ -31,7 +31,7 @@ export function BulletListField({
             <button
               type="button"
               onClick={() => setItems((prev) => prev.filter((_, idx) => idx !== i))}
-              className="flex size-9 shrink-0 items-center justify-center rounded-[var(--radius)] border border-border text-accent"
+              className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius)] border border-border text-accent"
               aria-label={`Remove ${label.toLowerCase()} item`}
             >
               <Trash2 className="size-3.5" aria-hidden />

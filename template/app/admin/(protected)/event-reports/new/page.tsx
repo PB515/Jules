@@ -12,8 +12,13 @@ interface EventOption {
   clubs: { name: string } | null;
 }
 
-export default async function NewEventReportPage() {
+export default async function NewEventReportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ event?: string }>;
+}) {
   await requireAdmin(['professor', 'committee_member']);
+  const { event: eventId } = await searchParams;
   const supabase = await createClient();
   const { data: events } = await supabase
     .from('events')
@@ -25,7 +30,7 @@ export default async function NewEventReportPage() {
     <div className="mx-auto max-w-lg p-6">
       <h1 className="mb-1 text-lg font-medium">New Event Report</h1>
       <p className="mb-6 text-xs text-tertiary">Fill in the gaps, the report is ready.</p>
-      <NewEventReportForm events={events ?? []} />
+      <NewEventReportForm events={events ?? []} defaultEventId={eventId} />
     </div>
   );
 }

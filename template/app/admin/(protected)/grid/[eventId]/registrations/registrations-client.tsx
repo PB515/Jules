@@ -97,7 +97,7 @@ export function RegistrationsClient({
         {registrations.length > 0 ? (
           <button
             onClick={exportCsv}
-            className="flex shrink-0 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 py-1.5 text-xs text-muted hover:border-gold/50 hover:text-gold"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 text-xs text-muted hover:border-gold/50 hover:text-gold"
           >
             <Download className="size-3.5" aria-hidden />
             Export CSV
