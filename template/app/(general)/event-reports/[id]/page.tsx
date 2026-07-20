@@ -1,8 +1,9 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
-import { Users, Zap, Calendar, MapPinned, BookOpen, CircleCheck, Download } from '@/lib/icons';
+import { Users, Zap, Calendar, MapPinned, BookOpen, CircleCheck, Download, ArrowLeft } from '@/lib/icons';
 
 export const metadata = { title: 'Event Report' };
 
@@ -45,6 +46,12 @@ export default async function EventReportPage({ params }: { params: Promise<{ id
 
   return (
     <article className="mx-auto flex max-w-2xl flex-col gap-6">
+      {admin ? (
+        <Link href="/admin/event-reports" className="flex items-center gap-1.5 text-sm text-muted hover:text-gold">
+          <ArrowLeft className="size-3.5" aria-hidden />
+          Back to Admin
+        </Link>
+      ) : null}
       <div>
         <h1 className="text-2xl font-medium">{report.title}</h1>
         {event ? (

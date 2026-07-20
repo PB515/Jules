@@ -113,11 +113,27 @@ test.describe('Event Report .docx export', () => {
   });
 
   test.afterAll(async () => {
-    await svc.from('event_reports').delete().eq('id', reportId);
-    await svc.storage.from('event-report-attachments').remove([attachmentPath]);
-    await svc.from('event_registrations').delete().eq('event_id', eventId);
-    await svc.from('events').delete().eq('id', eventId);
-    await svc.from('clubs').delete().eq('id', clubId);
+    // joule_transactions.event_id has no ON DELETE CASCADE — the real bug
+    // that silently left every run's club/event behind in the live DB
+    // (visible on the real production site). redeem_event_scan() in
+    // beforeAll credits Joules for volt's attendance; that row must be
+    // deleted before events, or the events delete fails on the FK and
+    // everything downstream (including the club) silently never runs.
+    // None of these calls previously checked `error` at all, which is
+    // exactly how this went unnoticed for ~15 consecutive test runs.
+    const steps: [string, () => PromiseLike<{ error: unknown }>][] = [
+      ['event_reports', () => svc.from('event_reports').delete().eq('id', reportId)],
+      ['joule_transactions', () => svc.from('joule_transactions').delete().eq('event_id', eventId)],
+      ['event_registrations', () => svc.from('event_registrations').delete().eq('event_id', eventId)],
+      ['events', () => svc.from('events').delete().eq('id', eventId)],
+      ['clubs', () => svc.from('clubs').delete().eq('id', clubId)],
+    ];
+    for (const [label, run] of steps) {
+      const { error } = await run();
+      if (error) console.error(`afterAll cleanup failed at ${label}:`, error);
+    }
+    const { error: storageError } = await svc.storage.from('event-report-attachments').remove([attachmentPath]);
+    if (storageError) console.error('afterAll cleanup failed removing the attachment:', storageError);
     await db.end();
   });
 
