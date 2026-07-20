@@ -31,6 +31,12 @@ export default function AdminGetAppPage() {
 
       <InstallButton label={`Install ${site.name} Staff`} />
 
+      <div className="w-full rounded-[var(--radius)] border border-accent/40 bg-card p-4 text-left text-xs text-accent">
+        Opened this link from WhatsApp, Instagram, or another app? Tap the <strong>••• (or Safari icon)</strong>{' '}
+        at the bottom or top-right first to open it in your real browser, not the in-app one. The install button
+        above only appears there.
+      </div>
+
       <div className="w-full space-y-4 text-left text-sm text-muted">
         <div>
           <p className="mb-1 font-medium text-foreground">Android (Chrome)</p>
