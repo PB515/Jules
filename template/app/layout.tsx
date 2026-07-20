@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { RegisterSW } from "@/lib/pwa/register-sw";
@@ -46,6 +47,21 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground font-body">
+        {/*
+          beforeinstallprompt commonly fires before React hydrates on a real
+          phone, so a useEffect-attached listener in InstallButton can miss
+          it entirely — the browser only fires it once per page load, with
+          no replay for a late listener. Captured here, before hydration,
+          onto window so InstallButton can pick up an already-fired event.
+        */}
+        <Script id="capture-install-prompt" strategy="beforeInteractive">
+          {`window.__deferredInstallPrompt = null;
+            window.addEventListener('beforeinstallprompt', function (e) {
+              e.preventDefault();
+              window.__deferredInstallPrompt = e;
+              window.dispatchEvent(new Event('synergy-install-prompt-ready'));
+            });`}
+        </Script>
         {children}
         <RegisterSW />
       </body>
