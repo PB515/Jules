@@ -454,6 +454,21 @@ export interface Database {
         Args: Record<string, never>;
         Returns: { club_id: string; club_name: string; total_joules: number; total_attendees: number }[];
       };
+      public_event_reports: {
+        Args: Record<string, never>;
+        Returns: { id: string; title: string; event_id: string; created_at: string }[];
+      };
+      public_event_report: {
+        Args: { p_id: string };
+        Returns: {
+          id: string; title: string; event_id: string; coordinators: string[];
+          introduction: string; objectives: string[]; event_highlights: string;
+          outcomes: string[]; conclusion: string;
+          attachment_attendance_list_paths: string[]; attachment_brochure_paths: string[];
+          attachment_geo_photos_paths: string[]; attachment_media_coverage_paths: string[];
+          created_at: string;
+        }[];
+      };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

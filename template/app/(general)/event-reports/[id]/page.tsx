@@ -19,7 +19,11 @@ export default async function EventReportPage({ params }: { params: Promise<{ id
   const supabase = await createClient();
   const admin = await getAdmin();
 
-  const { data: report } = await supabase.from('event_reports').select('*').eq('id', id).maybeSingle();
+  // Narrow public RPC (0042) — event_reports' raw table read is now
+  // staff-only/club-scoped, so the public detail page can't select it
+  // directly anymore, same reasoning `events` already had.
+  const { data: reportRows } = await supabase.rpc('public_event_report', { p_id: id });
+  const report = reportRows?.[0] ?? null;
   if (!report) {
     return (
       <div className="mx-auto max-w-2xl">

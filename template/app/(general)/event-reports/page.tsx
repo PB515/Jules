@@ -7,12 +7,12 @@ export const metadata = { title: 'Event Reports' };
 
 export default async function EventReportsListPage() {
   const supabase = await createClient();
-  // Two separate public reads, not an embedded `events(...)` join — `events`
-  // itself has no public SELECT policy (only public_events() is exposed, and
-  // only with safe columns), so an embedded join would silently return null
-  // event names for anonymous visitors instead of a real name.
+  // Both narrow public RPCs (0042) — event_reports' raw table read is now
+  // staff-only/club-scoped, same reasoning `events` already had (only
+  // public_events() is exposed, never a raw table select, to anonymous
+  // visitors).
   const [{ data: reports }, { data: events }] = await Promise.all([
-    supabase.from('event_reports').select('id, title, created_at, event_id').order('created_at', { ascending: false }),
+    supabase.rpc('public_event_reports'),
     supabase.rpc('public_events'),
   ]);
   const eventNames = new Map((events ?? []).map((e) => [e.id, e.name]));
