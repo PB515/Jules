@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
+import { logAdminAction } from '@/lib/jules/audit';
 import { redirect } from 'next/navigation';
 
 export interface ActionResult {
@@ -9,7 +10,7 @@ export interface ActionResult {
 }
 
 export async function createLiveRoundAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor', 'committee_member', 'super_admin']);
+  await requireAdmin(['professor', 'super_admin']);
   const surgeId = String(formData.get('surge_id') ?? '');
   if (!surgeId) return { error: 'Pick a Surge to host.' };
 
@@ -17,11 +18,13 @@ export async function createLiveRoundAction(_prev: ActionResult, formData: FormD
   const { data, error } = await supabase.rpc('host_create_round', { p_surge_id: surgeId });
   if (error || !data) return { error: error?.message ?? 'Could not start the round.' };
 
+  await logAdminAction(supabase, 'live_round_create', { round_id: data.id, surge_id: surgeId, room_code: data.room_code });
+
   redirect(`/admin/live/${data.id}`);
 }
 
 export async function advanceRoundAction(roundId: string) {
-  await requireAdmin(['professor', 'committee_member', 'super_admin']);
+  await requireAdmin(['professor', 'super_admin']);
   const supabase = await createClient();
   const { error } = await supabase.rpc('host_advance_round', { p_round_id: roundId });
   if (error) throw new Error(error.message);

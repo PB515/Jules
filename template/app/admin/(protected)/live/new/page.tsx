@@ -8,7 +8,7 @@ import { NewRoundForm } from './form';
 export const metadata = { title: 'Live Round' };
 
 export default async function NewLiveRoundPage() {
-  await requireAdmin(['professor', 'committee_member', 'super_admin']);
+  await requireAdmin(['professor', 'super_admin']);
   const supabase = await createClient();
   const { data: surges } = await supabase
     .from('surges')

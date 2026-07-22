@@ -46,7 +46,16 @@ export function RosterSection({ admins, clubs }: { admins: Admin[]; clubs: ClubO
       {open ? (
         <form action={formAction} className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-card p-4">
           <input name="name" className="input" placeholder="Name" required />
-          <input name="email" type="email" className="input" placeholder="admin email" required />
+          <label className="flex flex-col gap-1">
+            <input name="email" type="email" className="input" placeholder="admin email" required />
+            <span className="text-xs text-tertiary">
+              Doesn&apos;t need to be a real inbox, any unique ID works, e.g. cityscape-cm-priya@synergy.local
+            </span>
+          </label>
+          <label className="flex flex-col gap-1">
+            <input name="password" type="text" className="input" placeholder="Password (optional, leave blank to auto-generate)" minLength={8} />
+            <span className="text-xs text-tertiary">Set one yourself to relay over WhatsApp, or leave blank for a random temp password.</span>
+          </label>
           <select name="role" className="input" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="super_admin">Super Admin</option>
             <option value="professor">Professor</option>

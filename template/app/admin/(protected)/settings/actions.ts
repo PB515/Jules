@@ -58,14 +58,22 @@ export async function createAdminAction(_prev: ActionResult, formData: FormData)
   const role = String(formData.get('role') ?? '') as AdminRole;
   const clubId = String(formData.get('club_id') ?? '') || null;
 
+  const customPassword = String(formData.get('password') ?? '').trim();
+
   if (!name || !email || !role) return { error: 'Fill in name, email, and role.' };
   if (!['super_admin', 'professor', 'committee_member'].includes(role)) return { error: 'Invalid role.' };
   if ((role === 'professor' || role === 'committee_member') && !clubId) {
     return { error: `Pick the club this ${role === 'professor' ? 'Professor' : 'Committee Member'} belongs to.` };
   }
+  if (customPassword && customPassword.length < 8) return { error: 'Password must be at least 8 characters.' };
 
   const service = createServiceRoleClient();
-  const tempPassword = randomBytes(9).toString('base64url');
+  // A chosen password lets a real Professor/Committee Member's login be
+  // something simple enough to relay over WhatsApp and remember, rather
+  // than a copy-paste-only random string — the email itself doesn't need
+  // to be a real deliverable inbox either (admin-created accounts are
+  // always email_confirm: true, so nothing is ever sent to it).
+  const tempPassword = customPassword || randomBytes(9).toString('base64url');
   const { data: created, error: createErr } = await service.auth.admin.createUser({
     email,
     password: tempPassword,

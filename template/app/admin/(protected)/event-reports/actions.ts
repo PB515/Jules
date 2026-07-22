@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
+import { logAdminAction } from '@/lib/jules/audit';
 import { redirect } from 'next/navigation';
 
 export interface ActionResult {
@@ -60,22 +61,28 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
   const uploadError = attendanceList.error ?? brochure.error ?? geoPhotos.error ?? mediaCoverage.error;
   if (uploadError) return { error: uploadError };
 
-  const { error } = await supabase.from('event_reports').insert({
-    title: event.name,
-    event_id: eventId,
-    coordinators,
-    introduction,
-    objectives,
-    event_highlights: eventHighlights,
-    outcomes,
-    conclusion,
-    attachment_attendance_list_paths: attendanceList.paths,
-    attachment_brochure_paths: brochure.paths,
-    attachment_geo_photos_paths: geoPhotos.paths,
-    attachment_media_coverage_paths: mediaCoverage.paths,
-    uploaded_by: user?.id,
-  });
+  const { data: report, error } = await supabase
+    .from('event_reports')
+    .insert({
+      title: event.name,
+      event_id: eventId,
+      coordinators,
+      introduction,
+      objectives,
+      event_highlights: eventHighlights,
+      outcomes,
+      conclusion,
+      attachment_attendance_list_paths: attendanceList.paths,
+      attachment_brochure_paths: brochure.paths,
+      attachment_geo_photos_paths: geoPhotos.paths,
+      attachment_media_coverage_paths: mediaCoverage.paths,
+      uploaded_by: user?.id,
+    })
+    .select('id')
+    .single();
   if (error) return { error: error.message };
+
+  await logAdminAction(supabase, 'report_create', { report_id: report.id, event_id: eventId, title: event.name });
 
   redirect('/admin/event-reports');
 }

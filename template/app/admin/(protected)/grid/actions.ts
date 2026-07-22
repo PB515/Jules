@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
+import { logAdminAction } from '@/lib/jules/audit';
 import { redirect } from 'next/navigation';
 
 export interface ActionResult {
@@ -65,6 +66,8 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
 
   if (error) return { error: error.message };
 
+  await logAdminAction(supabase, 'event_create', { event_id: data.id, name, club_id: clubId });
+
   redirect(`/admin/grid?event=${data.id}`);
 }
 
@@ -108,6 +111,8 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   const { error } = await query;
 
   if (error) return { error: error.message };
+
+  await logAdminAction(supabase, 'event_edit', { event_id: eventId, name });
 
   redirect(`/admin/grid?event=${eventId}`);
 }

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
+import { logAdminAction } from '@/lib/jules/audit';
 import { revalidatePath } from 'next/cache';
 
 export interface ActionResult {
@@ -34,6 +35,8 @@ export async function uploadGalleryImageAction(_prev: ActionResult, formData: Fo
     club_id: admin.role === 'professor' || admin.role === 'committee_member' ? admin.club_id : null,
   });
   if (insertErr) return { error: insertErr.message };
+
+  await logAdminAction(supabase, 'gallery_upload', { file_path: path, caption });
 
   revalidatePath('/admin/gallery');
   return {};

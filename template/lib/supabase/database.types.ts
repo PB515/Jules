@@ -20,7 +20,16 @@ export type EventType = 'standard_meeting' | 'expert_session' | 'volunteer_task'
 export type SurgeStatus = 'draft' | 'live' | 'complete';
 export type SeasonCadence = 'semester' | 'trimester' | 'annual' | 'custom';
 export type TransactionType = 'event_scan' | 'surge_earned' | 'surge_participation' | 'admin_manual_adjustment';
-export type AuditAction = 'force_reset' | 'manual_joule_adjustment' | 'csv_import' | 'role_change';
+export type AuditAction =
+  | 'force_reset'
+  | 'manual_joule_adjustment'
+  | 'csv_import'
+  | 'role_change'
+  | 'event_create'
+  | 'event_edit'
+  | 'report_create'
+  | 'gallery_upload'
+  | 'live_round_create';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
 export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
@@ -190,7 +199,15 @@ export interface Database {
           target_student_id?: string | null; details?: Json; created_at?: string;
         };
         Update: never;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'audit_log_entries_admin_id_fkey';
+            columns: ['admin_id'];
+            isOneToOne: false;
+            referencedRelation: 'admins';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       live_rounds: {
         Row: {
@@ -359,6 +376,10 @@ export interface Database {
         }[];
       };
       admin_adjust_joules: { Args: { p_student_id: string; p_amount: number; p_reason: string }; Returns: undefined };
+      log_admin_action: {
+        Args: { p_action: string; p_details?: Record<string, unknown>; p_target_student_id?: string | null };
+        Returns: undefined;
+      };
       admin_set_student_status: { Args: { p_student_id: string; p_status: StudentStatus }; Returns: undefined };
       admin_create_admin: {
         Args: { p_user_id: string; p_name: string; p_email: string; p_role: AdminRole; p_club_id?: string | null };
