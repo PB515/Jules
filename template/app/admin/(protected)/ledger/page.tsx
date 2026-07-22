@@ -4,22 +4,28 @@ import { EngagementChart } from './engagement-chart';
 import { EventTimeline } from './event-timeline';
 import { TierDistributionChart } from './tier-distribution-chart';
 import { ClubEngagementChart } from './club-engagement-chart';
+import { SimpleLedgerView } from './simple-ledger-view';
 import { Users, Trophy, Calendar, Zap } from '@/lib/icons';
 
 export const metadata = { title: 'System Ledger' };
 
-export default async function LedgerPage() {
+export default async function LedgerPage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
   const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
+
+  // Professor/Committee Member get a deliberately different, much simpler
+  // view here — pick an event, see who registered, download it. The dense
+  // charts/timeline dashboard below is the right tool for Super Admin's
+  // genuine platform-wide oversight, but was the wrong shape for a club-
+  // scoped role's actual, much narrower and more frequent task (confirmed
+  // directly with the user after live-testing the club-scoping fix).
+  if (admin.role !== 'super_admin') {
+    const { event } = await searchParams;
+    return <SimpleLedgerView admin={admin} selectedEventId={event} />;
+  }
+
   const supabase = await createClient();
 
-  // A club-scoped Professor/Committee Member only sees their own club's
-  // events in the timeline; a Super Admin sees every club's. The three RPCs
-  // below (monthly_engagement, event_engagement_totals, and the 0039 trio)
-  // already self-scope by the caller's own admin row.
-  let eventsQuery = supabase.from('events').select('id, name, type, event_date, location').order('event_date', { ascending: false });
-  if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
-    eventsQuery = eventsQuery.eq('club_id', admin.club_id);
-  }
+  const eventsQuery = supabase.from('events').select('id, name, type, event_date, location').order('event_date', { ascending: false });
 
   const [{ data: monthly }, { data: events }, { data: totals }, { data: summaryRows }, { data: tierRows }, { data: clubRows }] =
     await Promise.all([
