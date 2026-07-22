@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/auth/session';
 import { adminLogoutAction } from '@/app/(auth)/actions';
-import { AdminNav } from './admin-nav-client';
+import { AdminNav, MobileAdminNav } from './admin-nav-client';
 import { LogOut } from '@/lib/icons';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,8 +26,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:hidden">
-          <p className="text-sm font-medium">Reactor Command Center</p>
+        <header className="relative flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:hidden">
+          <div className="flex items-center gap-1">
+            <MobileAdminNav role={admin.role} />
+            <p className="text-sm font-medium">Reactor Command Center</p>
+          </div>
           <form action={adminLogoutAction}>
             <button className="text-xs text-muted">Log out</button>
           </form>
