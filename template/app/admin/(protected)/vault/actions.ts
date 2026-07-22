@@ -32,18 +32,18 @@ export async function getStudentActivityForVaultAction(studentId: string) {
 }
 
 /**
- * Force Reset (spec §7) — Owner only, instantly issues a temporary password.
+ * Force Reset (spec §7) — Super Admin only, instantly issues a temporary password.
  * Uses the service-role client (Auth Admin API) because setting an arbitrary
  * password requires it; the audit log write also goes through service-role
  * since it's a trusted server-only context, never a client-reachable insert.
  *
  * The Auth Admin API operates on ANY auth.users row, students or admins —
  * unlike admin_adjust_joules/admin_set_student_status, it isn't naturally
- * scoped by a foreign key to `students`. Without this check, an Owner could
- * pass another admin's (even another Owner's) id as "studentId" and silently
- * reset their password through this feature — no distinct audit trail from
- * a real student reset, and no functional barrier stopping it. Confirmed
- * during a security retrospective; this check is the fix.
+ * scoped by a foreign key to `students`. Without this check, a Super Admin
+ * could pass another admin's (even another Super Admin's) id as "studentId"
+ * and silently reset their password through this feature — no distinct
+ * audit trail from a real student reset, and no functional barrier stopping
+ * it. Confirmed during a security retrospective; this check is the fix.
  */
 export async function forceResetAction(studentId: string): Promise<ActionResult> {
   const admin = await requireAdmin(['super_admin']);

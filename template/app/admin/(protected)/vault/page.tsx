@@ -12,7 +12,7 @@ export default async function VaultPage() {
   return (
     <div className="mx-auto max-w-2xl p-6">
       <h1 className="mb-1 text-lg font-medium">Student Data Vault</h1>
-      <p className="mb-6 text-xs text-tertiary">Owner-only. Every Force Reset is audit-logged.</p>
+      <p className="mb-6 text-xs text-tertiary">Super Admin only. Every Force Reset is audit-logged.</p>
       <VaultClient students={students ?? []} />
     </div>
   );

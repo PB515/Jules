@@ -87,9 +87,12 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   const cover = await uploadCoverImage(supabase, formData);
   if (cover.error) return { error: cover.error };
 
-  // A Committee Member may only edit their own club's events — a Professor
-  // (club_id null) can edit any (same scoping the Grid Station list itself
-  // already applies, decision 45's club-scoping rule).
+  // A club-scoped Professor or Committee Member may only edit their own
+  // club's events; a Super Admin can edit any (0038's RBAC rework made
+  // Professor club-scoped too — RLS already enforces this via
+  // can_manage_event(), this app-layer filter just matches it so an
+  // out-of-scope edit fails cleanly with 0 rows instead of relying on RLS
+  // alone to reject it).
   let query = supabase.from('events').update({
     name,
     type: type as 'standard_meeting' | 'expert_session' | 'volunteer_task',
@@ -99,7 +102,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     ...(cover.path ? { cover_image_path: cover.path } : {}),
     joule_value: JOULE_BY_TYPE[type],
   }).eq('id', eventId);
-  if (admin.role === 'committee_member' && admin.club_id) {
+  if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('club_id', admin.club_id);
   }
   const { error } = await query;
