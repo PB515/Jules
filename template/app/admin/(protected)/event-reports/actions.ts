@@ -26,7 +26,7 @@ async function uploadAttachmentImages(
 }
 
 export async function createEventReportAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const eventId = String(formData.get('event_id') ?? '');
   const coordinators = formData.getAll('coordinators').map((c) => String(c).trim()).filter(Boolean);
   const introduction = String(formData.get('introduction') ?? '').trim();

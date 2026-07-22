@@ -22,6 +22,7 @@ interface Props {
   eventId: string;
   eventName: string;
   jouleValue: number | null;
+  eventDate: string;
 }
 
 interface RecentScan {
@@ -31,7 +32,7 @@ interface RecentScan {
   created_at: string;
 }
 
-export function StationClient({ eventId, eventName, jouleValue }: Props) {
+export function StationClient({ eventId, eventName, jouleValue, eventDate }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
   // Starts at 0, not Date.now() (keeps the component body pure) — the clock
@@ -73,6 +74,15 @@ export function StationClient({ eventId, eventName, jouleValue }: Props) {
   const link = token ? `${site.url}/scan?e=${eventId}&t=${token}` : '';
   const secondsLeft = expiresAt ? Math.max(0, Math.round((expiresAt - now) / 1000)) : null;
 
+  // current_qr_token() itself now enforces the same event-start -> +20min
+  // window redeem_event_scan does (0038) — a null token outside that window
+  // used to still show a QR that would always fail to scan. now===0 is the
+  // pre-mount placeholder value (kept pure, see the clock effect above), so
+  // don't render a window message before the first real clock tick lands.
+  const startMs = new Date(eventDate).getTime();
+  const endMs = startMs + 20 * 60_000;
+  const windowState = now === 0 ? null : now < startMs ? 'before' : now > endMs ? 'after' : 'open';
+
   function copyLink() {
     if (!link) return;
     navigator.clipboard?.writeText(link).then(() => {
@@ -101,12 +111,20 @@ export function StationClient({ eventId, eventName, jouleValue }: Props) {
             <div className="rounded-[var(--radius)] bg-white p-3">
               <QRCode value={link} size={160} />
             </div>
+          ) : windowState === 'before' ? (
+            <p className="text-sm text-muted">
+              Attendance window opens at{' '}
+              {new Date(eventDate).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+            </p>
+          ) : windowState === 'after' ? (
+            <p className="text-sm text-muted">Attendance window closed 20 minutes after the event started.</p>
           ) : null}
           <p className="text-xs text-muted">Current check-in code</p>
           <p className="font-mono text-4xl tracking-[0.15em] text-gold">{token ?? '··········'}</p>
           <button
             onClick={copyLink}
-            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted hover:text-gold"
+            disabled={!link}
+            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted hover:text-gold disabled:opacity-50"
           >
             {copied ? <Check className="size-3.5" aria-hidden /> : null}
             {copied ? 'Copied' : 'Copy check-in link'}

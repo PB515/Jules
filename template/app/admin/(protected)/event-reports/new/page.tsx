@@ -17,7 +17,7 @@ export default async function NewEventReportPage({
 }: {
   searchParams: Promise<{ event?: string }>;
 }) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const { event: eventId } = await searchParams;
   const supabase = await createClient();
   const { data: events } = await supabase

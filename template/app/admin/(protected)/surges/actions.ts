@@ -12,7 +12,7 @@ export interface ActionResult {
 }
 
 export async function createSurgeAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const name = String(formData.get('name') ?? '').trim();
   const clubId = String(formData.get('club_id') ?? '');
   const points = parseInt(String(formData.get('points_per_question') ?? '20'), 10);
@@ -55,7 +55,7 @@ export async function updateSurgeScoringAction(
   surgeId: string,
   scoring: { points_per_question: number; participation_points_per_question: number; negative_points_per_wrong_answer: number }
 ) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   const { error } = await supabase
     .from('surges')
@@ -70,7 +70,7 @@ export async function updateSurgeScoringAction(
 }
 
 export async function setSurgeStatusAction(surgeId: string, status: 'draft' | 'live' | 'complete') {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   // Marking a Surge complete finalizes pooled group scoring (decision 49) —
   // routed through complete_surge() rather than a raw status update, so the
@@ -99,7 +99,7 @@ export async function addQuestionAction(
     order_index: number;
   }
 ) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').insert({ surge_id: surgeId, ...q });
   if (error) throw new Error(error.message);
@@ -107,7 +107,7 @@ export async function addQuestionAction(
 }
 
 export async function updateQuestionAction(questionId: string, surgeId: string, patch: TablesUpdate<'questions'>) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').update(patch).eq('id', questionId);
   if (error) throw new Error(error.message);
@@ -115,7 +115,7 @@ export async function updateQuestionAction(questionId: string, surgeId: string, 
 }
 
 export async function deleteQuestionAction(questionId: string, surgeId: string) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   const { error } = await supabase.from('questions').delete().eq('id', questionId);
   if (error) throw new Error(error.message);
@@ -123,7 +123,7 @@ export async function deleteQuestionAction(questionId: string, surgeId: string) 
 }
 
 export async function importQuestionsAction(surgeId: string, rows: ParsedRow[]) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
 
   const clean = rows.filter((r) => r.errors.length === 0);

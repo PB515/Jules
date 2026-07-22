@@ -13,19 +13,25 @@ export default async function GridStationPage({
 }: {
   searchParams: Promise<{ event?: string }>;
 }) {
-  const admin = await requireAdmin();
+  // The page itself stays reachable by all three tiers (Committee Member
+  // still needs the event list + Edit/New links to do their own job), but
+  // the actual QR/scanner panel below only ever renders for Professor/Super
+  // Admin — Committee Member's job is event creation + Event Report
+  // writing, not showing/scanning attendance QR (RBAC rework).
+  const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
+  const canScan = admin.role === 'professor' || admin.role === 'super_admin';
   const { event: eventParam } = await searchParams;
   const supabase = await createClient();
 
-  // A Committee Member only ever sees their own club's events here; a
-  // Professor sees every club's (club_id is platform-wide, decision 45).
+  // A club-scoped Professor/Committee Member only ever sees their own
+  // club's events here; a Super Admin sees every club's.
   let query = supabase
     .from('events')
     .select('id, name, type, event_date, end_date, joule_value')
     .neq('type', 'surge')
     .order('event_date', { ascending: false })
     .limit(60);
-  if (admin.role === 'committee_member' && admin.club_id) {
+  if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('club_id', admin.club_id);
   }
   const { data: allEvents } = await query;
@@ -67,7 +73,7 @@ export default async function GridStationPage({
           <Pencil className="size-3.5" aria-hidden />
           Edit
         </Link>
-        {admin.role === 'professor' ? (
+        {canScan ? (
           <Link
             href={`/admin/grid/${selected.id}/registrations`}
             className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
@@ -84,7 +90,20 @@ export default async function GridStationPage({
           New
         </Link>
       </div>
-      <StationClient eventId={selected.id} eventName={selected.name} jouleValue={selected.joule_value} />
+      {canScan ? (
+        <StationClient
+          eventId={selected.id}
+          eventName={selected.name}
+          jouleValue={selected.joule_value}
+          eventDate={selected.event_date}
+        />
+      ) : (
+        <EmptyState
+          icon={ScanLine}
+          title="QR check-in is staff-only"
+          message="Showing and scanning the attendance QR is handled by your club's Professor. You can still create and edit events, and write the Event Report once it's over."
+        />
+      )}
     </div>
   );
 }

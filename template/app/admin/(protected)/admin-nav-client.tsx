@@ -15,15 +15,15 @@ import Link from 'next/link';
 import { ScanLine, Zap, BarChart3, Users, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone } from '@/lib/icons';
 
 const NAV = [
-  { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member'] },
-  { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['professor', 'committee_member'] },
-  { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['professor', 'committee_member'] },
-  { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['professor', 'committee_member'] },
-  { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['professor', 'committee_member'] },
-  { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member'] },
-  { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['professor'] },
-  { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['professor'] },
-  { href: '/admin/get-app', label: 'Get the App', icon: Smartphone, roles: ['professor', 'committee_member'] },
+  { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/live/new', label: 'Live Round', icon: MonitorPlay, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member', 'super_admin'] },
+  { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['super_admin'] },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['super_admin'] },
+  { href: '/admin/get-app', label: 'Get the App', icon: Smartphone, roles: ['professor', 'committee_member', 'super_admin'] },
 ] as const;
 
 export function AdminNav({ role }: { role: string }) {

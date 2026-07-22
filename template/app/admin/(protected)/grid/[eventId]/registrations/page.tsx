@@ -7,12 +7,13 @@ import { RegistrationsClient } from './registrations-client';
 export const metadata = { title: 'Registrations' };
 
 export default async function RegistrationsPage({ params }: { params: Promise<{ eventId: string }> }) {
-  // Professor-only (not Committee Member) — this view joins student
-  // name/email/phone, and only "professor reads all students (vault)"
-  // grants that; a Committee Member has no broad students-read policy at
-  // all, so the join would silently come back empty for them anyway. This
-  // matches the professor's actual ask, not an arbitrary restriction.
-  await requireAdmin(['professor']);
+  // Professor + Super Admin only (not Committee Member) — this view joins
+  // student name/email/phone, granted by the narrow
+  // "staff reads registered students for own club events" RLS policy
+  // (0038), scoped to events the caller can manage. A Committee Member has
+  // no students-read policy at all, so the join would silently come back
+  // empty for them anyway — matches the actual ask, not an arbitrary cut.
+  await requireAdmin(['professor', 'super_admin']);
   const { eventId } = await params;
   const supabase = await createClient();
 

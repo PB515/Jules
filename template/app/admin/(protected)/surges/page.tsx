@@ -13,11 +13,12 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export default async function SurgesListPage() {
-  const admin = await requireAdmin(['professor', 'committee_member']);
+  const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
-  // A Committee Member only sees their own club's Surges; a Professor sees every club's.
+  // A club-scoped Professor/Committee Member only sees their own club's
+  // Surges; a Super Admin sees every club's.
   let query = supabase.from('surges').select('id, name, status, created_at').order('created_at', { ascending: false });
-  if (admin.role === 'committee_member' && admin.club_id) {
+  if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('club_id', admin.club_id);
   }
   const { data: surges } = await query;

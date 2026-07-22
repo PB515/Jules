@@ -7,7 +7,7 @@ import { UploadForm } from './upload-form';
 export const metadata = { title: 'Gallery' };
 
 export default async function AdminGalleryPage() {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
   const { data: images } = await supabase
     .from('gallery_images')

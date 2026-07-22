@@ -9,7 +9,7 @@ import { BulkStudentsSection } from './bulk-students-section';
 export const metadata = { title: 'Institution Settings' };
 
 export default async function SettingsPage() {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const supabase = await createClient();
 
   const [{ data: settings }, { data: seasons }, { data: admins }, { data: clubs }] = await Promise.all([

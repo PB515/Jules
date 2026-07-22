@@ -3,13 +3,13 @@ import { requireAdmin } from '@/lib/auth/session';
 import { NewEventForm } from './form';
 
 export default async function NewEventPage() {
-  const admin = await requireAdmin(['professor', 'committee_member']);
+  const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
 
-  // Same reasoning as the New Surge form: a Committee Member can only ever
-  // create an event for their own club (decision 45).
+  // Same reasoning as the New Surge form: a club-scoped Professor or
+  // Committee Member can only ever create an event for their own club.
   let query = supabase.from('clubs').select('id, name').order('name');
-  if (admin.role === 'committee_member' && admin.club_id) {
+  if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('id', admin.club_id);
   }
   const { data: clubs } = await query;

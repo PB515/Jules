@@ -26,7 +26,7 @@ async function uploadCoverImage(supabase: Awaited<ReturnType<typeof createClient
 }
 
 export async function createEventAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
 
   const name = String(formData.get('name') ?? '').trim();
   const clubId = String(formData.get('club_id') ?? '');
@@ -69,7 +69,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function editEventAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin(['professor', 'committee_member']);
+  const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
 
   const eventId = String(formData.get('event_id') ?? '');
   const name = String(formData.get('name') ?? '').trim();

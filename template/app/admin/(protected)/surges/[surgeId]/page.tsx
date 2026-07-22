@@ -7,7 +7,7 @@ import { BuilderClient } from './builder-client';
 export const metadata = { title: 'Surge Builder' };
 
 export default async function SurgeBuilderPage({ params }: { params: Promise<{ surgeId: string }> }) {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const { surgeId } = await params;
   const supabase = await createClient();
 

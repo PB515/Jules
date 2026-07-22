@@ -15,7 +15,7 @@ export type Json =
   | Json[]
 
 export type StudentStatus = 'active' | 'locked';
-export type AdminRole = 'professor' | 'committee_member';
+export type AdminRole = 'super_admin' | 'professor' | 'committee_member';
 export type EventType = 'standard_meeting' | 'expert_session' | 'volunteer_task' | 'surge';
 export type SurgeStatus = 'draft' | 'live' | 'complete';
 export type SeasonCadence = 'semester' | 'trimester' | 'annual' | 'custom';
@@ -244,10 +244,13 @@ export interface Database {
         Relationships: [];
       };
       gallery_images: {
-        Row: { id: string; caption: string | null; file_path: string; uploaded_by: string | null; created_at: string };
+        Row: {
+          id: string; caption: string | null; file_path: string; uploaded_by: string | null;
+          club_id: string | null; created_at: string;
+        };
         Insert: {
           id?: string; caption?: string | null; file_path: string;
-          uploaded_by?: string | null; created_at?: string;
+          uploaded_by?: string | null; club_id?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['gallery_images']['Insert']>;
         Relationships: [];

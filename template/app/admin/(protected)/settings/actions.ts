@@ -13,7 +13,7 @@ export interface ActionResult {
 }
 
 export async function updateAllowedDomainsAction(domains: string[]): Promise<ActionResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const cleaned = domains.map((d) => d.trim().toLowerCase()).filter(Boolean);
   if (cleaned.length === 0) return { error: 'At least one domain is required.' };
 
@@ -25,7 +25,7 @@ export async function updateAllowedDomainsAction(domains: string[]): Promise<Act
 }
 
 export async function createSeasonAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const label = String(formData.get('label') ?? '').trim();
   const startDate = String(formData.get('start_date') ?? '');
   const endDate = String(formData.get('end_date') ?? '');
@@ -52,15 +52,17 @@ export async function createSeasonAction(_prev: ActionResult, formData: FormData
  * roster row via the Professor-gated, audit-logged RPC.
  */
 export async function createAdminAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const role = String(formData.get('role') ?? '') as AdminRole;
   const clubId = String(formData.get('club_id') ?? '') || null;
 
   if (!name || !email || !role) return { error: 'Fill in name, email, and role.' };
-  if (!['professor', 'committee_member'].includes(role)) return { error: 'Invalid role.' };
-  if (role === 'committee_member' && !clubId) return { error: 'Pick the club this Committee Member belongs to.' };
+  if (!['super_admin', 'professor', 'committee_member'].includes(role)) return { error: 'Invalid role.' };
+  if ((role === 'professor' || role === 'committee_member') && !clubId) {
+    return { error: `Pick the club this ${role === 'professor' ? 'Professor' : 'Committee Member'} belongs to.` };
+  }
 
   const service = createServiceRoleClient();
   const tempPassword = randomBytes(9).toString('base64url');
@@ -77,7 +79,7 @@ export async function createAdminAction(_prev: ActionResult, formData: FormData)
     p_name: name,
     p_email: email,
     p_role: role,
-    p_club_id: role === 'committee_member' ? clubId : null,
+    p_club_id: role === 'professor' || role === 'committee_member' ? clubId : null,
   });
   if (rpcErr) return { error: rpcErr.message };
 
@@ -86,12 +88,12 @@ export async function createAdminAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function setAdminRoleAction(adminId: string, role: AdminRole, clubId: string | null) {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const supabase = await createClient();
   const { error } = await supabase.rpc('admin_set_role', {
     p_admin_id: adminId,
     p_role: role,
-    p_club_id: role === 'committee_member' ? clubId : null,
+    p_club_id: role === 'professor' || role === 'committee_member' ? clubId : null,
   });
   if (error) throw new Error(error.message);
   revalidatePath('/admin/settings');
@@ -118,7 +120,7 @@ export interface BulkStudentResult {
  * acting on someone else's behalf has no such context to use.
  */
 export async function bulkCreateStudentsAction(_prev: BulkStudentResult, formData: FormData): Promise<BulkStudentResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const raw = String(formData.get('roster') ?? '').trim();
   if (!raw) return { error: 'Paste at least one name and email, one per line.' };
 
@@ -173,7 +175,7 @@ export async function bulkCreateStudentsAction(_prev: BulkStudentResult, formDat
 }
 
 export async function createClubAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const name = String(formData.get('name') ?? '').trim();
   const slug = String(formData.get('slug') ?? '').trim().toLowerCase();
   const description = String(formData.get('description') ?? '').trim();
@@ -190,7 +192,7 @@ export async function createClubAction(_prev: ActionResult, formData: FormData):
 }
 
 export async function updateClubDetailsAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await requireAdmin(['professor']);
+  await requireAdmin(['super_admin']);
   const clubId = String(formData.get('club_id') ?? '');
   const description = String(formData.get('description') ?? '').trim();
   const mentorName = String(formData.get('mentor_name') ?? '').trim();

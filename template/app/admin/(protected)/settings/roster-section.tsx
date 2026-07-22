@@ -48,10 +48,11 @@ export function RosterSection({ admins, clubs }: { admins: Admin[]; clubs: ClubO
           <input name="name" className="input" placeholder="Name" required />
           <input name="email" type="email" className="input" placeholder="admin email" required />
           <select name="role" className="input" value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="super_admin">Super Admin</option>
             <option value="professor">Professor</option>
             <option value="committee_member">Committee Member</option>
           </select>
-          {role === 'committee_member' ? (
+          {role === 'professor' || role === 'committee_member' ? (
             <select name="club_id" className="input" required>
               <option value="">Scope to club…</option>
               {clubs.map((c) => (

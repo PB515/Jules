@@ -9,7 +9,7 @@ import { Users, Trophy, Calendar, Zap } from '@/lib/icons';
 export const metadata = { title: 'System Ledger' };
 
 export default async function LedgerPage() {
-  await requireAdmin(['professor', 'committee_member']);
+  await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const supabase = await createClient();
 
   const [{ data: monthly }, { data: events }, { data: totals }, { data: summaryRows }, { data: tierRows }, { data: clubRows }] =
