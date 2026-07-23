@@ -8,6 +8,15 @@ Synergy is a mobile-first PWA that's the shared engagement platform for all 9 cl
 
 **The backend, data model, and every core flow are built and live-tested — this brief is only about how it looks, feels, moves, and sounds. Do not propose new features or data model changes.**
 
+## Direct feedback from the actual professor overseeing this (read this before anything else)
+
+A full 3D avatar/cosmetic-unlock system was built once and shown to her — she rejected it explicitly: **"we are doing MBA, this is childish, we need to be professional."** In the same review, she **loved** the escalating correct/incorrect sound cues and drama-building suspense (drumroll, winner burst) during Live Round quizzes.
+
+The real target is a specific grey area: **professional first, fun through restraint and craft — not through gamified spectacle.** Concretely, that means:
+- Subtle micro-interactions (hover states, press feedback, smooth shade/color transitions) over flashy animated mascots or 3D scenes.
+- Sound/haptic drama is proven to land well *inside the quiz experience specifically* — that's earned, keep it. Don't extend that same energy to, say, the admin dashboard or a professor's tracking screen, which need to read as calm and trustworthy.
+- When in doubt between "make it delightful" and "make it feel like a serious, well-built product a university would actually deploy," pick the second — delight should come from things being *smooth and considered*, not loud.
+
 ## Who actually uses this, and what they want in the moment
 
 - **Students** — open it in class or between classes, mostly on Android, some iPhone. They want quizzes to feel fun and fast, not like a form. The single most repeated real feedback so far: they want to feel a genuine "win" moment, not just see a number change.
@@ -61,6 +70,22 @@ Everything else stays functional/clean — these are the specific places worth g
 - Homepage hero centerpiece: `lib/components/hero-atom.tsx` (bigger animated atom mark)
 - Confetti/sound/haptics: `lib/components/winner-burst.tsx`, `lib/jules/sound.ts`, `lib/jules/haptics.ts`
 - Real Adani University logo: `public/brand/adani-university-logo.png` (footer only)
+
+## Cheap, professional polish — a real audit, not a guess (do this alongside the 6 hero moments, not instead of)
+
+A direct code audit found the app is currently under-polished in a very specific, cheap-to-fix way — this is the "grey area" territory the professor's feedback points at:
+
+- **Only 23 `transition` declarations exist across the entire app**, and just 4 distinct animation durations are used anywhere. Hover/press feedback is sparse by omission, not by intentional restraint.
+- **20+ primary call-to-action buttons** (Login, Register, Submit, Upload, Enter) currently have **zero hover state** — they sit completely static until clicked.
+- **The one place this is already done well**: the `/events` and `/clubs` card grids (`hover:border-gold/50` + `transition-colors`) — this is the proven, on-brand reference pattern. Extend it everywhere, don't invent a new one.
+- A few clickable rows (the admin Student Vault's expandable rows, Live Round's host screen) also have no hover/press cue.
+- No shared Button component exists yet — every button is hand-written per file, so fixing this is genuinely small, mechanical, low-risk work (adding a consistent `transition-colors` + a slightly-deeper-maroon hover state), not a redesign.
+
+If your wireframe pass touches any of these existing screens anyway, note the intended hover/press/transition behavior directly in the design so it ships in the same pass — otherwise this is cheap enough that Claude Code can do it as a separate, fast, asset-free pass on its own.
+
+## Logo / app icon
+
+The current app icon (`public/icons/icon.svg`) is hand-coded vector SVG (two crossed orbital ellipses + a spark), deliberately geometric so it stays crisp at every size down to a 32px favicon. If you explore a refreshed version: **keep it as clean vector geometry, not a raster/photographic-style mark** — anything generated as a bitmap image needs to be traced back into clean SVG before it can ship as a PWA icon, or it will look soft/blurry exactly where a university-affiliated app most needs to look sharp (the home-screen icon, the browser tab). Refining the existing orbit-and-spark concept is preferred over an unrelated new mark, unless something genuinely stronger emerges.
 
 ## What to hand back for execution
 
