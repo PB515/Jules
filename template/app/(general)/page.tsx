@@ -88,7 +88,7 @@ export default async function GeneralHomePage() {
             </div>
           </div>
 
-          <div className="hidden lg:col-span-5 lg:block">
+          <div className="hidden lg:col-span-5 lg:block lg:pt-10 lg:pr-6">
             <HeroCarousel />
           </div>
         </div>
