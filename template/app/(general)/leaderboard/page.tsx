@@ -67,18 +67,32 @@ export default async function LeaderboardPage({
             {rangeStart}–{rangeEnd} of {totalCount} students
           </p>
           <ol className="flex flex-col gap-2">
-            {rows.map((row) => (
-              <li
-                key={row.student_id}
-                className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="w-8 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
-                  <span className="text-sm">{row.name}</span>
-                </div>
-                <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
-              </li>
-            ))}
+            {rows.map((row) => {
+              const isFirst = row.rank === 1;
+              return (
+                <li
+                  key={row.student_id}
+                  className={`flex items-center justify-between rounded-[var(--radius)] border bg-card px-4 py-3 ${
+                    isFirst ? 'border-transparent' : 'border-border'
+                  }`}
+                  style={isFirst ? { boxShadow: 'inset 0 0 0 1.5px var(--adani-teal)' } : undefined}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex size-8 items-center justify-center rounded-full text-center text-sm font-semibold ${
+                        isFirst ? 'bg-adani-gradient text-white' : 'text-tertiary'
+                      }`}
+                    >
+                      {row.rank}
+                    </span>
+                    <span className="text-sm">{row.name}</span>
+                  </div>
+                  <span className={`text-sm font-medium ${isFirst ? 'text-adani-gradient font-semibold' : 'text-gold'}`}>
+                    {row.total_amount} J
+                  </span>
+                </li>
+              );
+            })}
           </ol>
 
           {hasPrev || hasNext ? (

@@ -1,8 +1,27 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { RegisterSW } from "@/lib/pwa/register-sw";
+
+// Self-hosted via next/font (built at compile time, no runtime Google Fonts
+// request — required for a PWA that needs to work offline/on flaky mobile
+// data). Weights match the finalized design choices: Plus Jakarta Sans
+// bold/extrabold for headings (900/"black" isn't offered by this family via
+// next/font/google), Inter regular/medium/semibold for body.
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -45,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`h-full antialiased ${plusJakartaSans.variable} ${inter.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-body">
         {/*
           beforeinstallprompt commonly fires before React hydrates on a real

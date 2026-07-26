@@ -12,6 +12,7 @@ import { EnergyBar } from '@/lib/components/energy-bar';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
+import { AnswerGrid, type AnswerState } from '@/lib/patterns/answer-grid';
 import { leaveLiveTeamAction } from './team-actions';
 import { getQuizMilestone, MILESTONE_LABEL } from '@/lib/jules/quiz-milestones';
 import { Check, X, Crown, Trophy, Home } from '@/lib/icons';
@@ -227,28 +228,13 @@ export function TeamClient({
           {!isLeader ? (
             <p className="text-center text-xs text-tertiary">Your team captain is answering for the team.</p>
           ) : null}
-          <div className="flex flex-1 flex-col gap-3">
-            {options.map(([key, label]) => {
-              const isSelected = selected === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => choose(key)}
-                  disabled={!isLeader || !!selected}
-                  className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-sm transition-colors disabled:cursor-default"
-                  style={{
-                    borderColor: isSelected ? 'var(--gold)' : 'var(--border)',
-                    background: isSelected ? 'var(--tier-volt-bg)' : 'var(--card)',
-                    opacity: isLeader ? 1 : 0.6,
-                  }}
-                >
-                  <span>
-                    <span className="mr-2 text-tertiary">{key}.</span>
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
+          <div style={{ opacity: isLeader ? 1 : 0.6 }}>
+            <AnswerGrid
+              options={options}
+              disabled={!isLeader || !!selected}
+              onSelect={choose}
+              getState={(key): AnswerState => (selected === key ? 'selected' : 'neutral')}
+            />
           </div>
           {isLeader && selected ? (
             <p className="text-center text-sm text-tertiary">Locked in, waiting for the host&hellip;</p>
@@ -266,32 +252,22 @@ export function TeamClient({
       {round.phase === 'reveal' && question && !suspense ? (
         <div className="flex flex-1 flex-col gap-6">
           <h2 className="text-lg leading-snug font-medium">{question.text}</h2>
-          <div className="flex flex-1 flex-col gap-3">
-            {options.map(([key, label]) => {
+          <AnswerGrid
+            options={options}
+            disabled
+            onSelect={() => {}}
+            getState={(key): AnswerState => {
               const isCorrect = key === question.correct_option;
-              const isWrongSelected = selected === key && !isCorrect;
-              return (
-                <div
-                  key={key}
-                  className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-sm"
-                  style={
-                    isCorrect
-                      ? { borderColor: 'var(--success)', background: 'var(--card)' }
-                      : isWrongSelected
-                        ? { borderColor: 'var(--accent)', background: 'var(--tier-current-bg)' }
-                        : { borderColor: 'var(--border)', background: 'var(--card)' }
-                  }
-                >
-                  <span>
-                    <span className="mr-2 text-tertiary">{key}.</span>
-                    {label}
-                  </span>
-                  {isCorrect ? <Check className="size-4 text-success" aria-hidden /> : null}
-                  {isWrongSelected ? <X className="size-4 text-accent" aria-hidden /> : null}
-                </div>
-              );
-            })}
-          </div>
+              if (isCorrect) return 'correct';
+              if (selected === key) return 'wrong';
+              return 'neutral';
+            }}
+            indicator={(state) => {
+              if (state === 'correct') return <Check className="size-4 text-success" aria-hidden />;
+              if (state === 'wrong') return <X className="size-4 text-accent" aria-hidden />;
+              return null;
+            }}
+          />
           {awarded !== null ? (
             <p className={`text-center text-sm ${awarded > 0 ? 'text-success' : 'text-accent'}`}>
               {awarded > 0 ? `+${awarded} J!` : 'Not quite.'}

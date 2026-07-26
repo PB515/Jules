@@ -72,7 +72,9 @@ export function RevealScoreboard({ rows, scale = 'full' }: { rows: RevealRow[]; 
         );
         return row.rank === 1 ? (
           <li key={row.key}>
-            <WinnerBurst scale={scale}>{rowContent}</WinnerBurst>
+            <WinnerBurst scale={scale} clip={{ src: '/videos/winner-burst.webp', frames: 96 }}>
+              {rowContent}
+            </WinnerBurst>
           </li>
         ) : (
           <li key={row.key} className="opacity-0" style={{ animation: 'reveal-row-in 0.4s ease-out forwards' }}>

@@ -14,9 +14,17 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { site } from '@/lib/site';
 import { vibrate } from '@/lib/jules/haptics';
+import { HeroClip } from '@/lib/components/hero-clip';
 
 const STORAGE_KEY = 'jules_splash_date';
-type Phase = 'jolt' | 'moto' | 'return' | 'done';
+// Real generated clip (trimmed to its first 100 frames/4.0s — the source
+// file ran 215 frames/8.6s, but everything past frame ~100 was just a
+// static hold + fade of the same already-formed logo, confirmed by sampling
+// frames directly). It replaces the old static-icon 'jolt'/'return' phases
+// entirely, since the clip itself already covers that exact motion.
+const CLIP_FRAMES = 100;
+const CLIP_MS = (CLIP_FRAMES / 25) * 1000;
+type Phase = 'clip' | 'moto' | 'done';
 
 // The Vishwambhari Stuti, verbatim as supplied — not translated/paraphrased.
 // Rotates with the English tagline so the moto beat isn't identical every
@@ -42,17 +50,16 @@ export function LaunchSplash({ children }: { children: React.ReactNode }) {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot kickoff of the sequence, same pattern as lib/components/count-up.tsx
     setMotoText(new Date().getDate() % 2 === 0 ? STUTI_VERSE : site.tagline);
-    setPhase('jolt');
+    setPhase('clip');
     vibrate([40, 30, 60]);
 
     const timers = [
-      setTimeout(() => setPhase('moto'), 650),
-      setTimeout(() => setPhase('return'), 1550),
-      setTimeout(() => setExiting(true), 1950),
+      setTimeout(() => setPhase('moto'), CLIP_MS),
+      setTimeout(() => setExiting(true), CLIP_MS + 900),
       setTimeout(() => {
         window.localStorage.setItem(STORAGE_KEY, todayKey());
         setPhase('done');
-      }, 2250),
+      }, CLIP_MS + 1200),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -69,16 +76,10 @@ export function LaunchSplash({ children }: { children: React.ReactNode }) {
             transition={{ duration: 0.3 }}
           >
             <AnimatePresence mode="wait">
-              {phase === 'jolt' ? (
-                <motion.img
-                  key="logo-jolt"
-                  src="/icons/icon.svg"
-                  alt={site.name}
-                  className="size-24"
-                  initial={{ scale: 0.3, opacity: 0, rotate: -8 }}
-                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 340, damping: 11 }}
-                />
+              {phase === 'clip' ? (
+                <motion.div key="logo-clip" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                  <HeroClip src="/videos/splash-daily.webp" frames={100} className="size-28 object-contain" />
+                </motion.div>
               ) : null}
               {phase === 'moto' ? (
                 <motion.p
@@ -91,17 +92,6 @@ export function LaunchSplash({ children }: { children: React.ReactNode }) {
                 >
                   {motoText}
                 </motion.p>
-              ) : null}
-              {phase === 'return' ? (
-                <motion.img
-                  key="logo-return"
-                  src="/icons/icon.svg"
-                  alt={site.name}
-                  className="size-20"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.35 }}
-                />
               ) : null}
             </AnimatePresence>
           </motion.div>

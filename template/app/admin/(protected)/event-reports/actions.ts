@@ -3,10 +3,14 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { logAdminAction } from '@/lib/jules/audit';
-import { redirect } from 'next/navigation';
 
 export interface ActionResult {
   error?: string;
+  /** Set on success instead of an immediate server-side redirect, so the
+   *  client can show the real "report archived" celebration moment first
+   *  (design-brief.md's own flagged gap — this used to be a plain redirect
+   *  with zero payoff for the committee member's actual work). */
+  success?: boolean;
 }
 
 async function uploadAttachmentImages(
@@ -84,5 +88,5 @@ export async function createEventReportAction(_prev: ActionResult, formData: For
 
   await logAdminAction(supabase, 'report_create', { report_id: report.id, event_id: eventId, title: event.name });
 
-  redirect('/admin/event-reports');
+  return { success: true };
 }

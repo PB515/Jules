@@ -1,0 +1,244 @@
+<title>Jules — General public site wireframes</title>
+<style>
+:root {
+  --bezel: #0f1620; --background: #070b12; --card: #0d1620; --card-raised: #101c28;
+  --border: #1c2836; --border-muted: #2b2745;
+  --accent: #E34234; --gold: #FFC72C; --success: #3ba26b;
+  --cosmetic-epic: #2E8B7A;
+  --foreground: #eef4fb; --muted: #6e8aa3; --tertiary: #5c7690;
+  --font-body: "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-num: "Cascadia Mono", "SF Mono", Consolas, ui-monospace, monospace;
+  --radius: 0.75rem;
+}
+* { box-sizing: border-box; }
+.wf-page { background: var(--background); color: var(--foreground); font-family: var(--font-body); font-size: 14px; padding: 2rem 1.25rem 3rem; }
+.wf-shell { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.5rem; }
+.wf-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
+.wf-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.wf-note { font-size: 12.5px; color: var(--tertiary); margin: 0 0 1rem; max-width: 70ch; }
+.tag { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--tertiary); letter-spacing: 0.03em; }
+.frames { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; }
+.callout { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 1rem 1.15rem; font-size: 13px; color: var(--muted); max-width: 560px; }
+.callout strong { color: var(--foreground); font-weight: 500; }
+.callout code { font-family: var(--font-num); }
+
+.site-frame { width: 760px; max-width: 100%; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--background); flex-shrink: 0; }
+.site-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--card); }
+.site-logo { font-size: 15px; font-weight: 600; color: var(--gold); }
+.site-nav { display: flex; align-items: center; gap: 16px; font-size: 11.5px; color: var(--muted); }
+.site-nav .active { color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+.site-nav .cta { background: var(--gold); color: #070b12; padding: 5px 10px; border-radius: 6px; font-weight: 500; }
+.site-body { padding: 24px 20px; min-height: 200px; }
+.site-footer { border-top: 1px solid var(--border); background: var(--card); padding: 10px 20px; text-align: center; font-size: 10.5px; color: var(--tertiary); }
+.gs-btn { background: var(--gold); color: #070b12; font-weight: 500; padding: 8px 16px; border-radius: 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+.gs-btn-ghost { border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; font-size: 12px; }
+.gs-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.gs-row:last-child { border-bottom: none; }
+.gs-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+</style>
+<div class="wf-page">
+  <div class="wf-shell">
+
+    <section>
+      <div class="wf-head"><h2>Homepage — wireframe</h2></div>
+      <p class="wf-note">Matches <code>(general)/page.tsx</code>: a hero with the ambient <code>EnergyField</code> particle background and the interactive <code>HeroAtom</code> mark (both real, already live &mdash; shown here as static placeholders), a role-aware CTA (visitor/student/admin get different buttons), &quot;the idea&quot; explainer, and the next 3 upcoming events.</p>
+      <div class="frames">
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav">
+              <span class="active">Home</span><span>Events</span><span>Afterglow</span><span>Gallery</span>
+              <span class="cta">Get the App</span>
+            </div>
+          </div>
+          <div class="site-body" style="text-align:center; background: radial-gradient(circle at 50% 30%, rgba(255,199,44,0.05), transparent 60%);">
+            <p style="font-size:10.5px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin:0 0 10px;">Energy Management Club</p>
+            <h1 style="font-size:26px; font-weight:500; line-height:1.3; margin:0 0 10px; max-width:520px; margin-left:auto; margin-right:auto;">Every atom generates a spark. Every action is energy.</h1>
+            <p style="font-size:12.5px; color:var(--muted); max-width:420px; margin:0 auto 18px;">Turning club participation into a living energy grid.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+              <span class="gs-btn">I'm a student &rarr;</span>
+              <span class="gs-btn-ghost">I'm an admin</span>
+            </div>
+
+            <div style="text-align:left; margin-top:32px;">
+              <h2 style="font-size:14px; font-weight:500; margin:0 0 8px;">The idea</h2>
+              <p style="font-size:12px; color:var(--muted); line-height:1.6; max-width:600px;">Jules bridges the Joule, the SI unit of energy, with Shakti, the primordial energy the Vishwambhari Stuti describes as present in every atom of the universe. Every meeting, expert session, volunteer task, and live quiz is a spark of that energy.</p>
+            </div>
+
+            <div style="text-align:left; margin-top:24px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2 style="font-size:14px; font-weight:500; margin:0;">Upcoming events</h2>
+                <span style="font-size:11.5px; color:var(--gold);">See all</span>
+              </div>
+              <div class="gs-card">
+                <div class="gs-row"><span>Guest Lecture: Solar Grids</span><span style="color:var(--muted); font-size:11px;">Feb 5</span></div>
+                <div class="gs-row"><span>Campus Cleanup Drive</span><span style="color:var(--muted); font-size:11px;">Feb 22</span></div>
+                <div class="gs-row"><span>Weekly Sync</span><span style="color:var(--muted); font-size:11px;">Mar 3</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="callout">
+          <strong>Role-aware CTA, not one-size-fits-all</strong>: a returning student sees &quot;Continue to your Grid&quot;, a returning admin sees &quot;Continue to the Command Center&quot;, and only a true visitor sees the two buttons shown here.<br/><br/>
+          <strong>Active-nav uses kumkum</strong> (the same &quot;you are here&quot; meaning as admin and Live Round) &mdash; &quot;Home&quot; is underlined here since we're on <code>/</code>.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Events — wireframe</h2></div>
+      <p class="wf-note">Matches <code>events/page.tsx</code>: upcoming events sorted soonest-first, past events sorted most-recent-first, fed live from <code>public_events()</code> &mdash; never a hand-managed list.</p>
+      <div class="frames">
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span class="active">Events</span><span>Afterglow</span><span>Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body">
+            <h1 style="font-size:22px; font-weight:500; margin:0;">Events</h1>
+            <p style="font-size:12px; color:var(--muted); margin:4px 0 20px;">Meetings, expert sessions, and volunteer tasks, all in one calendar.</p>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Upcoming</p>
+            <div class="gs-card" style="margin-bottom:20px;">
+              <div class="gs-row"><span>Guest Lecture: Solar Grids<br/><span style="font-size:10.5px; color:var(--tertiary);">Expert Session &middot; Seminar Hall B</span></span><span style="color:var(--muted); font-size:11px;">Feb 5, 2026</span></div>
+              <div class="gs-row"><span>Campus Cleanup Drive<br/><span style="font-size:10.5px; color:var(--tertiary);">Volunteer Task &middot; East Quad</span></span><span style="color:var(--muted); font-size:11px;">Feb 22, 2026</span></div>
+            </div>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Past</p>
+            <div class="gs-card">
+              <div class="gs-row"><span>Winter Surge 2026<br/><span style="font-size:10.5px; color:var(--tertiary);">Main Auditorium</span></span><span style="color:var(--muted); font-size:11px;">Jan 18, 2026</span></div>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="callout">
+          <strong>No hand-managed calendar entries</strong>: every row here is a real seeded/created <code>events</code> row, exposed through the narrow <code>public_events()</code> RPC &mdash; never a broad public policy on the real <code>events</code> table.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Afterglow — list + detail — wireframe</h2></div>
+      <p class="wf-note">Matches <code>afterglow/page.tsx</code> + <code>afterglow/[id]/page.tsx</code>: a list of recaps linking to a real event, and a post detail showing live-pulled attendance/Joules stats above the write-up body.</p>
+      <div class="frames">
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span>Events</span><span class="active">Afterglow</span><span>Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body">
+            <h1 style="font-size:22px; font-weight:500; margin:0;">Afterglow</h1>
+            <p style="font-size:12px; color:var(--muted); margin:4px 0 16px;">What happened, in the club's own words, after the energy settles.</p>
+            <div class="gs-card">
+              <div class="gs-row"><span>A great turnout for the Winter Surge<br/><span style="font-size:10.5px; color:var(--tertiary);">Winter Surge 2026</span></span><span style="color:var(--muted); font-size:11px;">Jan 20, 2026</span></div>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span>Events</span><span class="active">Afterglow</span><span>Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body">
+            <p style="font-size:11px; color:var(--tertiary); margin:0;">January 20, 2026, Winter Surge 2026</p>
+            <h1 style="font-size:20px; font-weight:500; margin:6px 0 14px;">A great turnout for the Winter Surge</h1>
+            <div style="display:flex; gap:24px; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:14px 18px; margin-bottom:16px;">
+              <div><p style="font-size:16px; font-weight:500; margin:0;">142</p><p style="font-size:10.5px; color:var(--tertiary); margin:2px 0 0;">attendees</p></div>
+              <div><p style="font-size:16px; font-weight:500; color:var(--gold); margin:0;">3,400</p><p style="font-size:10.5px; color:var(--tertiary); margin:2px 0 0;">Joules distributed</p></div>
+            </div>
+            <p style="font-size:12.5px; color:var(--foreground); line-height:1.6; margin:0;">The room was packed for the season opener &mdash; 142 students turned out on a cold January evening, and the energy in the auditorium matched the name of the event. Twenty questions, four rounds of the Grid lighting up in real time...</p>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="callout">
+          <strong>Two separate public reads, not an embedded join</strong>: <code>events</code> has no public SELECT policy, so the list page fetches <code>public_events()</code> separately and maps event names client-side, rather than an <code>events(name)</code> join that would silently return null for anonymous visitors.<br/><br/>
+          <strong>Known edge case</strong>: the stats box only aggregates QR check-in Joules &mdash; a Surge-type event recap won't show meaningful numbers unless that Surge's own <code>event_id</code> is set too.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Gallery — wireframe</h2></div>
+      <p class="wf-note">Matches <code>gallery/page.tsx</code>: a real photo grid once uploads exist, and today's actual empty state &mdash; the hand-coded <code>GalleryPlaceholder</code> illustration, deliberately not a mockup pretending to be a real photo.</p>
+      <div class="frames">
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span>Events</span><span>Afterglow</span><span class="active">Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body" style="text-align:center;">
+            <h1 style="font-size:22px; font-weight:500; margin:0 0 4px;">Gallery</h1>
+            <p style="font-size:12px; color:var(--muted); margin:0 0 24px;">Moments from past meetings, sessions, and Surges.</p>
+            <div style="border:1px dashed var(--border); border-radius:var(--radius); padding:40px 20px;">
+              <div style="width:120px; height:80px; margin:0 auto 16px; background:linear-gradient(160deg, var(--cosmetic-epic), var(--card-raised)); border-radius:8px; opacity:0.5;"></div>
+              <h3 style="font-size:14px; font-weight:500; margin:0;">Real photos coming soon</h3>
+              <p style="font-size:11.5px; color:var(--tertiary); margin:6px 0 0; max-width:280px; margin-left:auto; margin-right:auto;">The Gallery is being filled in. Check back after the next event.</p>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span>Events</span><span>Afterglow</span><span class="active">Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body">
+            <h1 style="font-size:22px; font-weight:500; margin:0 0 16px;">Gallery</h1>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="callout">
+          <strong>The placeholder is real today</strong>, not a hypothetical &mdash; the club has no real event photos yet, so this empty state is what actually renders right now.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Get the App — wireframe</h2></div>
+      <p class="wf-note">Matches <code>get-app/page.tsx</code>: a scannable QR (encoding the bare site URL), the raw link as a fallback, a native install-prompt button, and per-platform manual instructions.</p>
+      <div class="frames">
+        <div class="site-frame">
+          <div class="site-header">
+            <span class="site-logo">Jules</span>
+            <div class="site-nav"><span>Home</span><span>Events</span><span>Afterglow</span><span>Gallery</span><span class="cta">Get the App</span></div>
+          </div>
+          <div class="site-body" style="text-align:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6" width="34" height="34" style="margin:0 auto 14px;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            <h1 style="font-size:20px; font-weight:500; margin:0 0 8px;">Get Jules on your phone</h1>
+            <p style="font-size:12px; color:var(--muted); max-width:380px; margin:0 auto 20px; line-height:1.6;">The student side of Jules, your Grid, QR check-ins, Surges, and Live Round, only runs as an installed app on your phone. This keeps quizzes fair and focused, one device, nothing else open.</p>
+            <div style="width:110px; height:110px; background:#fff; border-radius:8px; margin:0 auto 14px;"></div>
+            <div class="gs-card" style="text-align:left; padding:12px 16px; max-width:360px; margin:0 auto 16px;">
+              <p style="font-size:10px; color:var(--tertiary); text-transform:uppercase; margin:0 0 4px;">The link to open on your phone</p>
+              <p style="font-family:var(--font-num); font-size:12px; color:var(--gold); margin:0;">jules-purven-s-projects.vercel.app</p>
+            </div>
+            <span class="gs-btn">Install app</span>
+            <div style="text-align:left; max-width:360px; margin:24px auto 0; font-size:11.5px; color:var(--muted); line-height:1.6;">
+              <p style="margin:0 0 8px;"><strong style="color:var(--foreground);">Android (Chrome)</strong><br/>Open the link above, then tap the install button, or the menu (&#8942;) &rarr; &quot;Add to Home screen&quot;.</p>
+              <p style="margin:0;"><strong style="color:var(--foreground);">iPhone (Safari)</strong><br/>Open the link above, tap the Share icon, then &quot;Add to Home Screen&quot;.</p>
+            </div>
+          </div>
+          <div class="site-footer">Jules: Every atom generates a spark. Every action is energy.</div>
+        </div>
+
+        <div class="callout">
+          <strong>QR kept black-on-white deliberately</strong>, not theme-colored &mdash; real-world scan reliability across random phone cameras and lighting matters more here than matching the dark UI.
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

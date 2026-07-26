@@ -3,10 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 import { getStudent, getAdmin } from '@/lib/auth/session';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { EnergyField } from '@/lib/components/energy-field';
-import { HeroAtom } from '@/lib/components/hero-atom';
+import { HeroCarousel } from '@/lib/components/hero-carousel';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
-import { ArrowRight, Calendar, MapPin } from '@/lib/icons';
+import { ArrowRight, Calendar, MapPin, Briefcase, Network, Crown, Lightbulb, HeartHandshake } from '@/lib/icons';
+
+const PILLARS = [
+  { icon: Briefcase, label: 'Professional', color: 'text-adani-teal' },
+  { icon: Network, label: 'Networking', color: 'text-adani-blue' },
+  { icon: Crown, label: 'Leadership', color: 'text-amber-500' },
+  { icon: Lightbulb, label: 'Industry Insights', color: 'text-adani-violet' },
+  { icon: HeartHandshake, label: 'Societal Impact', color: 'text-success' },
+] as const;
 
 export const metadata = { title: 'Home' };
 
@@ -22,27 +29,100 @@ export default async function GeneralHomePage() {
 
   return (
     <div className="relative z-10 flex flex-col gap-16">
-      <EnergyField />
+      {/* Full-bleed 100vh split hero — breaks out of the shared <main>'s
+          max-w-5xl/px-6/py-10 constraints via the standard "50vw" full-bleed
+          technique, since a wall-to-wall hero can't live inside a
+          centered/padded container. */}
+      <section className="relative left-1/2 -mx-[50vw] -mt-10 flex h-[calc(100vh-100px)] w-screen items-stretch overflow-hidden border-b border-border bg-white">
+        <div className="grid w-full grid-cols-1 items-stretch lg:grid-cols-12">
+          <div className="flex flex-col justify-center gap-4 py-8 pr-6 pl-6 lg:col-span-7 lg:pr-12 lg:pl-24">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface-slate px-3 py-1 shadow-2xs">
+              <span className="size-2 animate-pulse rounded-full bg-adani-teal" aria-hidden />
+              <span className="text-[11px] font-extrabold tracking-wider text-slate-700 uppercase">Faculty of Management Sciences (FMS)</span>
+            </div>
 
-      <section className="relative isolate flex flex-col items-center gap-4 py-10 text-center">
-        <HeroAtom className="absolute inset-0 -z-10 opacity-10" />
-        <p className="text-xs uppercase tracking-[0.3em] text-gold">Faculty of Management Sciences</p>
-        <h1 className="max-w-2xl text-4xl leading-tight font-medium">{site.tagline}</h1>
-        <p className="max-w-xl text-muted">{site.description}</p>
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          {student ? (
-            <Link href="/dashboard" className="rounded-[var(--radius)] bg-gold px-5 py-2.5 text-sm font-medium text-gold-foreground">
-              Continue to your Grid
-            </Link>
-          ) : admin ? (
-            <Link href="/admin" className="rounded-[var(--radius)] bg-gold px-5 py-2.5 text-sm font-medium text-gold-foreground">
-              Continue to the Command Center
-            </Link>
-          ) : (
-            <Link href="/get-app" className="flex items-center gap-1.5 rounded-[var(--radius)] bg-gold px-5 py-2.5 text-sm font-medium text-gold-foreground">
-              I&apos;m a student <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          )}
+            <h1 className="max-w-2xl text-3xl leading-[1.1] font-black text-slate-900 sm:text-5xl">
+              Progress, <span className="text-adani-gradient">Together.</span>
+            </h1>
+
+            <p className="max-w-xl text-sm leading-relaxed text-slate-600">{site.description}</p>
+
+            <div className="grid max-w-md grid-cols-3 gap-3 pt-0.5">
+              <div className="rounded-xl border border-border bg-surface-slate p-2.5 text-center">
+                <p className="text-xl font-black text-gold">9</p>
+                <p className="text-[9px] font-bold tracking-wider text-slate-500 uppercase">FMS Clubs</p>
+              </div>
+              <div className="rounded-xl border border-border bg-surface-slate p-2.5 text-center">
+                <p className="text-xl font-black text-adani-teal">4</p>
+                <p className="text-[9px] font-bold tracking-wider text-slate-500 uppercase">Standing Tiers</p>
+              </div>
+              <div className="rounded-xl border border-border bg-surface-slate p-2.5 text-center">
+                <p className="text-xl font-black text-adani-blue">100%</p>
+                <p className="text-[9px] font-bold tracking-wider text-slate-500 uppercase">SOP Verified</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              {student ? (
+                <Link
+                  href="/dashboard"
+                  className="rounded-full bg-adani-gradient px-6 py-3 text-sm font-extrabold text-white shadow-[0_4px_14px_rgba(0,140,168,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Continue to your Grid
+                </Link>
+              ) : admin ? (
+                <Link
+                  href="/admin"
+                  className="rounded-full bg-adani-gradient px-6 py-3 text-sm font-extrabold text-white shadow-[0_4px_14px_rgba(0,140,168,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Continue to the Command Center
+                </Link>
+              ) : (
+                <Link
+                  href="/get-app"
+                  className="flex items-center gap-2 rounded-full bg-adani-gradient px-6 py-3 text-sm font-extrabold text-white shadow-[0_4px_14px_rgba(0,140,168,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  I&apos;m an MBA Student <ArrowRight className="size-4" aria-hidden />
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="hidden lg:col-span-5 lg:block">
+            <HeroCarousel />
+          </div>
+        </div>
+      </section>
+
+      {/* Message from the Faculty Chair */}
+      <section className="space-y-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-xl sm:p-10">
+        <div className="flex flex-col items-start justify-between gap-4 border-b border-slate-700/80 pb-5 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-3.5">
+            <div className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-gold/90 text-xl font-black text-white shadow-md">
+              RM
+            </div>
+            <div>
+              <h3 className="text-lg font-extrabold text-white">Dr. Riya Mehta</h3>
+              <p className="text-xs font-medium text-slate-300">Faculty Chair, Faculty of Management Sciences (FMS)</p>
+            </div>
+          </div>
+          <span className="rounded-full border border-slate-700 bg-slate-800 px-3.5 py-1.5 text-xs font-extrabold text-amber-300 shadow-2xs">FMS Official SOP</span>
+        </div>
+
+        <blockquote className="text-sm leading-relaxed font-normal text-slate-200 italic sm:text-base">
+          &ldquo;The FMS Students Clubs and Conduits offer more than mere student organizations; they form a
+          vibrant community where ambitious minds converge to explore, learn, and foster professional growth.
+          Becoming a member grants you exclusive access to networking opportunities, skill development, and
+          leadership training.&rdquo;
+        </blockquote>
+
+        <div className="grid grid-cols-2 gap-3.5 pt-2 sm:grid-cols-5">
+          {PILLARS.map(({ icon: Icon, label, color }) => (
+            <div key={label} className="space-y-1.5 rounded-2xl border border-slate-700/60 bg-slate-800/80 p-3 text-center">
+              <Icon className={`mx-auto size-4 ${color}`} aria-hidden />
+              <p className="text-xs font-bold text-slate-200">{label}</p>
+            </div>
+          ))}
         </div>
       </section>
 

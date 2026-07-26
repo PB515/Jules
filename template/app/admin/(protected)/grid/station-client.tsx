@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
+import { HeroClip } from '@/lib/components/hero-clip';
 import { Check, ShieldAlert, ScanLine } from '@/lib/icons';
 import QRCode from 'react-qr-code';
 
@@ -131,6 +132,14 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
           </button>
         </div>
       </div>
+
+      {/* Plays once per page load — HeroClip only fires on mount, so the
+          5s metrics poll below doesn't retrigger it. Deliberately a one-time
+          accent, not a persistent loop — a professor/committee-member
+          dashboard should read as calm, not have a flashy animation running
+          forever underneath it (design-brief.md's own "restraint" direction
+          for admin screens specifically). */}
+      <HeroClip src="/videos/professor-analytics.webp" frames={96} className="mx-auto h-16 w-16 object-contain" />
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-[var(--radius)] border border-border bg-card p-4 text-center">

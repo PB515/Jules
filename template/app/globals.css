@@ -16,14 +16,18 @@
    ============================================================================ */
 
 :root {
-  /* — Backgrounds — warm ivory, softer than clinical white or cool gray — */
-  --bezel: #f0eae0;        /* phone frame / device chrome */
-  --background: #faf7f2;   /* main light canvas */
+  /* — Backgrounds — pure crisp white + cool slate, per the finalized public
+     site prototype (superseding the earlier warm-ivory direction, decision
+     53 — the user explicitly moved off cream/beige to this cooler palette). — */
+  --bezel: #f0eae0;        /* phone frame / device chrome — untouched, PWA-only surface */
+  --background: #ffffff;   /* main light canvas — pure solid white */
   --card: #ffffff;         /* rows, cards, inputs */
+  --surface-slate: #f8fafc;      /* secondary surface / section fill (slate-50) */
+  --surface-slate-100: #f1f5f9;  /* tertiary surface / border fill (slate-100) */
 
-  /* — Borders — */
-  --border: #e8e1d6;       /* hairlines, input borders */
-  --border-muted: #ded5c6; /* onboarding-style inputs */
+  /* — Borders — cool slate, matching the white/slate canvas — */
+  --border: #e2e8f0;       /* hairlines, input borders (slate-200) */
+  --border-muted: #cbd5e1; /* onboarding-style inputs (slate-300) */
 
   /* — Accents — */
   /* --gold is the primary brand/CTA accent — Adani's X11 Maroon,
@@ -53,9 +57,22 @@
   --tier-current-text: #BD3861; --tier-current-border: #c7401a; --tier-current-bg: #fce7de;
   --tier-plasma-text: #BD3861;  --tier-plasma-border: #BD3861;  --tier-plasma-bg: #f8e3ea;
 
-  /* — Typography — system sans, two weights only (400/500), no bold — */
-  --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* — Typography — self-hosted via next/font/google in app/layout.tsx,
+     which exposes these as CSS vars (--font-plus-jakarta-sans/--font-inter);
+     falls back to system-ui if either ever fails to load. — */
+  --font-display: var(--font-plus-jakarta-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* — Adani accent tokens — additive, not a replacement. --gold already IS
+     the Adani Crimson/Maroon (#BD3861, exact match), so these 3 are the new
+     ground: Teal/Blue/Violet. Used narrowly, per the finalized design
+     choices: primary CTAs, Rank-1 leaderboard pills, Plasma tier badges,
+     and the Kahoot-style answer grid — never smeared across every button,
+     which is exactly the "gradient fatigue" the design audit itself warns
+     against. --accent/--success (danger/success meaning) are untouched. */
+  --adani-teal: #008CA8;
+  --adani-blue: #2D4C9C;
+  --adani-violet: #633A8C;
 
   /* — Spacing scale — */
   --space-tight: 0.5rem;
@@ -71,6 +88,8 @@
   --color-bezel: var(--bezel);
   --color-background: var(--background);
   --color-card: var(--card);
+  --color-surface-slate: var(--surface-slate);
+  --color-surface-slate-100: var(--surface-slate-100);
   --color-border: var(--border);
   --color-border-muted: var(--border-muted);
   --color-accent: var(--accent);
@@ -78,6 +97,9 @@
   --color-gold: var(--gold);
   --color-gold-foreground: var(--gold-foreground);
   --color-success: var(--success);
+  --color-adani-teal: var(--adani-teal);
+  --color-adani-blue: var(--adani-blue);
+  --color-adani-violet: var(--adani-violet);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-tertiary: var(--tertiary);
@@ -131,6 +153,14 @@ body {
   font-family: var(--font-body);
 }
 
+/* Headings default to the display face site-wide — no component previously
+   opted into `--font-display` explicitly since both tokens were identical
+   (system-ui) until this pass; a blanket rule is the lowest-risk way to
+   apply the new typeface everywhere without touching every component. */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
 /* Shared form input — auth pages + a few admin forms. */
 .auth-input,
 .input {
@@ -150,4 +180,30 @@ body {
 .input:focus {
   outline: none;
   border-color: var(--gold);
+}
+
+/* Adani logo-spectrum gradient — reserved narrowly (primary CTAs, Rank-1
+   leaderboard pills, Plasma tier badges) per the finalized design choices;
+   never applied to secondary/tertiary buttons. Composed from tokens only. */
+.bg-adani-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--adani-teal) 0%,
+    var(--adani-blue) 35%,
+    var(--adani-violet) 70%,
+    var(--gold) 100%
+  );
+}
+.text-adani-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--adani-teal) 0%,
+    var(--adani-blue) 35%,
+    var(--adani-violet) 70%,
+    var(--gold) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }

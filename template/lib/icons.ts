@@ -65,6 +65,10 @@ export {
   Camera,
   Target,
   Gift,
+  Briefcase,
+  Network,
+  Lightbulb,
+  HeartHandshake,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';

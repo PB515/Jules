@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { EnergyBar } from '@/lib/components/energy-bar';
+import { AnswerGrid, type AnswerState } from '@/lib/patterns/answer-grid';
 import { Check, X } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -101,34 +102,23 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
 
       <h2 className="text-lg leading-snug font-medium">{q.text}</h2>
 
-      <div className="flex flex-1 flex-col gap-3">
-        {options.map(([key, label]) => {
+      <AnswerGrid
+        options={options}
+        disabled={phase !== 'answering'}
+        onSelect={choose}
+        getState={(key): AnswerState => {
           const isSelected = selected === key;
-          const isCorrect = phase !== 'answering' && correctOption === key;
-          const isWrongSelected = phase === 'revealed' && isSelected && correctOption !== key;
-
-          let style: React.CSSProperties = { borderColor: 'var(--border)', background: 'var(--card)' };
-          if (isCorrect) style = { borderColor: 'var(--success)', background: 'var(--card)' };
-          else if (isWrongSelected) style = { borderColor: 'var(--accent)', background: 'var(--tier-current-bg)' };
-
-          return (
-            <button
-              key={key}
-              onClick={() => choose(key)}
-              disabled={phase !== 'answering'}
-              className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3.5 text-left text-sm transition-colors disabled:cursor-default"
-              style={style}
-            >
-              <span>
-                <span className="mr-2 text-tertiary">{key}.</span>
-                {label}
-              </span>
-              {isCorrect ? <Check className="size-4 text-success" aria-hidden /> : null}
-              {isWrongSelected ? <X className="size-4 text-accent" aria-hidden /> : null}
-            </button>
-          );
-        })}
-      </div>
+          if (phase !== 'answering' && correctOption === key) return 'correct';
+          if (phase === 'revealed' && isSelected && correctOption !== key) return 'wrong';
+          if (isSelected) return 'selected';
+          return 'neutral';
+        }}
+        indicator={(state) => {
+          if (state === 'correct') return <Check className="size-4 text-success" aria-hidden />;
+          if (state === 'wrong') return <X className="size-4 text-accent" aria-hidden />;
+          return null;
+        }}
+      />
 
       {phase === 'expired' ? <p className="text-center text-sm text-tertiary">Time&apos;s up</p> : null}
       {phase === 'revealed' && awarded !== 0 ? (

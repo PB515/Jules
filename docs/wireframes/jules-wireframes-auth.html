@@ -1,0 +1,246 @@
+<title>Jules — Auth wireframes</title>
+<style>
+:root {
+  --bezel: #0f1620; --background: #070b12; --card: #0d1620; --card-raised: #101c28;
+  --border: #1c2836; --border-muted: #2b2745;
+  --accent: #E34234; --gold: #FFC72C; --success: #3ba26b;
+  --cosmetic-rare: #C98A3E; --cosmetic-epic: #2E8B7A;
+  --foreground: #eef4fb; --muted: #6e8aa3; --tertiary: #5c7690;
+  --tier-ember-text: #d99a4e; --tier-ember-border: #4a3018; --tier-ember-bg: #1c140a;
+  --font-body: "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-num: "Cascadia Mono", "SF Mono", Consolas, ui-monospace, monospace;
+  --radius: 0.75rem;
+}
+* { box-sizing: border-box; }
+.wf-page { background: var(--background); color: var(--foreground); font-family: var(--font-body); font-size: 14px; padding: 2rem 1.25rem 3rem; }
+.wf-shell { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.5rem; }
+.wf-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
+.wf-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.wf-note { font-size: 12.5px; color: var(--tertiary); margin: 0 0 1rem; max-width: 60ch; }
+.tag { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--tertiary); letter-spacing: 0.03em; }
+.tag.new { border-color: var(--cosmetic-epic); color: var(--cosmetic-epic); }
+.frames { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; }
+.phone { width: 360px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 20px; background: var(--bezel); padding: 10px; }
+.phone-screen { background: var(--background); border-radius: 14px; overflow: hidden; padding: 1.25rem 0.9rem 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; min-height: 480px; justify-content: center; }
+.screen-label { font-size: 11px; color: var(--tertiary); text-align: center; margin-bottom: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.pg { font-size: 18px; font-weight: 600; margin: 0; }
+.section { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 0.9rem; }
+.input-stub { background: var(--card-raised); border: 1px solid var(--border-muted); border-radius: var(--radius); padding: 8px 11px; font-size: 12px; color: var(--tertiary); }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.tier-pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--tier-ember-border); color: var(--tier-ember-text); background: var(--tier-ember-bg); }
+.btn-gold { background: var(--gold); color: #070b12; font-weight: 500; text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.btn-accent { background: var(--accent); color: #fbe4e1; font-weight: 500; text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.btn-ghost { border: 1px solid var(--border); color: var(--muted); text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.btn-disabled { background: var(--card); color: var(--tertiary); border: 1px solid var(--border); text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.bar-track { height: 5px; background: var(--card-raised); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--gold); border-radius: 999px; }
+.callout { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 1rem 1.15rem; font-size: 13px; color: var(--muted); max-width: 480px; }
+.callout strong { color: var(--foreground); font-weight: 500; }
+.field-lab { font-size: 11px; color: var(--muted); margin: 0 0 6px; }
+.banner-accent { border: 1px solid rgba(227,66,52,0.4); background: var(--card); color: var(--accent); border-radius: var(--radius); padding: 10px 12px; font-size: 12.5px; }
+.banner-success { border: 1px solid rgba(59,162,107,0.4); background: var(--card); color: var(--success); border-radius: var(--radius); padding: 10px 12px; font-size: 12.5px; }
+</style>
+<div class="wf-page">
+  <div class="wf-shell">
+
+    <section>
+      <div class="wf-head"><h2>Student Signup — "The Connection" — wireframe</h2></div>
+      <p class="wf-note">Matches the real <code style="font-family:var(--font-num);">signup/page.tsx</code> exactly: name, college email, phone, password — a connection-strength meter fills 25% per completed field and the CTA turns gold only once all four are filled. No particle background here (that's scoped only to the public homepage, decision 42) — this is the real, plain centered-card layout.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Signup — in progress (75%)</div>
+          <div class="phone-screen">
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:600; color:var(--gold); letter-spacing:-0.01em; margin-bottom:4px;">Jules</div>
+              <h1 class="pg">Make the Connection</h1>
+              <p style="font-size:12.5px; color:var(--muted); margin:4px 0 0;">Every atom generates a spark.</p>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:75%;"></div></div>
+            <div>
+              <p class="field-lab">Name</p>
+              <div class="input-stub" style="color:var(--foreground);">Ethan Fernandes</div>
+            </div>
+            <div>
+              <p class="field-lab">College email</p>
+              <div class="input-stub" style="color:var(--foreground);">ethan@yourcollege.edu</div>
+            </div>
+            <div>
+              <p class="field-lab">Phone</p>
+              <div class="input-stub" style="color:var(--tertiary);">10-digit number</div>
+            </div>
+            <div>
+              <p class="field-lab">Password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div class="btn-disabled">Connect</div>
+            <p style="text-align:center; font-size:12px; color:var(--muted); margin:0;">Already connected? <span style="color:var(--gold);">Log in</span></p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Signup — ready (100%)</div>
+          <div class="phone-screen">
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:600; color:var(--gold); letter-spacing:-0.01em; margin-bottom:4px;">Jules</div>
+              <h1 class="pg">Make the Connection</h1>
+              <p style="font-size:12.5px; color:var(--muted); margin:4px 0 0;">Every atom generates a spark.</p>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+            <div>
+              <p class="field-lab">Name</p>
+              <div class="input-stub" style="color:var(--foreground);">Ethan Fernandes</div>
+            </div>
+            <div>
+              <p class="field-lab">College email</p>
+              <div class="input-stub" style="color:var(--foreground);">ethan@yourcollege.edu</div>
+            </div>
+            <div>
+              <p class="field-lab">Phone</p>
+              <div class="input-stub" style="color:var(--foreground);">9876543210</div>
+            </div>
+            <div>
+              <p class="field-lab">Password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div class="btn-gold">Connect</div>
+            <p style="text-align:center; font-size:12px; color:var(--muted); margin:0;">Already connected? <span style="color:var(--gold);">Log in</span></p>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Real behavior, not invented</strong>: strength is <code style="font-family:var(--font-num);">filledFieldCount * 25</code>, password only counts once it's 8+ characters. The CTA is a real disabled state (muted card colors, not just gold-at-low-opacity) until <code style="font-family:var(--font-num);">strength === 100</code>, then reads &quot;Connecting…&quot; while pending.<br/><br/>
+          <strong>Gap flagged, not fixed here</strong>: the original prototype spec (§7a) describes ambient floating particles behind every student-facing screen — the real signup/login pages don't have this today. Worth a follow-up decision, not assumed into this wireframe.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Student Login — wireframe</h2></div>
+      <p class="wf-note">Matches <code style="font-family:var(--font-num);">login/page.tsx</code>: college email + password, gold CTA, &quot;Lost connection?&quot; and &quot;New to Jules? Connect now&quot; links below. Includes the real locked-account banner state.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Login</div>
+          <div class="phone-screen">
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:600; color:var(--gold); letter-spacing:-0.01em; margin-bottom:4px;">Jules</div>
+              <h1 class="pg">Reconnect</h1>
+            </div>
+            <div>
+              <p class="field-lab">College email</p>
+              <div class="input-stub" style="color:var(--foreground);">ethan@yourcollege.edu</div>
+            </div>
+            <div>
+              <p class="field-lab">Password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div class="btn-gold">Log in</div>
+            <div style="text-align:center; display:flex; flex-direction:column; gap:8px;">
+              <span style="font-size:12px; color:var(--gold);">Lost connection?</span>
+              <p style="font-size:12px; color:var(--muted); margin:0;">New to Jules? <span style="color:var(--gold);">Connect now</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Login — locked account</div>
+          <div class="phone-screen">
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:600; color:var(--gold); letter-spacing:-0.01em; margin-bottom:4px;">Jules</div>
+              <h1 class="pg">Reconnect</h1>
+            </div>
+            <div class="banner-accent">This account is locked. Contact club leadership.</div>
+            <div>
+              <p class="field-lab">College email</p>
+              <div class="input-stub" style="color:var(--foreground);">ethan@yourcollege.edu</div>
+            </div>
+            <div>
+              <p class="field-lab">Password</p>
+              <div class="input-stub">Password</div>
+            </div>
+            <div class="btn-gold">Log in</div>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>The lock banner is real, not hypothetical</strong>: it's the same lock/unlock state the Student Data Vault sets (Officer/Owner admin action) — a locked student sees this exact message on their next login attempt, not a generic auth error.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Admin Login — wireframe</h2></div>
+      <p class="wf-note">Matches <code style="font-family:var(--font-num);">admin/login/page.tsx</code>: a deliberately separate screen (never inside the guarded admin layout, decision 20) with its own kumkum-accented CTA instead of gold — a real, intentional visual distinction between the student and admin worlds, not a copy-paste miss. No signup link — admins are created via the bootstrap script or in-app role assignment, never self-serve.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Admin Login</div>
+          <div class="phone-screen">
+            <div style="text-align:center;">
+              <p style="font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.2em; margin:0 0 6px;">Jules</p>
+              <h1 class="pg">Reactor Command Center</h1>
+            </div>
+            <div>
+              <p class="field-lab">Admin email</p>
+              <div class="input-stub" style="color:var(--foreground);">owner@yourcollege.edu</div>
+            </div>
+            <div>
+              <p class="field-lab">Password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div class="btn-accent">Enter</div>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Why kumkum here, and only here</strong>: this reuses the same accent Live Round already established for &quot;admin/host-flavored&quot; chrome (decision 39) — a quiet signal that you've crossed into the operator side of the app, distinct from every gold-forward student screen.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Password Reset — wireframe</h2></div>
+      <p class="wf-note">Matches the real <code style="font-family:var(--font-num);">forgot-password</code> / <code style="font-family:var(--font-num);">reset-password</code> pages exactly — a Supabase-native email magic-link flow (decision 17), <strong>not</strong> the 6-digit OTP-box flow the original prototype spec showed. Fewer screens: request → confirmation → (email link) → set new password. No OTP entry step exists in the real code.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Request reset link</div>
+          <div class="phone-screen">
+            <h1 class="pg">Lost connection?</h1>
+            <p style="font-size:12.5px; color:var(--muted); margin:0;">Enter your college email and we'll send a link to set a new password.</p>
+            <div>
+              <div class="input-stub" style="color:var(--tertiary);">you@yourcollege.edu</div>
+            </div>
+            <div class="btn-gold">Send reset link</div>
+            <p style="text-align:center; font-size:12px; color:var(--gold); margin:0;">Back to login</p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Reset link sent</div>
+          <div class="phone-screen">
+            <h1 class="pg">Lost connection?</h1>
+            <p style="font-size:12.5px; color:var(--muted); margin:0 0 4px;">Enter your college email and we'll send a link to set a new password.</p>
+            <div class="banner-success">If that email is connected to Jules, a reset link is on its way.</div>
+            <p style="text-align:center; font-size:12px; color:var(--gold); margin:0;">Back to login</p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Set new password (from email link)</div>
+          <div class="phone-screen">
+            <h1 class="pg">Set a new password</h1>
+            <div>
+              <p class="field-lab">New password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div>
+              <p class="field-lab">Confirm password</p>
+              <div class="input-stub" style="color:var(--foreground);">••••••••••</div>
+            </div>
+            <div class="btn-gold">Save password</div>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Deliberately vague confirmation copy</strong>: &quot;If that email is connected to Jules…&quot; never confirms or denies an email exists in the system — a standard enumeration-prevention pattern, already in the real code, not a wireframe invention.<br/><br/>
+          <strong>Admin Force Reset is a separate mechanism</strong>, covered in File 3 (Student Data Vault) — an admin-issued temporary password with an audit log entry, not this self-serve flow.</div>
+      </div>
+    </section>
+
+  </div>
+</div>

@@ -1,9 +1,11 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { Instagram, Linkedin, ExternalLink, Users, Calendar, MapPin } from '@/lib/icons';
 import { EmptyState } from '@/lib/patterns/empty-state';
+import { clubCoverImage } from '@/lib/jules/club-covers';
 import { CardTrio } from './card-trio';
 import { RulesAccordion } from './rules-accordion';
 
@@ -35,8 +37,16 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
     club.x_url ? { href: club.x_url, label: 'X', icon: ExternalLink } : null,
   ].filter((s): s is { href: string; label: string; icon: typeof Instagram } => s !== null);
 
+  const cover = clubCoverImage(club.name);
+
   return (
     <div className="flex flex-col gap-8">
+      {cover ? (
+        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-[var(--radius)] border border-border bg-background">
+          <Image src={cover} alt="" fill className="object-cover" priority />
+        </div>
+      ) : null}
+
       <div>
         <h1 className="text-2xl font-medium">{club.name}</h1>
         {club.mentor_name ? <p className="mt-1 text-sm text-tertiary">Faculty mentor: {club.mentor_name}</p> : null}

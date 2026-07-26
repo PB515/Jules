@@ -70,7 +70,9 @@ export function MatrixClient({ top10, mine, myTier }: { top10: Row[]; mine: Row 
             // one revealed, so this fires exactly once, right on cue.
             return row.rank === 1 ? (
               <li key={row.student_id}>
-                <WinnerBurst scale="compact">{rowContent}</WinnerBurst>
+                <WinnerBurst scale="compact" clip={{ src: '/videos/winner-burst.webp', frames: 96 }}>
+                  {rowContent}
+                </WinnerBurst>
               </li>
             ) : (
               <li

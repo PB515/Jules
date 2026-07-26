@@ -19,6 +19,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { playSound, type SoundName } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
+import { HeroClip } from '@/lib/components/hero-clip';
 
 const DEFAULT_COLOR_VARS = ['--gold', '--accent'];
 const DEFAULT_VIBRATION = [50, 40, 50, 40, 120];
@@ -43,6 +44,7 @@ export function WinnerBurst({
   colors,
   sound = 'winner',
   vibration = DEFAULT_VIBRATION,
+  clip,
 }: {
   children: React.ReactNode;
   scale?: 'full' | 'compact';
@@ -50,6 +52,10 @@ export function WinnerBurst({
   colors?: string[];
   sound?: SoundName;
   vibration?: number | number[];
+  /** Optional real generated hero-moment clip (trophy burst), shown once
+   *  above the content. Only the true Winner Declaration call sites pass
+   *  this — reused elsewhere (tier-up) without it. */
+  clip?: { src: string; frames: number };
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
@@ -82,6 +88,11 @@ export function WinnerBurst({
       animate={{ scale: 1, opacity: 1 }}
       transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 12 }}
     >
+      {clip ? (
+        <div className="mb-2 flex justify-center">
+          <HeroClip src={clip.src} frames={clip.frames} className="h-28 w-28 object-contain" />
+        </div>
+      ) : null}
       {children}
     </motion.div>
   );

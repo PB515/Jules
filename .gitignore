@@ -36,3 +36,9 @@ Thumbs.db
 
 # Real credentials — never committed, local reference only
 docs/runbooks/demo-credentials.md
+
+# Raw asset staging folder — the user's local source dump for generated
+# images/videos; already copied into template/public/* in organized form,
+# committing the raw duplicate here would just double the repo's binary size.
+/Images & Videos/
+~$*.docx

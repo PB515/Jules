@@ -10,10 +10,14 @@
  * public_event_stats(), same as before.
  */
 import { useActionState, useEffect, useState, useTransition } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createEventReportAction, type ActionResult } from '../actions';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { createClient } from '@/lib/supabase/client';
 import { BulletListField } from '@/lib/patterns/bullet-list-field';
+import { HeroClip } from '@/lib/components/hero-clip';
+import { CircleCheck } from '@/lib/icons';
 
 const initialState: ActionResult = {};
 
@@ -31,6 +35,7 @@ interface EventOption {
 }
 
 export function NewEventReportForm({ events, defaultEventId }: { events: EventOption[]; defaultEventId?: string }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(createEventReportAction, initialState);
   const [stats, setStats] = useState<EventStats | null>(null);
   const [, startTransition] = useTransition();
@@ -62,6 +67,31 @@ export function NewEventReportForm({ events, defaultEventId }: { events: EventOp
     if (defaultEventId && events.some((e) => e.id === defaultEventId)) onEventChange(defaultEventId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultEventId]);
+
+  useEffect(() => {
+    if (!state?.success) return;
+    // Auto-navigate once the celebration clip has had time to play (~3.84s)
+    // plus a small buffer — the "Back to Event Reports" link covers anyone
+    // who wants to leave sooner.
+    const t = setTimeout(() => router.push('/admin/event-reports'), 4400);
+    return () => clearTimeout(t);
+  }, [state?.success, router]);
+
+  if (state?.success) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-success/40 bg-card p-8 text-center">
+        <HeroClip src="/videos/report-submitted.webp" frames={96} className="h-28 w-28 object-contain" />
+        <CircleCheck className="size-10 text-success" aria-hidden />
+        <div>
+          <p className="text-lg font-medium">Catalyst Record archived</p>
+          <p className="mt-1 text-sm text-muted">Your Event Report has been submitted and is now live.</p>
+        </div>
+        <Link href="/admin/event-reports" className="text-sm text-gold">
+          Back to Event Reports
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form action={formAction} className="flex flex-col gap-4">

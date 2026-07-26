@@ -8,9 +8,11 @@ import { PowerGrid } from '@/lib/components/power-grid';
 import { StreakChain } from '@/lib/components/streak-chain';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { tierProgress, nextTierAt } from '@/lib/jules/tiers';
+import { tierBadgeImage } from '@/lib/jules/tier-badges';
 import { getStudentActivitySummary } from '@/lib/jules/student-activity';
 import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 import { ScanLine, Clock, Calendar, CircleCheck, CircleX, ChevronRight, Bell } from '@/lib/icons';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Tier } from '@/lib/supabase/database.types';
 
@@ -160,7 +162,13 @@ export default async function DashboardPage() {
             <p className="text-xs uppercase tracking-wide text-muted">Season Joules</p>
             <CountUp value={totals.season_joules} className="text-4xl font-medium text-gold" />
           </div>
-          <TierBadge tier={totals.tier} />
+          {/* ★ TEMP tier badge art — see lib/jules/tier-badges.ts. Sits directly
+              on this card's own white background (--card), so the badge
+              JPEGs' opaque white backing blends in with no extra chip needed. */}
+          <div className="flex flex-col items-center gap-1.5">
+            <Image src={tierBadgeImage(totals.tier)} alt="" width={56} height={56} className="rounded-full" />
+            <TierBadge tier={totals.tier} />
+          </div>
         </div>
 
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-background">

@@ -11,7 +11,8 @@ import { site } from '@/lib/site';
  * Deliberately NOT the same manifest as the student one (app/manifest.ts):
  * different name, different start_url (the student one points at
  * /dashboard, which an admin can't open at all), and a visually distinct
- * icon (icon-admin.svg — same core Synergy mark, inverted palette) so an
+ * icon (icon-admin-*.png — a real generated executive-palette mark,
+ * decision "frontend overhaul", replacing the earlier hand-coded SVG) so an
  * installed home-screen icon never reads as "the student app" to a
  * professor or committee member. The student PWA and its phone-only gate
  * are completely untouched by this.
@@ -26,7 +27,6 @@ export async function GET() {
     background_color: '#faf7f2',
     theme_color: '#faf7f2',
     icons: [
-      { src: '/icons/icon-admin.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/icons/icon-admin-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icons/icon-admin-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
       { src: '/icons/icon-admin-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },

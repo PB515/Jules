@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { WinnerBurst } from '@/lib/components/winner-burst';
+import { HeroClip } from '@/lib/components/hero-clip';
 import { TIERS, tierLabel } from '@/lib/jules/tiers';
 import type { Tier } from '@/lib/supabase/database.types';
 
@@ -50,6 +51,7 @@ export function TierUpCelebration({ tier }: { tier: Tier }) {
         vibration={[60, 40, 60]}
       >
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card px-6 py-4 text-center shadow-lg">
+          <HeroClip src="/videos/tier-up.webp" frames={96} className="h-20 w-20 object-contain" />
           <p className="text-xs uppercase tracking-wide text-muted">You reached</p>
           <TierBadge tier={tier} />
           <p className="text-sm text-muted">{tierLabel(tier)} unlocked</p>

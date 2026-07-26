@@ -12,6 +12,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CircleCheck, CircleX, ScanLine, Camera } from '@/lib/icons';
 import { TierBadge } from '@/lib/components/tier-badge';
+import { HeroClip } from '@/lib/components/hero-clip';
 import { CameraScanner } from './camera-scanner';
 import type { Tier } from '@/lib/supabase/database.types';
 
@@ -89,6 +90,7 @@ export function ScanClient({
   if (result.state === 'success') {
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-success/40 bg-card p-8 text-center">
+        <HeroClip src="/videos/qr-success.webp" frames={96} className="h-24 w-24 object-contain" />
         <CircleCheck className="size-10 text-success" aria-hidden />
         <div>
           <p className="text-2xl font-medium text-gold">+{result.amount} J</p>

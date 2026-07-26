@@ -1,0 +1,309 @@
+<title>Jules — Quiz &amp; Live Round wireframes</title>
+<style>
+:root {
+  --bezel: #0f1620; --background: #070b12; --card: #0d1620; --card-raised: #101c28;
+  --border: #1c2836; --border-muted: #2b2745;
+  --accent: #E34234; --gold: #FFC72C; --success: #3ba26b;
+  --cosmetic-rare: #C98A3E; --cosmetic-epic: #2E8B7A;
+  --foreground: #eef4fb; --muted: #6e8aa3; --tertiary: #5c7690;
+  --tier-ember-text: #d99a4e; --tier-ember-border: #4a3018; --tier-ember-bg: #1c140a;
+  --font-body: "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-num: "Cascadia Mono", "SF Mono", Consolas, ui-monospace, monospace;
+  --radius: 0.75rem;
+}
+* { box-sizing: border-box; }
+.wf-page { background: var(--background); color: var(--foreground); font-family: var(--font-body); font-size: 14px; padding: 2rem 1.25rem 3rem; }
+.wf-shell { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.5rem; }
+.wf-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
+.wf-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.wf-note { font-size: 12.5px; color: var(--tertiary); margin: 0 0 1rem; max-width: 60ch; }
+.tag { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--tertiary); letter-spacing: 0.03em; }
+.tag.new { border-color: var(--cosmetic-epic); color: var(--cosmetic-epic); }
+.frames { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; }
+.phone { width: 360px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 20px; background: var(--bezel); padding: 10px; }
+.phone-screen { background: var(--background); border-radius: 14px; overflow: hidden; padding: 1.25rem 0.9rem 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; min-height: 420px; }
+.screen-label { font-size: 11px; color: var(--tertiary); text-align: center; margin-bottom: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.pg { font-size: 18px; font-weight: 600; margin: 0; }
+.section { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 0.9rem; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat-box { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 10px 12px; }
+.stat-box .lab { font-size: 10.5px; color: var(--muted); margin: 0 0 3px; }
+.stat-box .val { font-size: 15px; font-weight: 500; margin: 0; font-family: var(--font-num); }
+.input-stub { background: var(--card-raised); border: 1px solid var(--border-muted); border-radius: var(--radius); padding: 8px 11px; font-size: 12px; color: var(--tertiary); }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.tier-pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--tier-ember-border); color: var(--tier-ember-text); background: var(--tier-ember-bg); }
+.btn-gold { background: var(--gold); color: #070b12; font-weight: 500; text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.btn-ghost { border: 1px solid var(--border); color: var(--muted); text-align: center; padding: 10px; border-radius: var(--radius); font-size: 13px; }
+.callout { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 1rem 1.15rem; font-size: 13px; color: var(--muted); max-width: 480px; }
+.callout strong { color: var(--foreground); font-weight: 500; }
+.qtimer { height: 4px; background: var(--card-raised); border-radius: 999px; overflow: hidden; }
+.qtimer div { height: 100%; background: var(--gold); }
+.qtext { font-size: 14px; font-weight: 500; line-height: 1.4; margin: 0; }
+.quiz-btn { position: relative; padding: 13px 15px; font-size: 12.5px; display: flex; align-items: center; justify-content: space-between; border: 1.5px solid var(--border); background: var(--card); clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); }
+.quiz-btn .k { color: var(--tertiary); margin-right: 6px; }
+.quiz-btn.selected { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset, 0 0 12px rgba(255,199,44,0.3); }
+.quiz-btn.correct { border-color: var(--success); background: rgba(59,162,107,0.14); box-shadow: 0 0 14px rgba(59,162,107,0.3); }
+.quiz-btn.incorrect { border-color: var(--accent); background: rgba(227,66,52,0.14); box-shadow: 0 0 14px rgba(227,66,52,0.3); }
+.quiz-btn.dimmed { opacity: 0.45; }
+.state-label { font-size: 10.5px; color: var(--tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; text-align: center; }
+.story-row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+.story-frame { flex: 1; min-width: 200px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.story-arrow { display: flex; align-items: center; justify-content: center; color: var(--tertiary); font-size: 20px; padding: 0 2px; }
+.tree-item { position: relative; display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+.tree-node { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); background: var(--card-raised); flex-shrink: 0; margin-left: -22px; z-index: 1; }
+.tree-node.unlocked { border-color: currentColor; box-shadow: 0 0 8px currentColor; }
+.tree-copy .name { font-size: 12.5px; font-weight: 500; margin: 0; }
+.tree-copy .meta { font-size: 10.5px; color: var(--tertiary); margin: 1px 0 0; }
+.tree-copy .meta.locked { opacity: 0.55; }
+.rank-row { display: flex; align-items: center; justify-content: space-between; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); padding: 10px 14px; }
+.rank-row.top { border-color: var(--gold); background: rgba(255,199,44,0.08); }
+.rank-row.mine { border-color: var(--gold); background: rgba(255,199,44,0.06); }
+.rank-num { width: 22px; text-align: center; font-size: 12.5px; color: var(--tertiary); }
+.rank-num.top { color: var(--gold); }
+</style>
+<div class="wf-page">
+  <div class="wf-shell">
+
+    <section>
+      <div class="wf-head"><h2>Quiz-answer buttons — wireframe</h2><span class="tag new">redesign</span></div>
+      <p class="wf-note">Same screen, same logic as the real <code style="font-family:var(--font-num);">surge-client.tsx</code> (question counter, energy-bar timer, question text, 4 options, awarded feedback) — only the button shape and state treatment change, from plain rectangles to the faceted crystal language.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Answering phase</div>
+          <div class="phone-screen">
+            <div class="row-between" style="font-size:11px; color:var(--tertiary);">
+              <span>Question 4 / 20</span>
+              <span style="color:var(--gold);">+60 J so far</span>
+            </div>
+            <div class="qtimer"><div style="width:70%;"></div></div>
+            <p class="qtext">Which of these is a renewable energy source?</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="quiz-btn"><span><span class="k">A.</span>Coal</span></div>
+              <div class="quiz-btn"><span><span class="k">B.</span>Solar</span></div>
+              <div class="quiz-btn"><span><span class="k">C.</span>Natural gas</span></div>
+              <div class="quiz-btn"><span><span class="k">D.</span>Diesel</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Revealed phase</div>
+          <div class="phone-screen">
+            <div class="row-between" style="font-size:11px; color:var(--tertiary);">
+              <span>Question 4 / 20</span>
+              <span style="color:var(--gold);">+60 J so far</span>
+            </div>
+            <div class="qtimer"><div style="width:100%;"></div></div>
+            <p class="qtext">Which of these is a renewable energy source?</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="quiz-btn incorrect"><span><span class="k">A.</span>Coal</span><span style="color:var(--accent);">&#10005;</span></div>
+              <div class="quiz-btn correct"><span><span class="k">B.</span>Solar</span><span style="color:var(--success);">&#10003;</span></div>
+              <div class="quiz-btn dimmed"><span><span class="k">C.</span>Natural gas</span></div>
+              <div class="quiz-btn dimmed"><span><span class="k">D.</span>Diesel</span></div>
+            </div>
+            <p style="text-align:center; font-size:12px; color:var(--tertiary); margin:0;">+0 J &mdash; correct answer was B</p>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Shape:</strong> a subtle two-corner cut (clip-path, not a full hexagon) &mdash; angular enough to read as &quot;faceted crystal,&quot; restrained enough to stay left-aligned and legible at question-answer width.<br/><br/>
+          <strong>States map directly onto the existing logic</strong> in <code style="font-family:var(--font-num);">surge-client.tsx</code>: selected/correct/incorrect/dimmed already exist as separate style branches today &mdash; this redesign only changes what each branch renders, not the state machine itself. <strong>Same treatment applies to Live Round's identical option-button pattern</strong> below, since both screens share the exact same correct/incorrect/dimmed logic.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Cosmetic-unlock celebration &mdash; storyboard</h2><span class="tag new">new</span></div>
+      <p class="wf-note">The GSAP timeline that plays on &quot;Your Collection&quot; when a threshold is newly crossed &mdash; three beats, roughly 0.9s total. This is the sequence <code style="font-family:var(--font-num);">gsap.timeline()</code> will drive; the frames below are the storyboard, not literal animation.</p>
+      <div class="story-row">
+        <div class="story-frame">
+          <p class="state-label">0.0s &mdash; locked</p>
+          <div class="tree-item" style="color:var(--cosmetic-rare);">
+            <div class="tree-node"></div>
+            <div class="tree-copy"><p class="name">Current Cloak</p><p class="meta locked">Outfit &middot; locked, 600 J</p></div>
+          </div>
+        </div>
+        <div class="story-arrow">&rarr;</div>
+        <div class="story-frame">
+          <p class="state-label">0.0&ndash;0.4s &mdash; glow</p>
+          <div class="tree-item" style="color:var(--cosmetic-rare);">
+            <div class="tree-node unlocked" style="box-shadow:0 0 16px currentColor;"></div>
+            <div class="tree-copy"><p class="name">Current Cloak</p><p class="meta locked">Outfit &middot; locked, 600 J</p></div>
+          </div>
+        </div>
+        <div class="story-arrow">&rarr;</div>
+        <div class="story-frame">
+          <p class="state-label">0.4&ndash;0.7s &mdash; scale-in</p>
+          <div class="tree-item" style="color:var(--cosmetic-rare); transform:scale(1.08); transform-origin:left center;">
+            <div class="tree-node unlocked"></div>
+            <div class="tree-copy"><p class="name">Current Cloak</p><p class="meta locked" style="opacity:0.2;">Outfit &middot; locked, 600 J</p></div>
+          </div>
+        </div>
+        <div class="story-arrow">&rarr;</div>
+        <div class="story-frame">
+          <p class="state-label">0.7&ndash;0.9s &mdash; label settles</p>
+          <div class="tree-item" style="color:var(--cosmetic-rare);">
+            <div class="tree-node unlocked"></div>
+            <div class="tree-copy"><p class="name">Current Cloak</p><p class="meta">Outfit &middot; unlocked at 600 J</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 14px;">
+        <strong>Built with <code style="font-family:var(--font-num);">useGSAP()</code>, scoped to the collection-list container ref</strong> &mdash; glow (opacity/box-shadow tween) &rarr; scale-in (transform, springy ease-out) &rarr; the locked meta-text crossfades to the unlocked one as the scale settles. No layout shift at any point.<br/><br/>
+        <strong>Fires once, on mount, per newly-crossed item</strong> &mdash; computed the same way as the existing tier-up celebration (compare current <code style="font-family:var(--font-num);">lifetime_joules</code> against a localStorage-remembered last-seen value), not on every page load.
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Surge Matrix reveal + personal result &mdash; wireframe</h2></div>
+      <p class="wf-note">Matches the real <code style="font-family:var(--font-num);">matrix-client.tsx</code> exactly: ranks animate in 10th &rarr; 1st, ~370ms apart, rank 1 gets the shared <code style="font-family:var(--font-num);">WinnerBurst</code> confetti beat. The personal result card (V4 fix) is the key piece &mdash; everyone gets a takeaway, not just the top 10.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Fully revealed + your result (top 10)</div>
+          <div class="phone-screen">
+            <div>
+              <p style="font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:0;">Winter Surge</p>
+              <h1 class="pg" style="margin-top:4px;">Top of the grid</h1>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="rank-row"><span><span class="rank-num">#10</span> Vivaan J.</span><span style="color:var(--gold); font-size:12.5px;">610 J</span></div>
+              <div class="rank-row"><span><span class="rank-num">#9</span> Diya P.</span><span style="color:var(--gold); font-size:12.5px;">640 J</span></div>
+              <div class="rank-row"><span><span class="rank-num">#8</span> Ishita N.</span><span style="color:var(--gold); font-size:12.5px;">655 J</span></div>
+              <div class="rank-row top"><span><span class="rank-num top">&#9819;</span> Priya M.</span><span style="color:var(--gold); font-size:12.5px; font-weight:600;">940 J</span></div>
+            </div>
+            <div class="section" style="text-align:center;">
+              <p style="font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:0;">Your result</p>
+              <p style="font-size:28px; font-weight:600; color:var(--gold); margin:4px 0 0;">#14</p>
+              <p style="font-size:11px; color:var(--muted); margin:2px 0 0;">out of everyone who joined</p>
+              <div class="row-between" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+                <span style="font-size:12px;">45 J earned</span>
+                <span class="tier-pill">Current</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Personal card &mdash; didn't answer any questions</div>
+          <div class="phone-screen" style="justify-content:center;">
+            <div class="section" style="text-align:center;">
+              <p style="font-size:12.5px; color:var(--muted); margin:0;">You didn't answer any questions in this Surge.</p>
+              <div style="margin-top:12px; display:flex; justify-content:center;">
+                <span class="tier-pill">Current</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Empty-state handled too</strong>: if nobody answered a single question, the whole ranked list is replaced by the shared <code style="font-family:var(--font-num);">EmptyState</code> pattern (&quot;No answers were recorded&quot;) &mdash; the personal card still renders below it once the reveal sequence finishes.<br/><br/>
+          <strong>Reduced-motion</strong>: the whole staggered reveal is skipped &mdash; every row and the personal card render instantly, fully visible, no animation.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Live Round &mdash; team screens &mdash; wireframe</h2><span class="tag new">new</span></div>
+      <p class="wf-note">Matches the real <code style="font-family:var(--font-num);">team-client.tsx</code> exactly &mdash; Supabase Realtime drives every phase change (lobby &rarr; question &rarr; reveal &rarr; leaderboard &rarr; ... &rarr; complete), no polling. Option buttons reuse the same faceted-crystal treatment as async Surge above, since both share the identical correct/incorrect/dimmed state logic.</p>
+      <div class="frames">
+        <div class="phone">
+          <div class="screen-label">Join</div>
+          <div class="phone-screen" style="align-items:center; justify-content:center; text-align:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="34" height="34" style="margin:0 auto;"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            <h1 class="pg" style="margin-top:14px;">Join a Live Round</h1>
+            <p style="font-size:12px; color:var(--tertiary); margin:4px 0 20px;">Enter the code on the classroom screen.</p>
+            <div class="input-stub" style="text-align:center; font-size:22px; letter-spacing:0.3em; color:var(--foreground); margin-bottom:10px;">R7K2</div>
+            <div class="input-stub" style="text-align:center; margin-bottom:14px;">Team name</div>
+            <div class="btn-gold" style="width:100%;">Join</div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Lobby</div>
+          <div class="phone-screen" style="align-items:center; justify-content:center; text-align:center;">
+            <div class="row-between" style="width:100%; font-size:11px; color:var(--accent);">
+              <span>Team: Circuit Breakers</span>
+              <span style="color:var(--gold);">+20 J per correct answer</span>
+            </div>
+            <p style="font-size:17px; font-weight:500; margin:0;">You're in!</p>
+            <p style="font-size:12.5px; color:var(--tertiary); margin:0;">Waiting for the host to start the round&hellip;</p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Question &mdash; locked in, waiting</div>
+          <div class="phone-screen">
+            <div class="row-between" style="font-size:11px; color:var(--accent);">
+              <span>Team: Circuit Breakers</span>
+              <span style="color:var(--gold);">+20 J per correct answer</span>
+            </div>
+            <div class="qtimer"><div style="width:45%;"></div></div>
+            <p class="qtext">What is the SI unit of energy?</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="quiz-btn selected"><span><span class="k">A.</span>Joule</span></div>
+              <div class="quiz-btn dimmed"><span><span class="k">B.</span>Newton</span></div>
+              <div class="quiz-btn dimmed"><span><span class="k">C.</span>Watt</span></div>
+              <div class="quiz-btn dimmed"><span><span class="k">D.</span>Volt</span></div>
+            </div>
+            <p style="text-align:center; font-size:12px; color:var(--tertiary); margin:0;">Locked in, waiting for the host&hellip;</p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Reveal (non-final question)</div>
+          <div class="phone-screen">
+            <div class="row-between" style="font-size:11px; color:var(--accent);">
+              <span>Team: Circuit Breakers</span>
+              <span style="color:var(--gold);">+20 J per correct answer</span>
+            </div>
+            <p class="qtext">What is the SI unit of energy?</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="quiz-btn correct"><span><span class="k">A.</span>Joule</span><span style="color:var(--success);">&#10003;</span></div>
+              <div class="quiz-btn"><span><span class="k">B.</span>Newton</span></div>
+              <div class="quiz-btn"><span><span class="k">C.</span>Watt</span></div>
+              <div class="quiz-btn"><span><span class="k">D.</span>Volt</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Reveal &mdash; final question suspense beat</div>
+          <div class="phone-screen" style="align-items:center; justify-content:center; text-align:center;">
+            <p style="font-size:17px; font-weight:500; color:var(--gold); margin:0; opacity:0.6;">Revealing the answer&hellip;</p>
+            <p style="font-size:12px; color:var(--tertiary); margin:6px 0 0;">Final question</p>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Leaderboard</div>
+          <div class="phone-screen">
+            <h1 class="pg">Scoreboard</h1>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="rank-row top"><span><span class="rank-num top">&#9819;</span> Circuit Breakers</span><span style="color:var(--gold); font-size:12.5px;">140 J</span></div>
+              <div class="rank-row"><span><span class="rank-num">2</span> Team Watt</span><span style="color:var(--gold); font-size:12.5px;">120 J</span></div>
+              <div class="rank-row"><span><span class="rank-num">3</span> Volt Squad</span><span style="color:var(--gold); font-size:12.5px;">100 J</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="screen-label">Complete &mdash; final standings</div>
+          <div class="phone-screen">
+            <h1 class="pg">Final standings</h1>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="rank-row"><span><span class="rank-num">3</span> Volt Squad</span><span style="color:var(--gold); font-size:12.5px;">220 J</span></div>
+              <div class="rank-row mine"><span><span class="rank-num">2</span> Team Watt (you)</span><span style="color:var(--gold); font-size:12.5px;">260 J</span></div>
+              <div class="rank-row top"><span><span class="rank-num top">&#9819;</span> Circuit Breakers</span><span style="color:var(--gold); font-size:12.5px; font-weight:600;">340 J</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" style="align-self: flex-start;">
+          <strong>Cold-load safe</strong>: reloading directly into reveal/leaderboard/complete (not just a live transition) fetches the scoreboard on mount too &mdash; a real bug fixed earlier this project (a blank scoreboard on cold-load).<br/><br/>
+          <strong>Same escalating-drama system as async Surge</strong>: quiet per-question feedback (a sound + 30ms vibration on every question except the last), then the final question's reveal gets the drumroll + suspense beat, then Final Standings reuses the shared <code style="font-family:var(--font-num);">RevealScoreboard</code> worst-to-best countdown component &mdash; the exact same one the host's projector screen uses, just at &quot;compact&quot; scale for a phone.
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

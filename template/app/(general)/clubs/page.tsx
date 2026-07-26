@@ -1,7 +1,9 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { EventCoverPlaceholder } from '@/lib/components/event-cover-placeholder';
+import { clubCoverImage } from '@/lib/jules/club-covers';
 import { Users } from '@/lib/icons';
 
 export const metadata = { title: 'Clubs' };
@@ -21,21 +23,28 @@ export default async function ClubsPage() {
         <EmptyState icon={Users} title="No clubs yet" />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {clubs.map((c) => (
-            <Link
-              key={c.id}
-              href={`/clubs/${c.slug}`}
-              className="flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card transition-colors hover:border-gold/50"
-            >
-              <div className="flex aspect-video items-center justify-center bg-background">
-                <EventCoverPlaceholder className="h-full w-full" />
-              </div>
-              <div className="flex flex-col gap-1 p-4">
-                <p className="text-sm font-medium">{c.name}</p>
-                {c.description ? <p className="text-xs text-tertiary">{c.description}</p> : null}
-              </div>
-            </Link>
-          ))}
+          {clubs.map((c) => {
+            const cover = clubCoverImage(c.name);
+            return (
+              <Link
+                key={c.id}
+                href={`/clubs/${c.slug}`}
+                className="flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card transition-colors hover:border-gold/50"
+              >
+                <div className="relative flex aspect-video items-center justify-center bg-background">
+                  {cover ? (
+                    <Image src={cover} alt="" fill className="object-cover" />
+                  ) : (
+                    <EventCoverPlaceholder className="h-full w-full" />
+                  )}
+                </div>
+                <div className="flex flex-col gap-1 p-4">
+                  <p className="text-sm font-medium">{c.name}</p>
+                  {c.description ? <p className="text-xs text-tertiary">{c.description}</p> : null}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

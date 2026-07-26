@@ -193,7 +193,7 @@ export function HostClient({
         <button
           onClick={advance}
           disabled={advancing || (round.phase === 'lobby' && memberCount === 0)}
-          className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-8 py-3 text-sm font-medium text-gold-foreground disabled:opacity-50"
+          className="flex items-center gap-2 rounded-[var(--radius)] bg-adani-gradient px-8 py-3 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(0,140,168,0.3)] disabled:opacity-50"
         >
           {advancing ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
           {round.phase === 'lobby'

@@ -1,0 +1,413 @@
+<title>Jules — Admin (Reactor Command Center) wireframes</title>
+<style>
+:root {
+  --bezel: #0f1620; --background: #070b12; --card: #0d1620; --card-raised: #101c28;
+  --border: #1c2836; --border-muted: #2b2745;
+  --accent: #E34234; --gold: #FFC72C; --success: #3ba26b;
+  --cosmetic-rare: #C98A3E; --cosmetic-epic: #2E8B7A;
+  --foreground: #eef4fb; --muted: #6e8aa3; --tertiary: #5c7690;
+  --font-body: "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-num: "Cascadia Mono", "SF Mono", Consolas, ui-monospace, monospace;
+  --radius: 0.75rem;
+}
+* { box-sizing: border-box; }
+.wf-page { background: var(--background); color: var(--foreground); font-family: var(--font-body); font-size: 14px; padding: 2rem 1.25rem 3rem; }
+.wf-shell { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.5rem; }
+.wf-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
+.wf-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.wf-note { font-size: 12.5px; color: var(--tertiary); margin: 0 0 1rem; max-width: 70ch; }
+.tag { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--tertiary); letter-spacing: 0.03em; }
+.tag.new { border-color: var(--cosmetic-epic); color: var(--cosmetic-epic); }
+.frames { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; }
+.callout { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 1rem 1.15rem; font-size: 13px; color: var(--muted); max-width: 560px; }
+.callout strong { color: var(--foreground); font-weight: 500; }
+.callout code { font-family: var(--font-num); }
+
+.admin-frame { display: flex; width: 800px; max-width: 100%; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--background); flex-shrink: 0; }
+.admin-sidebar { width: 168px; flex-shrink: 0; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.admin-sidebar-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.admin-sidebar-head .k { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted); margin: 0; }
+.admin-sidebar-head .v { font-size: 12.5px; font-weight: 500; margin: 2px 0 0; }
+.admin-nav { display: flex; flex-direction: column; gap: 2px; padding: 8px; flex: 1; }
+.admin-nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 12px; color: var(--muted); border-left: 2px solid transparent; border-radius: 4px; }
+.admin-nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--card-raised); }
+.admin-sidebar-foot { border-top: 1px solid var(--border); padding: 10px 14px; font-size: 10.5px; color: var(--tertiary); }
+.admin-content { flex: 1; padding: 20px; min-width: 0; }
+.admin-h1 { font-size: 15px; font-weight: 500; margin: 0; }
+.admin-sub { font-size: 11.5px; color: var(--tertiary); margin: 2px 0 0; }
+.a-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 14px; }
+.a-input { background: var(--card-raised); border: 1px solid var(--border-muted); border-radius: var(--radius); padding: 7px 10px; font-size: 12px; color: var(--tertiary); }
+.a-btn-gold { background: var(--gold); color: #070b12; font-weight: 500; text-align: center; padding: 7px 12px; border-radius: var(--radius); font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; }
+.a-btn-ghost { border: 1px solid var(--border); color: var(--muted); text-align: center; padding: 7px 12px; border-radius: var(--radius); font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; }
+.a-btn-accent { border: 1px solid var(--accent); color: var(--accent); text-align: center; padding: 7px 12px; border-radius: var(--radius); font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; }
+.a-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.a-row:last-child { border-bottom: none; }
+.a-pill { font-size: 10px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.a-pill.active-p { border-color: var(--gold); color: var(--gold); }
+.a-metric { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 10px 12px; text-align: center; flex: 1; }
+.a-metric .v { font-size: 18px; font-weight: 500; margin: 0; }
+.a-metric .l { font-size: 10px; color: var(--muted); margin: 4px 0 0; }
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 110px; }
+.bar-col { width: 22px; display: flex; flex-direction: column-reverse; border-radius: 3px 3px 0 0; overflow: hidden; }
+</style>
+<div class="wf-page">
+  <div class="wf-shell">
+
+    <section>
+      <div class="wf-head"><h2>Admin shell / nav — wireframe</h2></div>
+      <p class="wf-note">Matches <code>app/admin/(protected)/layout.tsx</code> + <code>admin-nav-client.tsx</code> exactly: a fixed left sidebar, role-filtered nav items, kumkum active-route highlighting (reusing Live Round's own identity meaning), admin name/role + logout pinned at the bottom. Desktop-shaped, not mobile-gated &mdash; admin isn't behind the PWA gate.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item active">Grid Station</div>
+              <div class="admin-nav-item">Surge Builder</div>
+              <div class="admin-nav-item">Live Round</div>
+              <div class="admin-nav-item">System Ledger</div>
+              <div class="admin-nav-item">Afterglow</div>
+              <div class="admin-nav-item">Gallery</div>
+              <div class="admin-nav-item">Student Vault</div>
+              <div class="admin-nav-item">Settings</div>
+            </div>
+            <div class="admin-sidebar-foot">Meera Iyer &middot; owner<br/>Log out</div>
+          </div>
+          <div class="admin-content" style="display:flex; align-items:center; justify-content:center; color:var(--tertiary); font-size:12px;">
+            (screen content &mdash; see sections below)
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Role filtering is real, not cosmetic</strong>: an Officer's sidebar shows 6 items (no Vault, no Settings &mdash; both Owner-only); a Volunteer's shows just Grid Station, scoped to their one assigned event.<br/><br/>
+          <strong>A real bug lives in this file's history</strong>: the first implementation tried passing pre-built nav items (including Lucide icon components) from the Server Component layout into this Client Component &mdash; Next.js throws at runtime since a component reference isn't plain-serializable. Fixed by having the Client Component own the icon set itself, receiving only the plain <code>role</code> string from the server.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Grid Station (QR Scan Station) — wireframe</h2></div>
+      <p class="wf-note">Matches <code>station-client.tsx</code> exactly: a real scannable QR (black-on-white, deliberately not theme-colored, for scan reliability) alongside the text code as an accessible fallback, live metrics, and a real-time recent-scans feed, polling every 5s.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item active">Grid Station</div>
+              <div class="admin-nav-item">Surge Builder</div>
+              <div class="admin-nav-item">Live Round</div>
+              <div class="admin-nav-item">System Ledger</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <div class="a-card" style="text-align:center;">
+              <div style="display:flex; justify-content:space-between; align-items:center; text-align:left;">
+                <div><p class="admin-sub" style="text-transform:uppercase;">Weekly Sync</p><p style="font-size:11.5px; color:var(--tertiary); margin:2px 0 0;">10 J per check-in</p></div>
+                <span class="a-pill">rotates in 47s</span>
+              </div>
+              <div style="margin:16px auto 10px; width:130px; height:130px; background:#fff; border-radius:8px;"></div>
+              <p style="font-size:11px; color:var(--muted); margin:0;">Current check-in code</p>
+              <p style="font-family:var(--font-num); font-size:28px; letter-spacing:0.15em; color:var(--gold); margin:2px 0 10px;">7XQ2K9PL4M</p>
+              <span class="a-btn-ghost">Copy check-in link</span>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <div class="a-metric"><p class="v">38</p><p class="l">students scanned</p></div>
+              <div class="a-metric"><p class="v" style="color:var(--gold);">380</p><p class="l">Joules distributed</p></div>
+            </div>
+            <div style="margin-top:14px;">
+              <p style="font-size:11px; color:var(--muted); margin:0 0 6px;">Recent scans</p>
+              <div class="a-card" style="padding:0;">
+                <div class="a-row"><span>Priya Mehta</span><span style="color:var(--tertiary); font-size:11px;">2:14 PM</span></div>
+                <div class="a-row"><span>Kabir Rana &nbsp;<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="11" height="11" style="display:inline;vertical-align:-1px;"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg></span><span style="color:var(--tertiary); font-size:11px;">2:11 PM</span></div>
+                <div class="a-row"><span>Diya Patel</span><span style="color:var(--tertiary); font-size:11px;">2:09 PM</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Deterministic HMAC token</strong>, not a stored/mutable column &mdash; rotates every 90s, computed the same way client and server side, no cron job needed.<br/><br/>
+          <strong>The flag icon on Kabir Rana's row</strong> means the geofence soft-check failed &mdash; Joules are still credited, just surfaced for admin review, never a hard block.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Surge Builder — wireframe</h2></div>
+      <p class="wf-note">Matches <code>builder-client.tsx</code>: CSV paste + preview table (errors/duplicates/out-of-range flagged inline, still importable unless a hard error), manual &quot;Add spark&quot; form, and the editable question list &mdash; all disabled once the Surge goes live.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item">Grid Station</div>
+              <div class="admin-nav-item active">Surge Builder</div>
+              <div class="admin-nav-item">Live Round</div>
+              <div class="admin-nav-item">System Ledger</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div><h1 class="admin-h1">Season Opener Surge</h1><p class="admin-sub">20 J per correct answer</p></div>
+              <div style="display:flex; align-items:center; gap:8px;"><span class="a-pill active-p">draft</span><span class="a-btn-gold">Go live</span></div>
+            </div>
+            <div class="a-card" style="margin-bottom:12px;">
+              <p style="font-size:12px; font-weight:500; margin:0 0 4px;">Import from CSV</p>
+              <p style="font-size:10.5px; color:var(--tertiary); margin:0 0 8px;">question,option_a,option_b,option_c,option_d,correct_option,time_limit_seconds,tag</p>
+              <div style="border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:8px;">
+                <div class="a-row" style="font-size:11px;"><span>What is the SI unit of energy?</span><span style="color:var(--success);">&#10003; ok</span></div>
+                <div class="a-row" style="font-size:11px;"><span>In E=mc&sup2;, what does c represent?</span><span style="color:var(--accent);">duplicate, imported anyway</span></div>
+                <div class="a-row" style="font-size:11px;"><span>(empty)</span><span style="color:var(--accent);">&#9888; missing correct answer</span></div>
+              </div>
+              <span class="a-btn-gold">Import 2 question(s)</span>
+            </div>
+            <div class="a-card">
+              <p style="font-size:12px; font-weight:500; margin:0 0 8px;">Questions (20)</p>
+              <div class="a-row"><span>What is the SI unit of energy?</span><span style="color:var(--tertiary); font-size:11px;">Correct: A &middot; 15s</span></div>
+              <div class="a-row"><span>Which unit measures electrical power?</span><span style="color:var(--tertiary); font-size:11px;">Correct: A &middot; 15s</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Errors vs. flags, a real distinction</strong>: a row with a hard error (missing question/option/correct-answer) is excluded from import entirely; duplicates and out-of-range time limits are only <em>flagged</em> &mdash; still imported, per spec &sect;9.<br/><br/>
+          <strong>Editable only in draft</strong>: once a Surge goes &quot;live,&quot; the import/add/edit UI disappears &mdash; the question list becomes read-only.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>System Ledger — wireframe</h2></div>
+      <p class="wf-note">Matches <code>engagement-chart.tsx</code> + <code>event-timeline.tsx</code>: a month-over-month stacked bar chart (click a bar for the exact breakdown) and a filterable, expandable event timeline &mdash; plain CSS bars, no chart library.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item">Grid Station</div>
+              <div class="admin-nav-item">Surge Builder</div>
+              <div class="admin-nav-item active">System Ledger</div>
+              <div class="admin-nav-item">Afterglow</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <h1 class="admin-h1" style="margin-bottom:12px;">System Ledger</h1>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Engagement, month over month</p>
+            <div class="bar-chart">
+              <div class="bar-col"><div style="height:20px; background:var(--success);"></div><div style="height:15px; background:var(--accent);"></div><div style="height:40px; background:var(--border-muted);"></div></div>
+              <div class="bar-col"><div style="height:35px; background:var(--success);"></div><div style="height:20px; background:var(--accent);"></div><div style="height:50px; background:var(--border-muted);"></div></div>
+              <div class="bar-col"><div style="height:60px; background:var(--success);"></div><div style="height:25px; background:var(--accent);"></div><div style="height:60px; background:var(--border-muted);"></div></div>
+              <div class="bar-col"><div style="height:10px; background:var(--success);"></div><div style="height:45px; background:var(--accent);"></div><div style="height:36px; background:var(--border-muted);"></div></div>
+            </div>
+            <div style="display:flex; gap:12px; margin:8px 0 16px; font-size:10.5px; color:var(--muted);">
+              <span><span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--border-muted); margin-right:4px;"></span>Standard</span>
+              <span><span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--gold); margin-right:4px;"></span>Expert</span>
+              <span><span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--accent); margin-right:4px;"></span>Volunteer</span>
+              <span><span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--success); margin-right:4px;"></span>Surge</span>
+            </div>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Event timeline</p>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <span class="a-pill active-p">All</span><span class="a-pill">Standard</span><span class="a-pill">Expert</span><span class="a-pill">Volunteer</span><span class="a-pill">Surge</span>
+            </div>
+            <div class="a-card" style="padding:0;">
+              <div class="a-row"><span>Winter Surge 2026</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--tertiary)" stroke-width="2" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg></div>
+              <div style="padding:0 12px 10px; display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:10.5px; color:var(--muted);">
+                <span>Date: Jan 18, 2026</span><span>Location: Main Auditorium</span><span>Attendees: 142</span><span>Joules: 3,400</span>
+              </div>
+              <div class="a-row"><span>Guest Lecture: Solar Grids</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--tertiary)" stroke-width="2" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Chart palette is a deliberate exception</strong>, documented in code: gold/accent/success are repurposed here as a 4-category chart palette, not their usual correct/incorrect/emphasis meaning &mdash; a categorical data-viz needs distinct hues regardless of what those hues mean elsewhere.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Student Data Vault — wireframe</h2></div>
+      <p class="wf-note">Owner-only. Matches <code>vault-client.tsx</code>: search by name/email, an expandable row per student with Force Reset (audit-logged temp password), manual Joule adjustment with a reason, and lock/unlock.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item">Grid Station</div>
+              <div class="admin-nav-item active">Student Vault</div>
+              <div class="admin-nav-item">Settings</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <div class="a-input" style="margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--tertiary)" stroke-width="2" width="13" height="13"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              Search by name or email&hellip;
+            </div>
+            <div class="a-card" style="padding:0;">
+              <div class="a-row"><span>Aarav Shah</span><span style="display:flex; align-items:center; gap:8px;"><span class="a-pill">Volt</span><span style="color:var(--tertiary); font-size:11px;">420 J</span></span></div>
+              <div style="padding:12px; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:10.5px; color:var(--muted); margin-bottom:10px;">
+                  <span>Email: aarav.shah@yourcollege.edu</span><span>Phone: 98xxxxxx10</span>
+                  <span>Lifetime Joules: 1,240</span><span>Streak: 6 days</span>
+                </div>
+                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                  <span class="a-input" style="width:70px;">&plusmn; Joules</span>
+                  <span class="a-input" style="flex:1;">Reason</span>
+                  <span class="a-btn-gold">Adjust</span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <span class="a-btn-ghost">Force Reset</span>
+                  <span class="a-btn-ghost">Lock account</span>
+                </div>
+              </div>
+              <div class="a-row"><span>Priya Mehta &nbsp;<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="11" height="11" style="display:inline;vertical-align:-1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span style="display:flex; align-items:center; gap:8px;"><span class="a-pill">Current</span><span style="color:var(--tertiary); font-size:11px;">820 J</span></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Force Reset shows the temp password once</strong>, inline, in a gold-bordered box &mdash; &quot;relay to the student now, it won't be shown again&quot; &mdash; and is audit-logged (who, whom, when), a real fix from this project's own security retrospective (Force Reset now also verifies the target is actually a student, not another admin).
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Institution Settings — wireframe</h2></div>
+      <p class="wf-note">Owner-only. Matches <code>settings/page.tsx</code>: allowed email domains (chip-list editor), seasons (add a new one with cadence), and the admin roster (create Officer/Volunteer, Volunteers scoped to one event).</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item">Student Vault</div>
+              <div class="admin-nav-item active">Settings</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <h1 class="admin-h1" style="margin-bottom:14px;">Institution Settings</h1>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 6px;">Allowed college email domains &middot; <span style="color:var(--accent);">&#9733; placeholder</span></p>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+              <span class="a-pill active-p">yourcollege.edu &times;</span>
+              <span class="a-input" style="font-size:11px;">+ add domain</span>
+            </div>
+            <span class="a-btn-gold" style="margin-bottom:16px; display:inline-flex;">Save domains</span>
+
+            <p style="font-size:11px; color:var(--muted); margin:16px 0 6px;">Seasons &middot; <span style="color:var(--accent);">&#9733; placeholder</span></p>
+            <div class="a-card" style="padding:0; margin-bottom:8px;">
+              <div class="a-row"><span>Odd/Monsoon 2026</span><span style="color:var(--tertiary); font-size:11px;">2026-07-01 &rarr; 2026-12-15 &middot; semester</span></div>
+              <div class="a-row"><span>Even/Winter 2025-26</span><span style="color:var(--tertiary); font-size:11px;">2025-12-16 &rarr; 2026-05-31 &middot; semester</span></div>
+            </div>
+            <span class="a-btn-ghost">+ Add season</span>
+
+            <p style="font-size:11px; color:var(--muted); margin:18px 0 6px;">Admin roster</p>
+            <div class="a-card" style="padding:0; margin-bottom:8px;">
+              <div class="a-row"><span>Meera Iyer</span><span class="a-pill">owner</span></div>
+              <div class="a-row"><span>Rohan Nair</span><span class="a-pill">officer</span></div>
+            </div>
+            <span class="a-btn-ghost">+ Add admin</span>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Both &#9733; placeholders are flagged for a reason</strong>: the domain and season dates are real, working mechanisms, seeded with placeholder values (<code>yourcollege.edu</code>, a generic academic calendar) until the club supplies its real domain(s) and registrar dates &mdash; not fake data pretending to be final.<br/><br/>
+          <strong>Volunteer creation requires an event</strong>: choosing role &quot;Volunteer&quot; reveals a required event-scope dropdown, since Volunteer access is always scoped to exactly one event and auto-expires when it ends.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Live Round — host screens — wireframe</h2></div>
+      <p class="wf-note">Matches <code>host-client.tsx</code>: one device is both the controller and the projector display. Supabase Realtime drives join counts, answer counts, and phase changes with zero polling.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item">Surge Builder</div>
+              <div class="admin-nav-item active">Live Round</div>
+            </div>
+          </div>
+          <div class="admin-content" style="text-align:center;">
+            <p style="font-size:10px; text-transform:uppercase; letter-spacing:0.2em; color:var(--accent); margin:0 0 16px;">Season Opener Surge &middot; Live Round</p>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 10px;">Teams join at /live with this code, or scan to join</p>
+            <div style="width:110px; height:110px; background:#fff; border-radius:8px; margin:0 auto 14px;"></div>
+            <div style="display:inline-block; border:2px solid var(--accent); border-radius:16px; padding:20px 48px; font-size:40px; font-weight:500; letter-spacing:0.3em; color:var(--gold); margin-bottom:12px;">R7K2</div>
+            <p style="font-size:14px; margin:0 0 16px;">3 teams joined</p>
+            <span class="a-btn-gold" style="padding:10px 28px;">Start round</span>
+          </div>
+        </div>
+
+        <div class="admin-frame">
+          <div class="admin-content" style="text-align:center; padding-top:14px;">
+            <p style="font-size:10px; text-transform:uppercase; letter-spacing:0.2em; color:var(--accent); margin:0 0 16px;">Question phase</p>
+            <p style="font-size:11px; color:var(--tertiary); margin:0 0 10px;">Question 4 / 20 &middot; 11s left</p>
+            <h1 style="font-size:20px; font-weight:500; margin:0 0 14px;">What is the SI unit of energy?</h1>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; text-align:left;">
+              <div class="a-card" style="font-size:12.5px;">A. Joule</div>
+              <div class="a-card" style="font-size:12.5px;">B. Newton</div>
+              <div class="a-card" style="font-size:12.5px;">C. Watt</div>
+              <div class="a-card" style="font-size:12.5px;">D. Volt</div>
+            </div>
+            <p style="font-size:14px; color:var(--gold); margin:0 0 12px;">2 / 3 teams answered</p>
+            <span class="a-btn-gold" style="padding:10px 28px;">Reveal answer</span>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>The final question's reveal gets extra weight</strong>: a ~1.5s suspense beat (dimmed/pulsing hold + drumroll sound + building vibration) before showing the same reveal data every other question shows instantly &mdash; a client-side pacing effect, not a new DB phase, kept in sync between the host screen and every team's device.<br/><br/>
+          <strong>Reveal &rarr; Scoreboard &rarr; next question, or Finish round</strong> on the last one, which shows Final Standings via the shared <code>RevealScoreboard</code> component at full scale.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wf-head"><h2>Afterglow + Gallery authoring — wireframe</h2></div>
+      <p class="wf-note">Matches the real admin authoring pages: a write-up form tied to a real event (with live-pulled attendance/Joules stats shown on the public post), and a simple file-upload form for Gallery photos.</p>
+      <div class="frames">
+        <div class="admin-frame">
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-head"><p class="k">Jules</p><p class="v">Reactor Command Center</p></div>
+            <div class="admin-nav">
+              <div class="admin-nav-item active">Afterglow</div>
+              <div class="admin-nav-item">Gallery</div>
+            </div>
+          </div>
+          <div class="admin-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h1 class="admin-h1">New write-up</h1>
+            </div>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 6px;">Which event is this about</p>
+            <div class="a-input" style="margin-bottom:12px;">Winter Surge 2026 (Jan 18, 2026)</div>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 6px;">Title</p>
+            <div class="a-input" style="margin-bottom:12px;">A great turnout for the Winter Surge</div>
+            <p style="font-size:11px; color:var(--muted); margin:0 0 6px;">Write-up</p>
+            <div class="a-input" style="min-height:70px; margin-bottom:12px;">What happened, how it went, what stood out&hellip;</div>
+            <span class="a-btn-gold">Publish</span>
+          </div>
+        </div>
+
+        <div class="admin-frame">
+          <div class="admin-content">
+            <h1 class="admin-h1" style="margin-bottom:14px;">Gallery</h1>
+            <div class="a-card" style="margin-bottom:14px;">
+              <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Photo</p>
+              <div class="a-input" style="margin-bottom:8px;">Choose file&hellip;</div>
+              <p style="font-size:11px; color:var(--muted); margin:0 0 8px;">Caption (optional)</p>
+              <div class="a-input" style="margin-bottom:10px;">Winter Surge, December 2026</div>
+              <span class="a-btn-gold">Upload</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+              <div style="aspect-ratio:1; background:var(--card-raised); border-radius:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Afterglow's stats box only aggregates QR check-in Joules</strong> (<code>joules_transactions.event_id</code>-scoped) &mdash; a recap of a Surge-type event won't show meaningful numbers unless that Surge's own <code>event_id</code> is also set. A known, disclosed edge case, not a bug.
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

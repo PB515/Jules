@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adani University - Synergy Button Redesign Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Headings, Inter for Body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        body: ['"Inter"', 'sans-serif']
+                    },
+                    colors: {
+                        adaniTeal: '#008CA8',
+                        adaniBlue: '#2D4C9C',
+                        adaniViolet: '#633A8C',
+                        adaniCrimson: '#CE235B',
+                        adaniMaroon: '#BD3861',
+                        adaniBg: '#FDFBF9',
+                        adaniCard: '#FFFFFF',
+                        adaniText: '#1E293B'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .bg-adani-gradient {
+            background: linear-gradient(135deg, #008CA8 0%, #2D4C9C 33%, #633A8C 66%, #CE235B 100%);
+        }
+
+        .text-adani-gradient {
+            background: linear-gradient(135deg, #008CA8 0%, #2D4C9C 35%, #633A8C 70%, #CE235B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-adaniBg text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-adaniMaroon selection:text-white">
+
+    <!-- FLOATING CONTAINER PILL NAVBAR (OFFICIAL ADANI LOGO + STYLE 2 SYNERGY COMBINATION WORDMARK) -->
+    <header class="sticky top-4 z-50 max-w-5xl mx-auto px-4 sm:px-6 my-4 w-full">
+        <div class="bg-white/95 backdrop-blur-md px-6 py-3 rounded-full border border-slate-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex justify-between items-center">
+            
+            <!-- Unified Single-Line Horizontal Brandmark Lockup -->
+            <a href="public_site_prototype.html" class="flex items-center gap-3.5 group">
+                <!-- Official Adani University Logo Image (Gradient Typo & Symbol) -->
+                <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/official_adani_university_logo.png" alt="Adani University Logo" class="h-9 object-contain">
+                
+                <!-- Vertical Divider Line -->
+                <span class="h-6 w-[1.5px] bg-slate-200 rounded-full"></span>
+                
+                <!-- User Canva Synergy Combination Wordmark PNG (Symbol + SYN⚡RGY) -->
+                <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/synergy_combination_wordmark.png" alt="Synergy Combination Wordmark" class="h-9 w-auto object-contain flex-shrink-0">
+            </a>
+
+            <!-- Center: Floating Pill Navigation Container (More Dropdown REMOVED) -->
+            <nav class="hidden md:flex items-center gap-6 font-heading font-semibold text-xs text-slate-600">
+                <a href="#hero" class="text-adaniMaroon font-extrabold border-b-2 border-adaniMaroon pb-0.5">Home</a>
+                <a href="#events" class="hover:text-slate-900 transition-colors">Events</a>
+                <a href="#reports" class="hover:text-slate-900 transition-colors">Event Reports</a>
+                <a href="#clubs" class="hover:text-slate-900 transition-colors">Clubs</a>
+                <a href="#leaderboard" class="hover:text-slate-900 transition-colors">Leaderboard</a>
+                <a href="#gallery" class="hover:text-slate-900 transition-colors">Gallery</a>
+            </nav>
+
+            <!-- Right: Style 2 Adani Logo Spectrum Gradient CTA -->
+            <button class="bg-adani-gradient text-white font-heading font-extrabold text-xs px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(0,140,168,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+                Install App / Login
+            </button>
+        </div>
+    </header>
+
+    <!-- TOP-LEVEL 100% WALL-TO-WALL HERO SECTION (NO OUTER MAX-WIDTH BOX OR MARGIN GAPS) -->
+    <section id="hero" class="w-full h-[calc(100vh-80px)] flex items-stretch bg-white border-b border-slate-200/80 relative overflow-hidden p-0 m-0">
+        <!-- Floating Subtle Background FMS Accent Symbols (Matching Reference Site Pattern) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+            <span class="absolute top-6 left-10 text-3xl text-slate-300/35 font-black">⚡</span>
+            <span class="absolute top-1/3 left-1/4 text-3xl text-slate-300/25 font-black">🛡️</span>
+            <span class="absolute bottom-8 left-16 text-3xl text-slate-300/30 font-black">🤝</span>
+            <span class="absolute top-8 right-1/2 text-3xl text-slate-300/20 font-black">🚀</span>
+            <!-- Subtle Radial Gradient Glow -->
+            <div class="absolute left-1/3 top-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-gradient-to-br from-teal-100/20 via-purple-100/15 to-rose-100/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- 100% WALL-TO-WALL FLUID SPLIT GRID (EXACT ONE-SCREEN VIEWPORT HEIGHT) -->
+        <div class="w-full h-full grid grid-cols-1 lg:grid-cols-12 items-stretch p-0 m-0 relative z-10">
+            <!-- Section Number Badge [10] -->
+            <span class="absolute top-2.5 left-4 text-[9px] font-mono font-bold bg-slate-900 text-white px-2 py-0.5 rounded-full shadow-2xs z-30">SECTION #10 (100% ONE-SCREEN FIT - ZERO SCROLLBAR)</span>
+
+            <!-- LEFT COLUMN: COPY, CATEGORY PILL, STATS, AND DUAL CTAs (SHIFTED RIGHT MATCHING USER RED BOX) -->
+            <div class="lg:col-span-7 pl-12 lg:pl-24 pr-6 lg:pr-12 py-6 lg:py-8 flex flex-col justify-center space-y-4 text-left relative z-20">
+                <!-- Element #1: Eyebrow Pill -->
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-slate-100/90 border border-slate-200 px-3 py-1 rounded-full shadow-2xs relative">
+                        <span class="text-[9px] font-mono font-extrabold bg-adaniMaroon text-white px-1.5 py-0.2 rounded-full mr-1">#1</span>
+                        <span class="w-2 h-2 rounded-full bg-adaniTeal animate-pulse"></span>
+                        <span class="text-[11px] font-heading font-extrabold uppercase tracking-wider text-slate-700">Faculty of Management Sciences (FMS)</span>
+                    </div>
+                </div>
+
+                <!-- Element #2: Main Headline -->
+                <div class="relative">
+                    <span class="text-[9px] font-mono font-extrabold bg-slate-900 text-white px-1.5 py-0.2 rounded-full align-middle mr-2">#2</span>
+                    <h1 class="inline text-3xl sm:text-5xl font-heading font-black text-slate-900 leading-[1.1] tracking-tight">
+                        Progress, <span class="text-adani-gradient">Together.</span>
+                    </h1>
+                </div>
+
+                <!-- Element #3: Subtitle Description -->
+                <div class="relative max-w-xl">
+                    <span class="text-[9px] font-mono font-extrabold bg-slate-700 text-white px-1.5 py-0.2 rounded-full mr-1.5 align-top">#3</span>
+                    <p class="inline text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                        Synergy is the unified engagement operating system for Adani University MBA programs. Earn Joules via QR check-ins and Surge quizzes across 9 official FMS clubs, climb standing tiers, and build your lifetime Catalyst Record archive.
+                    </p>
+                </div>
+
+                <!-- Key Impact Stats Bar (Elements #4, #5, #6) -->
+                <div class="grid grid-cols-3 gap-3 pt-0.5 max-w-md">
+                    <!-- Element #4: Stat 1 -->
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200/90 text-center relative shadow-2xs">
+                        <span class="absolute top-1 left-1.5 text-[8px] font-mono font-bold text-slate-400">#4</span>
+                        <p class="text-xl font-heading font-black text-adaniMaroon">9</p>
+                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">FMS Clubs</p>
+                    </div>
+                    <!-- Element #5: Stat 2 -->
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200/90 text-center relative shadow-2xs">
+                        <span class="absolute top-1 left-1.5 text-[8px] font-mono font-bold text-slate-400">#5</span>
+                        <p class="text-xl font-heading font-black text-adaniTeal">4</p>
+                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Standing Tiers</p>
+                    </div>
+                    <!-- Element #6: Stat 3 -->
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200/90 text-center relative shadow-2xs">
+                        <span class="absolute top-1 left-1.5 text-[8px] font-mono font-bold text-slate-400">#6</span>
+                        <p class="text-xl font-heading font-black text-adaniBlue">100%</p>
+                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">SOP Verified</p>
+                    </div>
+                </div>
+
+                <!-- Dual CTAs (Elements #8 and #9) -->
+                <div class="flex flex-wrap items-center gap-3 pt-1">
+                    <!-- Element #8: Primary CTA -->
+                    <div class="relative">
+                        <span class="absolute -top-2.5 -left-1 text-[9px] font-mono font-bold bg-adaniTeal text-white px-1.5 rounded-full z-10">#8</span>
+                        <button class="bg-adani-gradient text-white font-heading font-extrabold text-xs px-6 py-3 rounded-full shadow-[0_4px_14px_rgba(0,140,168,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+                            <span>I'm an MBA Student</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Element #9: Secondary CTA -->
+                    <div class="relative">
+                        <span class="absolute -top-2.5 -left-1 text-[9px] font-mono font-bold bg-slate-900 text-white px-1.5 rounded-full z-10">#9</span>
+                        <button class="bg-slate-900 text-white font-heading font-extrabold text-xs px-5 py-3 rounded-full hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center gap-2 shadow-xs">
+                            <i class="fa-solid fa-user-shield text-xs text-amber-400"></i>
+                            <span>Faculty Command Center</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: CARD #7 (FULL-BLEED FLUSH TO RIGHT SCREEN WALL - EXACT ONE-SCREEN HEIGHT) -->
+            <div class="lg:col-span-5 w-full h-full relative overflow-hidden bg-slate-900 flex items-center justify-center p-0 m-0 border-l border-slate-200/80 shadow-2xl group">
+                <span class="absolute top-2.5 right-4 text-[9px] font-mono font-bold bg-slate-900/90 text-white px-2 py-0.5 rounded-full z-30 shadow-xs border border-white/20">CARD #7 (ONE-SCREEN FLUSH CAROUSEL)</span>
+
+                <!-- Full-Bleed Carousel Photo -->
+                <img id="carousel-img" src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/club_01_joules_energy_cover.jpeg" alt="MBA Conclave" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 absolute inset-0">
+                
+                <!-- Gradient Overlays for High Legibility -->
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-black/20"></div>
+
+                <!-- Top Floating Header Badges -->
+                <div class="absolute top-3 left-5 right-5 flex justify-between items-center z-20">
+                    <span id="carousel-tag" class="px-3 py-1 rounded-full bg-adaniMaroon text-white text-[11px] font-heading font-extrabold uppercase tracking-wider shadow-md">Joules Club</span>
+                    <span class="px-2.5 py-1 rounded-full bg-amber-400 text-slate-900 text-[11px] font-heading font-black shadow-md flex items-center gap-1">
+                        <i class="fa-solid fa-bolt text-xs"></i>
+                        <span>+250 J</span>
+                    </span>
+                </div>
+
+                <!-- Bottom Content Overlay (Inside Full-Bleed Photo) -->
+                <div class="absolute bottom-6 left-5 right-5 text-left space-y-3 z-20">
+                    <div class="space-y-0.5">
+                        <h4 id="carousel-title" class="font-heading font-black text-white text-xl leading-snug drop-shadow-sm">Clean Energy Transition Conclave</h4>
+                        <p id="carousel-subtitle" class="text-xs text-slate-300 font-medium drop-shadow-xs">Dr. Namita Pragya • 120 MBA Attendees</p>
+                    </div>
+
+                    <!-- Glassmorphism Carousel Navigation Bar -->
+                    <div class="pt-1.5 flex justify-between items-center bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/20 shadow-lg">
+                        <!-- Prev / Next Glassmorphism Buttons -->
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="prevSlide()" class="w-7 h-7 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center text-xs transition-colors backdrop-blur-sm">
+                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                            </button>
+                            <button onclick="nextSlide()" class="w-7 h-7 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center text-xs transition-colors backdrop-blur-sm">
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+
+                        <!-- Slide Dot Indicators -->
+                        <div class="flex items-center gap-1.5">
+                            <span id="dot-0" class="w-2.5 h-2.5 rounded-full bg-white shadow-xs transition-all"></span>
+                            <span id="dot-1" class="w-2 h-2 rounded-full bg-white/40 transition-all"></span>
+                            <span id="dot-2" class="w-2 h-2 rounded-full bg-white/40 transition-all"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JS Carousel Controller -->
+    <script>
+        const slides = [
+            {
+                img: "file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/club_01_joules_energy_cover.jpeg",
+                tag: "Joules Club",
+                title: "Clean Energy Transition Conclave",
+                subtitle: "Dr. Namita Pragya • 120 MBA Attendees",
+                tagBg: "bg-adaniMaroon"
+            },
+            {
+                img: "file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/club_02_gati_logistics_cover.jpeg",
+                tag: "Gati Club",
+                title: "Multimodal Logistics Port Visit",
+                subtitle: "Prof. Rachna Gangwar • Mundra Port Tour",
+                tagBg: "bg-adaniBlue"
+            },
+            {
+                img: "file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/club_05_marketing_mavericks_cover.jpeg",
+                tag: "Marketing Mavericks",
+                title: "Digital Brand Growth Hackathon",
+                subtitle: "Prof. Chatterjee & Prof. Sanyal • Live Surge",
+                tagBg: "bg-adaniTeal"
+            }
+        ];
+        let currentSlide = 0;
+
+        function updateSlide() {
+            const s = slides[currentSlide];
+            document.getElementById('carousel-img').src = s.img;
+            document.getElementById('carousel-tag').textContent = s.tag;
+            document.getElementById('carousel-title').textContent = s.title;
+            document.getElementById('carousel-subtitle').textContent = s.subtitle;
+            
+            for (let i = 0; i < slides.length; i++) {
+                const dot = document.getElementById('dot-' + i);
+                if (i === currentSlide) {
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-adaniMaroon transition-all";
+                } else {
+                    dot.className = "w-2 h-2 rounded-full bg-slate-300 transition-all";
+                }
+            }
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlide();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlide();
+        }
+
+        setInterval(nextSlide, 4000);
+    </script>
+
+    <!-- MAIN CONTENT CANVAS WITH SUBTLE SIDE-MARGIN FLOATING SYMBOLS (ZERO OVERLAP WITH TEXT OR CARDS) -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12 flex-1 relative">
+        <!-- Floating Subtle Side-Margin Background Accent Symbols (Strictly in Empty Outer Margins) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden select-none -z-10">
+            <!-- Left Margin Floating Symbols -->
+            <span class="absolute top-12 -left-12 text-4xl text-slate-300/40 font-black">⚡</span>
+            <span class="absolute top-1/3 -left-14 text-5xl text-slate-300/30 font-black">🛡️</span>
+            <span class="absolute top-2/3 -left-12 text-4xl text-slate-300/35 font-black">🤝</span>
+            <span class="absolute bottom-20 -left-14 text-5xl text-slate-300/30 font-black">🚀</span>
+
+            <!-- Right Margin Floating Symbols -->
+            <span class="absolute top-24 -right-12 text-4xl text-slate-300/40 font-black">🚀</span>
+            <span class="absolute top-1/2 -right-14 text-5xl text-slate-300/30 font-black">⚡</span>
+            <span class="absolute top-3/4 -right-12 text-4xl text-slate-300/35 font-black">🛡️</span>
+            <span class="absolute bottom-28 -right-14 text-5xl text-slate-300/30 font-black">🤝</span>
+        </div>
+
+        <!-- MESSAGE FROM FACULTY CHAIR (DR. RIYA MEHTA) -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 sm:p-10 rounded-3xl text-white space-y-6 shadow-xl relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/80 pb-5">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-adaniMaroon/90 text-white flex items-center justify-center font-heading font-black text-xl shadow-md border border-white/10">
+                        RM
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-extrabold text-lg text-white">Dr. Riya Mehta</h3>
+                        <p class="text-xs text-slate-300 font-medium">Faculty Chair, Faculty of Management Sciences (FMS)</p>
+                    </div>
+                </div>
+                <span class="px-3.5 py-1.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700 text-xs font-heading font-extrabold shadow-2xs">FMS Official SOP</span>
+            </div>
+
+            <blockquote class="text-sm sm:text-base text-slate-200 leading-relaxed italic font-normal">
+                "The FMS Students Clubs and Conduits offer more than mere student organizations; they form a vibrant community where ambitious minds converge to explore, learn, and foster professional growth. Becoming a member grants you exclusive access to networking opportunities, skill development, and leadership training."
+            </blockquote>
+
+            <!-- 5 Core Pillars -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 pt-2">
+                <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/60 text-center space-y-1.5">
+                    <i class="fa-solid fa-user-tie text-adaniTeal text-base"></i>
+                    <p class="text-xs font-heading font-bold text-slate-200">Professional</p>
+                </div>
+                <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/60 text-center space-y-1.5">
+                    <i class="fa-solid fa-network-wired text-adaniBlue text-base"></i>
+                    <p class="text-xs font-heading font-bold text-slate-200">Networking</p>
+                </div>
+                <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/60 text-center space-y-1.5">
+                    <i class="fa-solid fa-crown text-amber-400 text-base"></i>
+                    <p class="text-xs font-heading font-bold text-slate-200">Leadership</p>
+                </div>
+                <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/60 text-center space-y-1.5">
+                    <i class="fa-solid fa-lightbulb text-purple-400 text-base"></i>
+                    <p class="text-xs font-heading font-bold text-slate-200">Industry Insights</p>
+                </div>
+                <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/60 text-center space-y-1.5 col-span-2 sm:col-span-1">
+                    <i class="fa-solid fa-hand-holding-heart text-emerald-400 text-base"></i>
+                    <p class="text-xs font-heading font-bold text-slate-200">Societal Impact</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STANDING TIERS GRID WITH REAL GENERATED 2D BADGES -->
+        <section id="tiers" class="bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.02)] space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 border-b border-slate-100 pb-5">
+                <div>
+                    <span class="text-xs font-heading font-extrabold uppercase tracking-widest text-adaniMaroon">Standing Tiers System</span>
+                    <h2 class="text-2xl font-heading font-black text-slate-900 mt-1">Level Up Your MBA Standing</h2>
+                </div>
+                <p class="text-xs text-slate-500 font-medium">Points reset every academic season • Lifetime points archived in Catalyst Records</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <!-- Tier 1: Ember -->
+                <div class="p-5 rounded-2xl bg-[#FFF7ED] border border-orange-200/70 space-y-3 text-center flex flex-col items-center">
+                    <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/tier_01_ember_badge.jpeg" alt="Ember Badge" class="w-16 h-16 object-contain rounded-full shadow-xs">
+                    <div>
+                        <h3 class="font-heading font-extrabold text-sm text-amber-900">Ember</h3>
+                        <p class="text-xs font-semibold text-amber-700 font-mono mt-0.5">0 – 999 J</p>
+                    </div>
+                </div>
+
+                <!-- Tier 2: Volt -->
+                <div class="p-5 rounded-2xl bg-[#F0F9FF] border border-sky-200/70 space-y-3 text-center flex flex-col items-center">
+                    <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/tier_02_volt_badge.jpeg" alt="Volt Badge" class="w-16 h-16 object-contain rounded-full shadow-xs">
+                    <div>
+                        <h3 class="font-heading font-extrabold text-sm text-sky-900">Volt</h3>
+                        <p class="text-xs font-semibold text-sky-700 font-mono mt-0.5">1,000 – 2,499 J</p>
+                    </div>
+                </div>
+
+                <!-- Tier 3: Current -->
+                <div class="p-5 rounded-2xl bg-[#FAF5FF] border border-purple-200/70 space-y-3 text-center flex flex-col items-center">
+                    <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/tier_03_current_badge.jpeg" alt="Current Badge" class="w-16 h-16 object-contain rounded-full shadow-xs">
+                    <div>
+                        <h3 class="font-heading font-extrabold text-sm text-purple-900">Current</h3>
+                        <p class="text-xs font-semibold text-purple-700 font-mono mt-0.5">2,500 – 4,999 J</p>
+                    </div>
+                </div>
+
+                <!-- Tier 4: Plasma -->
+                <div class="p-5 rounded-2xl bg-white border-2 border-slate-200 relative overflow-hidden text-center flex flex-col items-center space-y-3 shadow-xs">
+                    <img src="file:///C:/Users/bpurv/OneDrive/Desktop/Website/jules/Images%20&%20Videos/tier_04_plasma_badge.jpeg" alt="Plasma Badge" class="w-16 h-16 object-contain rounded-full shadow-xs">
+                    <div>
+                        <h3 class="font-heading font-black text-sm text-adani-gradient">Plasma</h3>
+                        <p class="text-xs font-extrabold text-slate-800 font-mono mt-0.5">5,000+ J</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DYNAMIC UPCOMING EVENTS SECTION (WITH REFINED EMPTY STATE) -->
+        <section id="events" class="bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.02)] space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div>
+                    <span class="text-xs font-heading font-extrabold uppercase tracking-widest text-adaniTeal">Live & Scheduled Sessions</span>
+                    <h2 class="text-2xl font-heading font-black text-slate-900 mt-1">Upcoming Events</h2>
+                </div>
+                <a href="#events" class="text-xs font-heading font-extrabold text-adaniMaroon hover:underline">See all →</a>
+            </div>
+
+            <!-- Styled Empty State Box -->
+            <div class="p-12 text-center rounded-2xl bg-slate-50/70 border-2 border-dashed border-slate-200 space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center mx-auto shadow-2xs">
+                    <i class="fa-regular fa-calendar-xmark text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-heading font-bold text-slate-800 text-sm">Nothing scheduled right now</h3>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Check back soon for upcoming MBA guest lectures, Surge live quizzes, and club workshops.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
