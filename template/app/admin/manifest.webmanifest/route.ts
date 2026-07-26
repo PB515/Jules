@@ -24,8 +24,8 @@ export async function GET() {
     description: 'The staff side of Synergy: live event tracking and Event Report authoring.',
     start_url: '/admin',
     display: 'standalone',
-    background_color: '#faf7f2',
-    theme_color: '#faf7f2',
+    background_color: '#ffffff',
+    theme_color: '#ffffff',
     icons: [
       { src: '/icons/icon-admin-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icons/icon-admin-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
