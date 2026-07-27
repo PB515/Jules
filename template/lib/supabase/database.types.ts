@@ -272,6 +272,22 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['gallery_images']['Insert']>;
         Relationships: [];
       };
+      push_subscriptions: {
+        Row: {
+          id: string; student_id: string; endpoint: string; p256dh: string; auth: string; created_at: string;
+        };
+        Insert: never; // only via subscribe_push()
+        Update: never;
+        Relationships: [
+          {
+            foreignKeyName: 'push_subscriptions_student_id_fkey';
+            columns: ['student_id'];
+            isOneToOne: false;
+            referencedRelation: 'students';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       event_registrations: {
         Row: {
           id: string; event_id: string; student_id: string; registered_at: string; attended_at: string | null;
@@ -305,6 +321,8 @@ export interface Database {
         Returns: { season_joules: number; lifetime_joules: number; tier: Tier; streak: number; status: StudentStatus }[];
       };
       is_email_domain_allowed: { Args: { p_email: string }; Returns: boolean };
+      subscribe_push: { Args: { p_endpoint: string; p_p256dh: string; p_auth: string }; Returns: undefined };
+      unsubscribe_push: { Args: { p_endpoint: string }; Returns: undefined };
       complete_onboarding: { Args: { p_name: string; p_phone: string }; Returns: Database['public']['Tables']['students']['Row'] };
       register_for_event: {
         Args: { p_event_id: string };

@@ -69,6 +69,8 @@ export {
   Network,
   Lightbulb,
   HeartHandshake,
+  UserPlus,
+  FileText,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';

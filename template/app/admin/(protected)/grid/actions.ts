@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { logAdminAction } from '@/lib/jules/audit';
+import { sendPushToStudents } from '@/lib/jules/push';
 import { redirect } from 'next/navigation';
 
 export interface ActionResult {
@@ -68,6 +69,15 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
 
   await logAdminAction(supabase, 'event_create', { event_id: data.id, name, club_id: clubId });
 
+  // Type 1 — broadcast to every student. Fire-and-forget: a push-sending
+  // hiccup must never block the admin from successfully creating the
+  // event, so this is logged, not surfaced as an ActionResult error.
+  sendPushToStudents(null, {
+    title: `New event: ${name}`,
+    body: location ? `at ${location}` : 'Check it out on the calendar.',
+    url: `/events/${data.id}`,
+  }).catch((err) => console.error('push (event_create) failed', err));
+
   redirect(`/admin/grid?event=${data.id}`);
 }
 
@@ -86,6 +96,10 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
 
   const supabase = await createClient();
+
+  // Fetched before the update so Type 2 (registered-students-only) can
+  // detect an actual location/date change afterward, not just any edit.
+  const { data: before } = await supabase.from('events').select('location, event_date').eq('id', eventId).maybeSingle();
 
   const cover = await uploadCoverImage(supabase, formData);
   if (cover.error) return { error: cover.error };
@@ -113,6 +127,24 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   if (error) return { error: error.message };
 
   await logAdminAction(supabase, 'event_edit', { event_id: eventId, name });
+
+  // Type 2 — only students actually registered for THIS event, and only
+  // when the location/date genuinely changed (not on every edit — e.g. a
+  // typo fix to the name shouldn't push).
+  const newEventDate = new Date(eventDate).toISOString();
+  const changed = before && (before.location !== (location || null) || before.event_date !== newEventDate);
+  if (changed) {
+    (async () => {
+      const { data: regs } = await supabase.from('event_registrations').select('student_id').eq('event_id', eventId);
+      const studentIds = (regs ?? []).map((r) => r.student_id);
+      if (studentIds.length === 0) return;
+      await sendPushToStudents(studentIds, {
+        title: `Update: ${name}`,
+        body: location ? `New location: ${location}` : 'The date or venue changed, check the details.',
+        url: `/events/${eventId}`,
+      });
+    })().catch((err) => console.error('push (event_edit) failed', err));
+  }
 
   redirect(`/admin/grid?event=${eventId}`);
 }

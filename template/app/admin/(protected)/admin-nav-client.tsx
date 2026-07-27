@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ScanLine, Zap, BarChart3, Users, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone, ShieldAlert, Menu, X } from '@/lib/icons';
+import { ScanLine, Zap, BarChart3, Users, UserPlus, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone, ShieldAlert, Menu, X } from '@/lib/icons';
 
 const NAV = [
   { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member', 'super_admin'] },
@@ -26,6 +26,10 @@ const NAV = [
   { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['super_admin'] },
+  // Pulled out of Institution Settings into its own tab — the bulk-creation
+  // flow was buried as one section on an already-dense page (see
+  // students/page.tsx's own docstring for the full redesign rationale).
+  { href: '/admin/students', label: 'Students', icon: UserPlus, roles: ['super_admin'] },
   { href: '/admin/audit', label: 'Audit Log', icon: ShieldAlert, roles: ['super_admin'] },
   { href: '/admin/settings', label: 'Settings', icon: Settings, roles: ['super_admin'] },
   { href: '/admin/get-app', label: 'Get the App', icon: Smartphone, roles: ['professor', 'committee_member', 'super_admin'] },

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { TierBadge } from '@/lib/components/tier-badge';
 import { ProfileForm } from './profile-form';
 import { ChangePasswordForm } from './change-password-form';
+import { NotificationToggle } from '@/lib/components/notification-toggle';
 import { logoutAction } from '@/app/(auth)/actions';
 import { LogOut } from '@/lib/icons';
 import { StreakChain } from '@/lib/components/streak-chain';
@@ -87,6 +88,8 @@ export default async function ProfilePage() {
           </span>
         </div>
       </section>
+
+      <NotificationToggle />
 
       <ChangePasswordForm />
 
