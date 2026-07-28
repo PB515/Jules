@@ -61,6 +61,7 @@ export default async function DashboardPage() {
     { data: firstTransaction },
     { data: candidateEvents },
     { data: registrations },
+    { count: unreadCount },
   ] = await Promise.all([
     supabase.rpc('my_totals'),
     supabase
@@ -94,6 +95,7 @@ export default async function DashboardPage() {
       .eq('student_id', student.id)
       .order('registered_at', { ascending: false })
       .returns<RegistrationRow[]>(),
+    supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('student_id', student.id).is('read_at', null),
   ]);
 
   const totals = totalsRows?.[0] ?? {
@@ -151,9 +153,19 @@ export default async function DashboardPage() {
       <OnboardingTour />
       <TierUpCelebration tier={totals.tier} />
 
-      <div>
-        <p className="text-sm text-muted">Welcome back,</p>
-        <h1 className="text-xl font-medium">{student.name.split(' ')[0]}</h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted">Welcome back,</p>
+          <h1 className="text-xl font-medium">{student.name.split(' ')[0]}</h1>
+        </div>
+        <Link href="/notifications" className="relative flex size-10 items-center justify-center rounded-full border border-border bg-card text-muted">
+          <Bell className="size-4" aria-hidden />
+          {unreadCount ? (
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          ) : null}
+        </Link>
       </div>
 
       <section className="rounded-2xl border border-border bg-card p-6 ambient-drift">

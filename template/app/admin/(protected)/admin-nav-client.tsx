@@ -13,10 +13,15 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ScanLine, Zap, BarChart3, Users, UserPlus, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone, ShieldAlert, Menu, X } from '@/lib/icons';
+import { ScanLine, Zap, BarChart3, Users, UserPlus, Settings, MonitorPlay, BookOpen, ImageIcon, Smartphone, ShieldAlert, Bell, FileText, Menu, X } from '@/lib/icons';
 
 const NAV = [
   { href: '/admin/grid', label: 'Grid Station', icon: ScanLine, roles: ['professor', 'committee_member', 'super_admin'] },
+  // A real, discoverable way to send a manual push/notification about an
+  // event, not buried inside a specific event's own sub-pages — the two
+  // automatic triggers (event created, location/date changed) live in
+  // grid/actions.ts, this is the human-controlled third one.
+  { href: '/admin/updates', label: 'Updates', icon: Bell, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/surges', label: 'Surge Builder', icon: Zap, roles: ['professor', 'committee_member', 'super_admin'] },
   // Live Round hosting is Professor/Super Admin only, same reasoning as
   // the QR/scanner restriction — Committee Member's job is event creation
@@ -25,6 +30,11 @@ const NAV = [
   { href: '/admin/ledger', label: 'System Ledger', icon: BarChart3, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/event-reports', label: 'Event Reports', icon: BookOpen, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon, roles: ['professor', 'committee_member', 'super_admin'] },
+  // Row-level CSV exports (Students/Events/Attendance/Quiz/Ledger) — the
+  // actual gap against "give the Dean end-of-term participation data,"
+  // not more dashboard charts. Club-scoped roles see only their own
+  // club's data, enforced server-side regardless of the UI.
+  { href: '/admin/reports', label: 'Reports', icon: FileText, roles: ['professor', 'committee_member', 'super_admin'] },
   { href: '/admin/vault', label: 'Student Vault', icon: Users, roles: ['super_admin'] },
   // Pulled out of Institution Settings into its own tab — the bulk-creation
   // flow was buried as one section on an already-dense page (see

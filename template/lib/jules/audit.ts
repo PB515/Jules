@@ -15,7 +15,8 @@ export type AuditAction =
   | 'event_edit'
   | 'report_create'
   | 'gallery_upload'
-  | 'live_round_create';
+  | 'live_round_create'
+  | 'event_update_sent';
 
 export async function logAdminAction(
   supabase: SupabaseClient<Database>,

@@ -272,6 +272,26 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['gallery_images']['Insert']>;
         Relationships: [];
       };
+      notifications: {
+        Row: {
+          id: string; student_id: string; title: string; body: string; url: string | null;
+          read_at: string | null; created_at: string;
+        };
+        Insert: {
+          id?: string; student_id: string; title: string; body: string; url?: string | null;
+          read_at?: string | null; created_at?: string;
+        }; // written only from the service-role client in sendPushToStudents() — no client-facing insert policy
+        Update: never; // only via mark_notification_read()
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_student_id_fkey';
+            columns: ['student_id'];
+            isOneToOne: false;
+            referencedRelation: 'students';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       push_subscriptions: {
         Row: {
           id: string; student_id: string; endpoint: string; p256dh: string; auth: string; created_at: string;
@@ -323,6 +343,27 @@ export interface Database {
       is_email_domain_allowed: { Args: { p_email: string }; Returns: boolean };
       subscribe_push: { Args: { p_endpoint: string; p_p256dh: string; p_auth: string }; Returns: undefined };
       unsubscribe_push: { Args: { p_endpoint: string }; Returns: undefined };
+      mark_notification_read: { Args: { p_id: string }; Returns: undefined };
+      report_students: {
+        Args: { p_season_id?: string | null; p_club_id?: string | null };
+        Returns: { student_id: string; name: string; email: string; season_joules: number; lifetime_joules: number; tier: string; streak: number }[];
+      };
+      report_events: {
+        Args: { p_season_id?: string | null; p_club_id?: string | null };
+        Returns: { event_id: string; name: string; club_name: string; type: string; event_date: string; location: string | null; joule_value: number }[];
+      };
+      report_attendance: {
+        Args: { p_season_id?: string | null; p_club_id?: string | null };
+        Returns: { event_name: string; student_name: string; student_email: string; registered_at: string; attended_at: string | null }[];
+      };
+      report_quiz_participation: {
+        Args: { p_season_id?: string | null; p_club_id?: string | null };
+        Returns: { surge_name: string; student_name: string; student_email: string; mode: string; joined_at: string }[];
+      };
+      report_joule_ledger: {
+        Args: { p_season_id?: string | null; p_club_id?: string | null };
+        Returns: { student_name: string; student_email: string; type: string; amount: number; source_name: string; created_at: string }[];
+      };
       complete_onboarding: { Args: { p_name: string; p_phone: string }; Returns: Database['public']['Tables']['students']['Row'] };
       register_for_event: {
         Args: { p_event_id: string };
