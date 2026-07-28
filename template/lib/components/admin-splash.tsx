@@ -1,13 +1,13 @@
 'use client';
 /**
  * A once-a-day "app boot" moment for the staff PWA — the executive-palette
- * counterpart to the student LaunchSplash, kept deliberately lighter: no
- * moto-text beat, just the clip then straight to the real dashboard. Admin
- * is used by professors/committee members checking things quickly, often
- * standing in a hallway right after an event — this needs to stay fast, not
- * become a landing-page moment (design-brief.md's own stated direction for
- * admin screens specifically), so it's short (~2.9s total) and once per
- * calendar day, same localStorage-gated pattern as launch-splash.tsx.
+ * counterpart to the student LaunchSplash. Now mirrors the same clip -> moto
+ * sequence (previously admin was deliberately lighter, clip-only, but the
+ * user asked for a consistent "Progress, together." beat in both PWAs).
+ * Admin is used by professors/committee members checking things quickly,
+ * often standing in a hallway right after an event, so it stays short
+ * (~4s total) and once per calendar day, same localStorage-gated pattern
+ * as launch-splash.tsx.
  *
  * Purely cosmetic, fails OPEN like its student counterpart: children always
  * render immediately, the overlay is only ever added on top by a client
@@ -15,18 +15,20 @@
  */
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { site } from '@/lib/site';
 import { HeroClip } from '@/lib/components/hero-clip';
 
 const STORAGE_KEY = 'jules_admin_splash_date';
 const CLIP_FRAMES = 66;
 const CLIP_MS = (CLIP_FRAMES / 25) * 1000;
+type Phase = 'clip' | 'moto' | 'done';
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
 export function AdminSplash({ children }: { children: React.ReactNode }) {
-  const [showing, setShowing] = useState(false);
+  const [phase, setPhase] = useState<Phase>('done');
   const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
@@ -35,14 +37,15 @@ export function AdminSplash({ children }: { children: React.ReactNode }) {
     if (reduced || seenToday) return;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot kickoff, same pattern as launch-splash.tsx
-    setShowing(true);
+    setPhase('clip');
 
     const timers = [
-      setTimeout(() => setExiting(true), CLIP_MS),
+      setTimeout(() => setPhase('moto'), CLIP_MS),
+      setTimeout(() => setExiting(true), CLIP_MS + 900),
       setTimeout(() => {
         window.localStorage.setItem(STORAGE_KEY, todayKey());
-        setShowing(false);
-      }, CLIP_MS + 300),
+        setPhase('done');
+      }, CLIP_MS + 1200),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -51,19 +54,32 @@ export function AdminSplash({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <AnimatePresence>
-        {showing ? (
+        {phase !== 'done' ? (
           <motion.div
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-background"
             initial={{ opacity: 1 }}
             animate={{ opacity: exiting ? 0 : 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* HeroClip renders its own full-screen 9:16 overlay (z-[100]) —
-                this wrapper's only remaining job is the graceful fade-out at
-                the end of the sequence. The "Reactor Command Center" caption
-                that used to sit under the small icon-sized clip is dropped:
-                it would render invisibly behind the now-full-screen clip. */}
-            <HeroClip src="/videos/splash-admin.webp" frames={CLIP_FRAMES} />
+            <AnimatePresence mode="wait">
+              {phase === 'clip' ? (
+                <motion.div key="admin-clip" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                  <HeroClip src="/videos/splash-admin.webp" frames={CLIP_FRAMES} />
+                </motion.div>
+              ) : null}
+              {phase === 'moto' ? (
+                <motion.p
+                  key="moto"
+                  className="max-w-sm px-8 text-center text-xl leading-snug font-medium text-gold"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.45 }}
+                >
+                  {site.tagline}
+                </motion.p>
+              ) : null}
+            </AnimatePresence>
           </motion.div>
         ) : null}
       </AnimatePresence>
