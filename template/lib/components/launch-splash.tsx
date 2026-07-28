@@ -78,7 +78,7 @@ export function LaunchSplash({ children }: { children: React.ReactNode }) {
             <AnimatePresence mode="wait">
               {phase === 'clip' ? (
                 <motion.div key="logo-clip" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                  <HeroClip src="/videos/splash-daily.webp" frames={100} className="size-28 object-contain" />
+                  <HeroClip src="/videos/splash-daily.webp" frames={100} />
                 </motion.div>
               ) : null}
               {phase === 'moto' ? (

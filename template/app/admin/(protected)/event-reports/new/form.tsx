@@ -80,7 +80,7 @@ export function NewEventReportForm({ events, defaultEventId }: { events: EventOp
   if (state?.success) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-success/40 bg-card p-8 text-center">
-        <HeroClip src="/videos/report-submitted.webp" frames={96} className="h-28 w-28 object-contain" />
+        <HeroClip src="/videos/report-submitted.webp" frames={96} />
         <CircleCheck className="size-10 text-success" aria-hidden />
         <div>
           <p className="text-lg font-medium">Catalyst Record archived</p>

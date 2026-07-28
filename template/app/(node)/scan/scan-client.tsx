@@ -90,7 +90,7 @@ export function ScanClient({
   if (result.state === 'success') {
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-success/40 bg-card p-8 text-center">
-        <HeroClip src="/videos/qr-success.webp" frames={96} className="h-24 w-24 object-contain" />
+        <HeroClip src="/videos/qr-success.webp" frames={96} />
         <CircleCheck className="size-10 text-success" aria-hidden />
         <div>
           <p className="text-2xl font-medium text-gold">+{result.amount} J</p>

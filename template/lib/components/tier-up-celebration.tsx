@@ -51,7 +51,7 @@ export function TierUpCelebration({ tier }: { tier: Tier }) {
         vibration={[60, 40, 60]}
       >
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card px-6 py-4 text-center shadow-lg">
-          <HeroClip src="/videos/tier-up.webp" frames={96} className="h-20 w-20 object-contain" />
+          <HeroClip src="/videos/tier-up.webp" frames={96} />
           <p className="text-xs uppercase tracking-wide text-muted">You reached</p>
           <TierBadge tier={tier} />
           <p className="text-sm text-muted">{tierLabel(tier)} unlocked</p>

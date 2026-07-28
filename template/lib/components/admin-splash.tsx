@@ -53,13 +53,17 @@ export function AdminSplash({ children }: { children: React.ReactNode }) {
       <AnimatePresence>
         {showing ? (
           <motion.div
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-background"
+            className="fixed inset-0 z-50"
             initial={{ opacity: 1 }}
             animate={{ opacity: exiting ? 0 : 1 }}
             transition={{ duration: 0.3 }}
           >
-            <HeroClip src="/videos/splash-admin.webp" frames={CLIP_FRAMES} className="size-24 object-contain" />
-            <p className="text-xs uppercase tracking-[0.2em] text-muted">Reactor Command Center</p>
+            {/* HeroClip renders its own full-screen 9:16 overlay (z-[100]) —
+                this wrapper's only remaining job is the graceful fade-out at
+                the end of the sequence. The "Reactor Command Center" caption
+                that used to sit under the small icon-sized clip is dropped:
+                it would render invisibly behind the now-full-screen clip. */}
+            <HeroClip src="/videos/splash-admin.webp" frames={CLIP_FRAMES} />
           </motion.div>
         ) : null}
       </AnimatePresence>

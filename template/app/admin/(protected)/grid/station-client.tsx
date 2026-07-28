@@ -139,7 +139,7 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
           dashboard should read as calm, not have a flashy animation running
           forever underneath it (design-brief.md's own "restraint" direction
           for admin screens specifically). */}
-      <HeroClip src="/videos/professor-analytics.webp" frames={96} className="mx-auto h-16 w-16 object-contain" />
+      <HeroClip src="/videos/professor-analytics.webp" frames={96} />
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-[var(--radius)] border border-border bg-card p-4 text-center">

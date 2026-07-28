@@ -11,6 +11,16 @@
  * animation forever would read as exactly the gamified spectacle the
  * professor pushed back on).
  *
+ * Every clip is a real 720x1280 (9:16) portrait recording, made
+ * specifically for the mobile PWA experience — so this renders as a
+ * uniform full-screen overlay, and only ever on a mobile-sized viewport
+ * (confirmed with the user: never on laptop, even for the admin-panel call
+ * sites that aren't behind the mobile-PWA gate, decision 29). Being fixed
+ * and full-screen also means it's removed from normal document flow, so
+ * every existing call site's surrounding layout (a result card, a stat
+ * grid, etc.) renders exactly as it did before — the clip just flashes on
+ * top of it for one pass, then reveals what was already there underneath.
+ *
  * Respects prefers-reduced-motion by never rendering at all — every call
  * site already has a non-video fallback (confetti/sound/haptics, or just
  * the underlying UI), so skipping the clip here is a no-op, not a blank
@@ -22,22 +32,26 @@ function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+// Same breakpoint this app already treats as "mobile" elsewhere (the admin
+// nav's own sm:hidden/sm:flex split) — not a new threshold to reason about.
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+}
+
 export function HeroClip({
   src,
   frames,
   fps = 25,
-  className,
   onComplete,
 }: {
   src: string;
   frames: number;
   fps?: number;
-  className?: string;
   onComplete?: () => void;
 }) {
   // Lazy initializer, not an effect — deciding whether to show at all is a
-  // pure read of a platform API, not a synchronization concern.
-  const [visible, setVisible] = useState(() => !prefersReducedMotion());
+  // pure read of platform APIs, not a synchronization concern.
+  const [visible, setVisible] = useState(() => !prefersReducedMotion() && isMobileViewport());
 
   useEffect(() => {
     if (!visible) return;
@@ -52,7 +66,9 @@ export function HeroClip({
 
   if (!visible) return null;
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- animated WebP: next/image doesn't animate WebP, it re-optimizes to a static frame.
-    <img src={src} alt="" className={className} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+      {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP: next/image doesn't animate WebP, it re-optimizes to a static frame. */}
+      <img src={src} alt="" className="h-full w-full object-cover" />
+    </div>
   );
 }

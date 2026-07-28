@@ -90,7 +90,7 @@ export function WinnerBurst({
     >
       {clip ? (
         <div className="mb-2 flex justify-center">
-          <HeroClip src={clip.src} frames={clip.frames} className="h-28 w-28 object-contain" />
+          <HeroClip src={clip.src} frames={clip.frames} />
         </div>
       ) : null}
       {children}
