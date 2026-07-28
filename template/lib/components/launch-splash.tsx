@@ -16,6 +16,14 @@ import { site } from '@/lib/site';
 import { vibrate } from '@/lib/jules/haptics';
 import { HeroClip } from '@/lib/components/hero-clip';
 
+// ★ TEMPORARY, confirmed with the user for the pre-launch testing/demo
+// period: fires on every fresh login instead of the real intended
+// once-per-calendar-day behavior, so it's reliably visible while
+// testing/demoing. MUST flip back to `false` before the real student
+// launch — see CLAUDE.md Known Open Items. Flipping it back restores the
+// exact original daily-gated behavior with no other changes needed.
+const ALWAYS_SHOW_FOR_TESTING = true;
+
 const STORAGE_KEY = 'jules_splash_date';
 // Real generated clip (trimmed to its first 100 frames/4.0s — the source
 // file ran 215 frames/8.6s, but everything past frame ~100 was just a
@@ -36,7 +44,7 @@ export function LaunchSplash({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const seenToday = window.localStorage.getItem(STORAGE_KEY) === todayKey();
+    const seenToday = !ALWAYS_SHOW_FOR_TESTING && window.localStorage.getItem(STORAGE_KEY) === todayKey();
     if (reduced || seenToday) return;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot kickoff of the sequence, same pattern as lib/components/count-up.tsx

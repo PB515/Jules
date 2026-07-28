@@ -18,6 +18,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { site } from '@/lib/site';
 import { HeroClip } from '@/lib/components/hero-clip';
 
+// ★ TEMPORARY, confirmed with the user for the pre-launch testing/demo
+// period — see the matching flag/comment in launch-splash.tsx, same
+// reasoning and same revert-before-launch requirement.
+const ALWAYS_SHOW_FOR_TESTING = true;
+
 const STORAGE_KEY = 'jules_admin_splash_date';
 const CLIP_FRAMES = 66;
 const CLIP_MS = (CLIP_FRAMES / 25) * 1000;
@@ -33,7 +38,7 @@ export function AdminSplash({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const seenToday = window.localStorage.getItem(STORAGE_KEY) === todayKey();
+    const seenToday = !ALWAYS_SHOW_FOR_TESTING && window.localStorage.getItem(STORAGE_KEY) === todayKey();
     if (reduced || seenToday) return;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot kickoff, same pattern as launch-splash.tsx
