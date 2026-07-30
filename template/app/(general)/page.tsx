@@ -131,7 +131,7 @@ export default async function GeneralHomePage() {
         <p className="max-w-3xl text-sm leading-relaxed text-muted">
           The FMS Students Clubs and Conduits are more than student organizations. They&apos;re a vibrant
           community where ambitious minds converge to explore, learn, and grow professionally. Every meeting,
-          expert session, volunteer task, and live quiz across every club earns Joules, building one shared,
+          expert session, volunteer task, and live quiz across every club earns Synergy Points, building one shared,
           permanent record of participation in Catalyst Records, a single points system shared across every
           club, not one per club. Members climb through standing tiers (Ember, Volt, Current, Plasma) as they
           engage: networking with peers, faculty, alumni, and industry professionals; building leadership

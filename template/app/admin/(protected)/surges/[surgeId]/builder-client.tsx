@@ -46,7 +46,7 @@ export function BuilderClient({ surge, questions }: { surge: Surge; questions: Q
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-medium">{surge.name}</h1>
-          <p className="text-xs text-tertiary">{surge.points_per_question} J per correct answer</p>
+          <p className="text-xs text-tertiary">{surge.points_per_question} SP per correct answer</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="rounded-full border border-border px-2.5 py-1 text-xs capitalize text-muted">{status}</span>

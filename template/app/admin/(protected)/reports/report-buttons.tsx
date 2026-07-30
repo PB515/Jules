@@ -31,8 +31,19 @@ function stamp(key: string) {
 async function downloadStudents(scope: Scope) {
   const rows = await fetchStudentsReportAction(scope);
   const csv = rowsToCsv(
-    ['student_id', 'name', 'email', 'season_joules', 'lifetime_joules', 'tier', 'streak'],
-    rows.map((r) => [r.student_id, r.name, r.email, String(r.season_joules), String(r.lifetime_joules), r.tier, String(r.streak)])
+    ['student_id', 'name', 'email', 'season_joules', 'lifetime_joules', 'tier', 'streak', 'total_registered', 'total_attended', 'not_attended'],
+    rows.map((r) => [
+      r.student_id,
+      r.name,
+      r.email,
+      String(r.season_joules),
+      String(r.lifetime_joules),
+      r.tier,
+      String(r.streak),
+      String(r.total_registered),
+      String(r.total_attended),
+      String(r.not_attended),
+    ])
   );
   downloadCsv(stamp('students'), csv);
 }
@@ -40,8 +51,19 @@ async function downloadStudents(scope: Scope) {
 async function downloadEvents(scope: Scope) {
   const rows = await fetchEventsReportAction(scope);
   const csv = rowsToCsv(
-    ['event_id', 'name', 'club_name', 'type', 'event_date', 'location', 'joule_value'],
-    rows.map((r) => [r.event_id, r.name, r.club_name, r.type, r.event_date, r.location ?? '', String(r.joule_value)])
+    ['event_id', 'name', 'club_name', 'type', 'event_date', 'location', 'joule_value', 'total_registered', 'total_attended', 'not_attended'],
+    rows.map((r) => [
+      r.event_id,
+      r.name,
+      r.club_name,
+      r.type,
+      r.event_date,
+      r.location ?? '',
+      String(r.joule_value),
+      String(r.total_registered),
+      String(r.total_attended),
+      String(r.not_attended),
+    ])
   );
   downloadCsv(stamp('events'), csv);
 }
@@ -74,11 +96,11 @@ async function downloadLedger(scope: Scope) {
 }
 
 const REPORTS = [
-  { key: 'students', label: 'Students', description: 'Every student with computed totals: season/lifetime Joules, tier, streak.', download: downloadStudents },
-  { key: 'events', label: 'Events', description: 'Every event in scope: club, type, date, location, Joule value.', download: downloadEvents },
+  { key: 'students', label: 'Students', description: 'Every student with computed totals: season/lifetime Synergy Points, tier, streak, and registered/attended/no-show counts.', download: downloadStudents },
+  { key: 'events', label: 'Events', description: 'Every event in scope: club, type, date, location, Synergy Point value, and registered/attended/no-show counts.', download: downloadEvents },
   { key: 'attendance', label: 'Attendance', description: 'One row per student per event, the core "who came to what" table.', download: downloadAttendance },
   { key: 'quiz', label: 'Quiz participation', description: 'Every Surge/Live Round a student joined, async or live.', download: downloadQuiz },
-  { key: 'ledger', label: 'Joule ledger', description: 'Every point transaction, the richest raw table, source and amount per row.', download: downloadLedger },
+  { key: 'ledger', label: 'Synergy Points ledger', description: 'Every point transaction, the richest raw table, source and amount per row.', download: downloadLedger },
 ] as const;
 
 export function ReportButtons({ scope }: { scope: Scope }) {

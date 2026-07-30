@@ -28,11 +28,11 @@ export function NewSurgeForm({ clubs }: { clubs: { id: string; name: string }[] 
           </select>
         </label>
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Joules for a correct answer (at full time remaining)</span>
+          <span className="text-xs text-muted">Synergy Points for a correct answer (at full time remaining)</span>
           <input name="points_per_question" type="number" min={1} defaultValue={20} className="input" />
         </label>
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Participation Joules per question attempted</span>
+          <span className="text-xs text-muted">Participation Synergy Points per question attempted</span>
           <input name="participation_points_per_question" type="number" min={0} defaultValue={5} className="input" />
         </label>
         <label className="flex flex-col gap-1.5">

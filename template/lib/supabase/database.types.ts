@@ -16,7 +16,7 @@ export type Json =
 
 export type StudentStatus = 'active' | 'locked';
 export type AdminRole = 'super_admin' | 'professor' | 'committee_member';
-export type EventType = 'standard_meeting' | 'expert_session' | 'volunteer_task' | 'surge';
+export type EventType = 'participation' | 'expert_session' | 'volunteer_task' | 'surge';
 export type SurgeStatus = 'draft' | 'live' | 'complete';
 export type SeasonCadence = 'semester' | 'trimester' | 'annual' | 'custom';
 export type TransactionType = 'event_scan' | 'surge_earned' | 'surge_participation' | 'admin_manual_adjustment';
@@ -346,11 +346,17 @@ export interface Database {
       mark_notification_read: { Args: { p_id: string }; Returns: undefined };
       report_students: {
         Args: { p_season_id?: string | null; p_club_id?: string | null };
-        Returns: { student_id: string; name: string; email: string; season_joules: number; lifetime_joules: number; tier: string; streak: number }[];
+        Returns: {
+          student_id: string; name: string; email: string; season_joules: number; lifetime_joules: number; tier: string; streak: number;
+          total_registered: number; total_attended: number; not_attended: number;
+        }[];
       };
       report_events: {
         Args: { p_season_id?: string | null; p_club_id?: string | null };
-        Returns: { event_id: string; name: string; club_name: string; type: string; event_date: string; location: string | null; joule_value: number }[];
+        Returns: {
+          event_id: string; name: string; club_name: string; type: string; event_date: string; location: string | null; joule_value: number;
+          total_registered: number; total_attended: number; not_attended: number;
+        }[];
       };
       report_attendance: {
         Args: { p_season_id?: string | null; p_club_id?: string | null };

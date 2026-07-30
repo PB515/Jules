@@ -67,7 +67,7 @@ export function VaultClient({ students }: { students: StudentRow[] }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <TierBadge tier={s.tier} />
-                  <span className="text-xs text-tertiary">{s.season_joules} J</span>
+                  <span className="text-xs text-tertiary">{s.season_joules} SP</span>
                 </div>
               </button>
               {expanded === s.id ? <StudentDetail student={s} /> : null}
@@ -138,7 +138,7 @@ function StudentDetail({ student }: { student: StudentRow }) {
       <div className="grid grid-cols-2 gap-2 text-xs text-muted">
         <p>Email: {student.college_email}</p>
         <p>Phone: {student.phone ?? 'n/a'}</p>
-        <p>Lifetime Joules: {student.lifetime_joules}</p>
+        <p>Lifetime SP: {student.lifetime_joules}</p>
         <div className="flex items-center gap-1.5">
           <span>Streak:</span>
           <StreakChain count={student.streak} />
@@ -172,9 +172,9 @@ function StudentDetail({ student }: { student: StudentRow }) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-xs text-tertiary">Joules by source</p>
+            <p className="text-xs text-tertiary">Synergy Points by source</p>
             {Object.keys(activity.pointsBySource).length === 0 ? (
-              <p className="text-xs text-tertiary">No Joules earned yet.</p>
+              <p className="text-xs text-tertiary">No Synergy Points earned yet.</p>
             ) : (
               (Object.keys(SOURCE_LABEL) as TransactionType[])
                 .filter((type) => activity.pointsBySource[type] !== undefined)
@@ -214,7 +214,7 @@ function StudentDetail({ student }: { student: StudentRow }) {
       <div className="flex flex-wrap items-center gap-2">
         <input
           type="number"
-          placeholder="± Joules"
+          placeholder="± SP"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="input w-28"

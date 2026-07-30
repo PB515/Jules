@@ -99,7 +99,7 @@ export default async function CatalystPage({
                   <span className="w-8 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
                   <span className="text-sm">{row.name}</span>
                 </div>
-                <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
+                <span className="text-sm font-medium text-gold">{row.total_amount} SP</span>
               </li>
             ))}
           </ol>

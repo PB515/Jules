@@ -37,7 +37,7 @@ export async function SimpleLedgerView({ admin, selectedEventId }: { admin: Tabl
 
       <p className="text-sm text-muted">
         {summary.total_events} event{summary.total_events === 1 ? '' : 's'} held · {summary.total_students} student
-        {summary.total_students === 1 ? '' : 's'} engaged · {summary.total_lifetime_joules} Joules given out
+        {summary.total_students === 1 ? '' : 's'} engaged · {summary.total_lifetime_joules} SP given out
       </p>
 
       {!events || events.length === 0 || !activeEvent ? (

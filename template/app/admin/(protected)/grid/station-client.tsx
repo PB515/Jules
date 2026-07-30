@@ -98,7 +98,7 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted">{eventName}</p>
-            <p className="text-sm text-tertiary">{jouleValue ?? '-'} J per check-in</p>
+            <p className="text-sm text-tertiary">{jouleValue ?? '-'} SP per check-in</p>
           </div>
           {secondsLeft !== null ? (
             <span className="rounded-full border border-border px-2.5 py-1 text-xs text-tertiary">
@@ -148,7 +148,7 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
         </div>
         <div className="rounded-[var(--radius)] border border-border bg-card p-4 text-center">
           <p className="text-2xl font-medium text-gold">{metrics.joules_distributed}</p>
-          <p className="text-xs text-muted">Joules distributed</p>
+          <p className="text-xs text-muted">Synergy Points distributed</p>
         </div>
       </div>
 

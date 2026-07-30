@@ -54,7 +54,7 @@ export default async function LeaderboardPage({
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-medium">Leaderboard</h1>
-        <p className="mt-1 text-sm text-muted">Every student, ranked by season Joules.</p>
+        <p className="mt-1 text-sm text-muted">Every student, ranked by season Synergy Points.</p>
       </div>
 
       <SeasonPicker seasons={seasons.map((s) => ({ id: s.id, label: s.label }))} selected={selectedId} />

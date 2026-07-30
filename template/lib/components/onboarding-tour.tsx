@@ -16,13 +16,13 @@ const STORAGE_KEY = 'jules_onboarding_seen';
 const SLIDES = [
   {
     icon: Zap,
-    title: 'Earn Joules',
-    body: 'Every event you check into and every quiz you play earns you Joules, your season score.',
+    title: 'Earn Synergy Points',
+    body: 'Every event you check into and every quiz you play earns you Synergy Points, your season score.',
   },
   {
     icon: ScanLine,
     title: 'Scan to check in',
-    body: 'At any event, scan the QR code on screen to confirm your attendance and collect Joules.',
+    body: 'At any event, scan the QR code on screen to confirm your attendance and collect Synergy Points.',
   },
   {
     icon: MonitorPlay,
@@ -32,7 +32,7 @@ const SLIDES = [
   {
     icon: Trophy,
     title: 'Climb the Leaderboard',
-    body: 'Your season Joules place you on the Leaderboard and move you up through Ember, Volt, Current, and Plasma tiers.',
+    body: 'Your season Synergy Points place you on the Leaderboard and move you up through Ember, Volt, Current, and Plasma tiers.',
   },
 ] as const;
 

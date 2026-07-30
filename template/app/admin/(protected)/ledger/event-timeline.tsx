@@ -17,7 +17,7 @@ interface EventRow {
 
 const FILTERS: { key: 'all' | EventType; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'standard_meeting', label: 'Standard' },
+  { key: 'participation', label: 'Participation' },
   { key: 'expert_session', label: 'Expert' },
   { key: 'volunteer_task', label: 'Volunteer' },
   { key: 'surge', label: 'Surge' },
@@ -65,7 +65,7 @@ export function EventTimeline({ events }: { events: EventRow[] }) {
                     <p>Date: {new Date(e.event_date).toLocaleString()}</p>
                     <p>Location: {e.location ?? 'n/a'}</p>
                     <p>Attendees: {e.total_attendees}</p>
-                    <p>Joules generated: {e.total_joules}</p>
+                    <p>Synergy Points generated: {e.total_joules}</p>
                   </div>
                 ) : null}
               </li>

@@ -30,9 +30,9 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Type</span>
           <select name="type" className="input" defaultValue={event.type} required>
-            <option value="standard_meeting">Standard meeting (10 J)</option>
-            <option value="expert_session">Expert session (25 J)</option>
-            <option value="volunteer_task">Volunteer task (50 J)</option>
+            <option value="participation">Participation (10 SP)</option>
+            <option value="expert_session">Expert session (5 SP)</option>
+            <option value="volunteer_task">Volunteer task (15 SP)</option>
           </select>
         </label>
         <label className="flex flex-col gap-1.5">

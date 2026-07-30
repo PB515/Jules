@@ -54,7 +54,7 @@ export default async function LedgerPage({ searchParams }: { searchParams: Promi
         <SummaryCard icon={Users} label="Students" value={summary.total_students} />
         <SummaryCard icon={Trophy} label="Clubs" value={summary.total_clubs} />
         <SummaryCard icon={Calendar} label="Events" value={summary.total_events} />
-        <SummaryCard icon={Zap} label="Joules distributed" value={summary.total_lifetime_joules} />
+        <SummaryCard icon={Zap} label="Synergy Points distributed" value={summary.total_lifetime_joules} />
       </section>
 
       <section>

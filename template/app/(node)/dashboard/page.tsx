@@ -171,7 +171,7 @@ export default async function DashboardPage() {
       <section className="rounded-2xl border border-border bg-card p-6 ambient-drift">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-muted">Season Joules</p>
+            <p className="text-xs uppercase tracking-wide text-muted">Season SP</p>
             <CountUp value={totals.season_joules} className="text-4xl font-medium text-gold" />
           </div>
           {/* ★ TEMP tier badge art — see lib/jules/tier-badges.ts. Sits directly
@@ -190,11 +190,11 @@ export default async function DashboardPage() {
           />
         </div>
         <p className="mt-1.5 text-xs text-tertiary">
-          {nextAt ? `${nextAt - totals.season_joules} J to next tier` : 'Top tier, uncapped'}
+          {nextAt ? `${nextAt - totals.season_joules} SP to next tier` : 'Top tier, uncapped'}
         </p>
 
         <div className="mt-4 flex items-center justify-between text-sm">
-          <span className="text-muted">Lifetime Joules</span>
+          <span className="text-muted">Lifetime SP</span>
           <CountUp value={totals.lifetime_joules} className="font-medium" />
         </div>
         {daysLeft !== null ? (
@@ -319,7 +319,7 @@ export default async function DashboardPage() {
           <EmptyState
             icon={Clock}
             title="No sparks yet"
-            message="Scan into an event or join a Surge to start generating Joules."
+            message="Scan into an event or join a Surge to start generating Synergy Points."
           />
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">

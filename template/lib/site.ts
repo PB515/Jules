@@ -12,7 +12,7 @@ export const site = {
   legalName: 'Synergy, Adani University FMS/Infra Management MBA',
   tagline: 'Progress, together.',
   description:
-    'Synergy is the shared engagement platform for every club across the program: Joules earned via QR check-in and Surge quizzes, standing tiers, and a permanent Catalyst Records archive, all under one shared points system.',
+    'Synergy is the shared engagement platform for every club across the program: Synergy Points earned via QR check-in and Surge quizzes, standing tiers, and a permanent Catalyst Records archive, all under one shared points system.',
 
   // Read from env so dev/staging/prod need no code change; falls back to
   // localhost. TODO: set NEXT_PUBLIC_SITE_URL for real before launch.

@@ -94,7 +94,7 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
         </span>
         <span className={totalAwarded >= 0 ? 'text-gold' : 'text-accent'}>
           {totalAwarded >= 0 ? '+' : ''}
-          {totalAwarded} J so far
+          {totalAwarded} SP so far
         </span>
       </div>
 

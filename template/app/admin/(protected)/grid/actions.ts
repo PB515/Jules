@@ -11,9 +11,9 @@ export interface ActionResult {
 }
 
 const JOULE_BY_TYPE: Record<string, number> = {
-  standard_meeting: 10,
-  expert_session: 25,
-  volunteer_task: 50,
+  participation: 10,
+  expert_session: 5,
+  volunteer_task: 15,
 };
 
 async function uploadCoverImage(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData): Promise<{ path?: string; error?: string }> {
@@ -54,7 +54,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
     .insert({
       name,
       club_id: clubId,
-      type: type as 'standard_meeting' | 'expert_session' | 'volunteer_task',
+      type: type as 'participation' | 'expert_session' | 'volunteer_task',
       event_date: new Date(eventDate).toISOString(),
       location: location || null,
       registration_form_url: registrationFormUrl || null,
@@ -112,7 +112,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   // alone to reject it).
   let query = supabase.from('events').update({
     name,
-    type: type as 'standard_meeting' | 'expert_session' | 'volunteer_task',
+    type: type as 'participation' | 'expert_session' | 'volunteer_task',
     event_date: new Date(eventDate).toISOString(),
     location: location || null,
     registration_form_url: registrationFormUrl || null,

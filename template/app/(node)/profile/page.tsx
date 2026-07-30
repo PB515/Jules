@@ -33,7 +33,7 @@ export default async function ProfilePage() {
       <ProfileForm name={student.name} phone={student.phone ?? ''} />
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Stat label="Lifetime Joules" value={totals.lifetime_joules.toLocaleString()} />
+        <Stat label="Lifetime SP" value={totals.lifetime_joules.toLocaleString()} />
         <div className="rounded-[var(--radius)] border border-border bg-card p-4">
           <p className="text-xs text-muted">Streak</p>
           <div className="mt-2">
@@ -63,9 +63,9 @@ export default async function ProfilePage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-xs text-tertiary">Joules by source</p>
+          <p className="text-xs text-tertiary">Synergy Points by source</p>
           {pointsBySource.size === 0 ? (
-            <p className="text-xs text-tertiary">No Joules earned yet.</p>
+            <p className="text-xs text-tertiary">No Synergy Points earned yet.</p>
           ) : (
             (Object.keys(SOURCE_LABEL) as TransactionType[])
               .filter((type) => pointsBySource.has(type))

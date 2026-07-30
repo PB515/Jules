@@ -8,7 +8,7 @@ import { formatDateUTC, formatTimeUTC } from '@/lib/jules/format-date';
 export const metadata = { title: 'Events' };
 
 const TYPE_LABEL: Record<string, string> = {
-  standard_meeting: 'Standard Meeting',
+  participation: 'Participation',
   expert_session: 'Expert Session',
   volunteer_task: 'Volunteer Task',
 };

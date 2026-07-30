@@ -196,7 +196,7 @@ export function TeamClient({
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
       <div className="flex items-center justify-between text-xs text-accent">
         <span>Team: {teamName}</span>
-        <span className="text-gold">+{pointsPerQuestion} J per correct answer</span>
+        <span className="text-gold">+{pointsPerQuestion} SP per correct answer</span>
       </div>
 
       {round.phase === 'lobby' ? (
@@ -270,7 +270,7 @@ export function TeamClient({
           />
           {awarded !== null ? (
             <p className={`text-center text-sm ${awarded > 0 ? 'text-success' : 'text-accent'}`}>
-              {awarded > 0 ? `+${awarded} J!` : 'Not quite.'}
+              {awarded > 0 ? `+${awarded} SP!` : 'Not quite.'}
             </p>
           ) : null}
         </div>
@@ -294,7 +294,7 @@ export function TeamClient({
                   {r.rank === 1 ? <Crown className="size-4 text-gold" aria-hidden /> : <span className="w-4 text-tertiary">{r.rank}</span>}
                   {r.team_name}
                 </span>
-                <span className="text-sm text-gold">{r.total_amount} J</span>
+                <span className="text-sm text-gold">{r.total_amount} SP</span>
               </li>
             ))}
           </ul>

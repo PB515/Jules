@@ -62,7 +62,7 @@ export function MatrixClient({ top10, mine, myTier }: { top10: Row[]; mine: Row 
                   <span className="w-6 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
                   <span className="text-sm">{row.name}</span>
                 </div>
-                <span className="text-sm font-medium text-gold">{row.total_amount} J</span>
+                <span className="text-sm font-medium text-gold">{row.total_amount} SP</span>
               </div>
             );
             // Rank 1 gets the shared winner beat (confetti + sound + vibration)
@@ -96,7 +96,7 @@ export function MatrixClient({ top10, mine, myTier }: { top10: Row[]; mine: Row 
           <p className="mt-1 text-3xl font-medium text-gold">#{mine.rank}</p>
           <p className="mt-1 text-sm text-muted">out of everyone who joined</p>
           <div className="mt-4 flex items-center justify-center gap-3">
-            <span className="text-sm">{mine.total_amount} J earned</span>
+            <span className="text-sm">{mine.total_amount} SP earned</span>
             <TierBadge tier={myTier} />
           </div>
         </div>

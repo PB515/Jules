@@ -105,7 +105,7 @@ export default async function EventReportPage({ params }: { params: Promise<{ id
               <Zap className="size-4 text-gold" aria-hidden />
               <div>
                 <p className="text-lg font-medium">{eventStats.total_joules}</p>
-                <p className="text-xs text-tertiary">Joules distributed</p>
+                <p className="text-xs text-tertiary">Synergy Points distributed</p>
               </div>
             </div>
           </div>

@@ -15,7 +15,7 @@ export const metadata = { title: 'Audit Log' };
  */
 const ACTION_LABEL: Record<AuditAction, string> = {
   force_reset: 'Force reset a password',
-  manual_joule_adjustment: 'Manually adjusted Joules',
+  manual_joule_adjustment: 'Manually adjusted Synergy Points',
   csv_import: 'Imported questions via CSV',
   role_change: 'Changed an admin role',
   event_create: 'Created an event',

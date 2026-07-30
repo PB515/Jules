@@ -93,12 +93,12 @@ export function ScanClient({
         <HeroClip src="/videos/qr-success.webp" frames={96} />
         <CircleCheck className="size-10 text-success" aria-hidden />
         <div>
-          <p className="text-2xl font-medium text-gold">+{result.amount} J</p>
+          <p className="text-2xl font-medium text-gold">+{result.amount} SP</p>
           <p className="mt-1 text-sm text-muted">Credited to your Grid</p>
         </div>
         <TierBadge tier={result.tier} />
         {result.flagged ? (
-          <p className="text-xs text-tertiary">Flagged for admin review (location check), your Joules are still credited.</p>
+          <p className="text-xs text-tertiary">Flagged for admin review (location check), your Synergy Points are still credited.</p>
         ) : null}
       </div>
     );

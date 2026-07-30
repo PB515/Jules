@@ -27,7 +27,7 @@ export function ClubEngagementChart({ rows }: { rows: Row[] }) {
           <div className="h-3 flex-1 rounded-full bg-background">
             <div className="h-3 rounded-full bg-gold" style={{ width: `${(r.total_joules / max) * 100}%` }} />
           </div>
-          <span className="w-16 shrink-0 text-right text-xs text-tertiary">{r.total_joules} J</span>
+          <span className="w-16 shrink-0 text-right text-xs text-tertiary">{r.total_joules} SP</span>
         </div>
       ))}
     </div>

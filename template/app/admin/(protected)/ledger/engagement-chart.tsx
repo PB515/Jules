@@ -20,14 +20,14 @@ interface Row {
 // a categorical data-viz palette needs distinct hues regardless of what
 // those hues mean on other screens. Reviewed, not a consistency violation.
 const TYPE_COLOR: Record<EventType, string> = {
-  standard_meeting: 'var(--border-muted)',
+  participation: 'var(--border-muted)',
   expert_session: 'var(--gold)',
   volunteer_task: 'var(--accent)',
   surge: 'var(--success)',
 };
 
 const TYPE_LABEL: Record<EventType, string> = {
-  standard_meeting: 'Standard',
+  participation: 'Participation',
   expert_session: 'Expert',
   volunteer_task: 'Volunteer',
   surge: 'Surge',
@@ -63,7 +63,7 @@ export function EngagementChart({ rows }: { rows: Row[] }) {
                       background: TYPE_COLOR[r.event_type],
                     }}
                     className="w-full transition-opacity hover:opacity-80"
-                    aria-label={`${TYPE_LABEL[r.event_type]}: ${r.total_joules} J`}
+                    aria-label={`${TYPE_LABEL[r.event_type]}: ${r.total_joules} SP`}
                   />
                 ))}
               </div>
@@ -91,7 +91,7 @@ export function EngagementChart({ rows }: { rows: Row[] }) {
             {new Date(selected.month).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
           </p>
           <p className="text-tertiary">
-            {selected.row.total_joules} J across {selected.row.scan_count} scans
+            {selected.row.total_joules} SP across {selected.row.scan_count} scans
           </p>
         </div>
       ) : null}

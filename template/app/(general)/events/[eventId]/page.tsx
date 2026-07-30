@@ -10,7 +10,7 @@ import { EventCoverPlaceholder } from '@/lib/components/event-cover-placeholder'
 export const metadata = { title: 'Event' };
 
 const TYPE_LABEL: Record<string, string> = {
-  standard_meeting: 'Standard Meeting',
+  participation: 'Participation',
   expert_session: 'Expert Session',
   volunteer_task: 'Volunteer Task',
 };
@@ -84,7 +84,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
           <Zap className="size-4 text-gold" aria-hidden />
           <div>
             <p className="text-lg font-medium">{event.joule_value}</p>
-            <p className="text-xs text-tertiary">Joules for attending</p>
+            <p className="text-xs text-tertiary">Synergy Points for attending</p>
           </div>
         </div>
       ) : null}

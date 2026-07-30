@@ -148,7 +148,7 @@ export function NewEventReportForm({ events, defaultEventId }: { events: EventOp
           </div>
           <div>
             <p className="text-lg font-medium text-gold">{stats.total_joules}</p>
-            <p className="text-xs text-tertiary">Joules distributed (auto-pulled)</p>
+            <p className="text-xs text-tertiary">Synergy Points distributed (auto-pulled)</p>
           </div>
         </div>
       ) : null}

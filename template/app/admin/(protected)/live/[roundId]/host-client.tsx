@@ -347,7 +347,7 @@ function RevealView({
               );
             })}
           </div>
-          <p className="text-sm text-tertiary">Correct answers earn +{points} J</p>
+          <p className="text-sm text-tertiary">Correct answers earn +{points} SP</p>
         </>
       ) : (
         <Scoreboard rows={scoreboard} />
@@ -386,7 +386,7 @@ function Scoreboard({ rows }: { rows: ScoreRow[] }) {
             {r.rank === 1 ? <Crown className="size-5 text-gold" aria-hidden /> : <span className="w-5 text-tertiary">{r.rank}</span>}
             {r.team_name}
           </span>
-          <span className="text-lg text-gold">{r.total_amount} J</span>
+          <span className="text-lg text-gold">{r.total_amount} SP</span>
         </li>
       ))}
     </ul>
