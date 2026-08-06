@@ -5,6 +5,12 @@
  * column). This client polls for the current token + live metrics every 5s so
  * the display always shows a fresh, redeemable code without a full reload.
  *
+ * Attendance is decoupled from event_date (0050) — the scan window opens
+ * only once someone actually presses "Start attendance," for a configurable
+ * duration, independent of the event's scheduled time. This is the fix for
+ * real events running late: the window opens whenever the room actually
+ * fills up, not whenever the calendar said it would.
+ *
  * Renders a real scannable QR (react-qr-code, decision 43) alongside the
  * text code + copy link, which stay as the manual/accessible fallback. The
  * QR itself is kept standard black-on-white (not theme-colored) — real-world
@@ -16,14 +22,17 @@ import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { HeroClip } from '@/lib/components/hero-clip';
-import { Check, ShieldAlert, ScanLine } from '@/lib/icons';
+import { EnergyBar } from '@/lib/components/energy-bar';
+import { Check, ShieldAlert, ScanLine, Play } from '@/lib/icons';
 import QRCode from 'react-qr-code';
 
 interface Props {
   eventId: string;
   eventName: string;
   jouleValue: number | null;
-  eventDate: string;
+  attendanceDurationMinutes: number;
+  attendanceOpensAt: string | null;
+  attendanceClosesAt: string | null;
 }
 
 interface RecentScan {
@@ -33,33 +42,57 @@ interface RecentScan {
   created_at: string;
 }
 
-export function StationClient({ eventId, eventName, jouleValue, eventDate }: Props) {
+const DURATION_PRESETS = [15, 20, 30, 45, 60];
+
+export function StationClient({
+  eventId,
+  eventName,
+  jouleValue,
+  attendanceDurationMinutes,
+  attendanceOpensAt,
+  attendanceClosesAt,
+}: Props) {
   const [token, setToken] = useState<string | null>(null);
-  const [expiresAt, setExpiresAt] = useState<number | null>(null);
-  // Starts at 0, not Date.now() (keeps the component body pure) — the clock
-  // effect below sets a real value within the first second.
-  const [now, setNow] = useState(0);
   const [metrics, setMetrics] = useState({ students_scanned: 0, joules_distributed: 0 });
   const [recent, setRecent] = useState<RecentScan[]>([]);
   const [copied, setCopied] = useState(false);
+
+  const [opensAt, setOpensAt] = useState(attendanceOpensAt);
+  const [closesAt, setClosesAt] = useState(attendanceClosesAt);
+  const [duration, setDuration] = useState(attendanceDurationMinutes);
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
+  // Starts at 0, not Date.now() (keeps the component body pure) — the clock
+  // interval below (started with no synchronous setState call, matching this
+  // component's own established pattern) sets a real value within the first
+  // tick.
+  const [now, setNow] = useState(0);
+
+  // The parent (grid/page.tsx) remounts this component via `key={eventId}`
+  // when a different event is picked, so `opensAt`/`closesAt`/`duration`
+  // above are always fresh from that event's own server-fetched props — no
+  // reset-on-prop-change effect needed, same pattern EnergyBar's own
+  // per-question remount already uses.
 
   useEffect(() => {
     const supabase = createClient();
     let cancelled = false;
 
     async function poll() {
-      const [tokenRes, metricsRes, recentRes] = await Promise.all([
+      const [tokenRes, metricsRes, recentRes, eventRes] = await Promise.all([
         supabase.rpc('current_qr_token', { p_event_id: eventId }),
         supabase.rpc('event_scan_metrics', { p_event_id: eventId }),
         supabase.rpc('event_recent_scans', { p_event_id: eventId, p_limit: 8 }),
+        supabase.from('events').select('attendance_opens_at, attendance_closes_at').eq('id', eventId).maybeSingle(),
       ]);
       if (cancelled) return;
-      if (tokenRes.data?.[0]) {
-        setToken(tokenRes.data[0].token);
-        setExpiresAt(new Date(tokenRes.data[0].expires_at).getTime());
-      }
+      setToken(tokenRes.data?.[0]?.token ?? null);
       if (metricsRes.data?.[0]) setMetrics(metricsRes.data[0]);
       if (recentRes.data) setRecent(recentRes.data);
+      if (eventRes.data) {
+        setOpensAt(eventRes.data.attendance_opens_at);
+        setClosesAt(eventRes.data.attendance_closes_at);
+      }
     }
 
     poll();
@@ -73,16 +106,29 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
   }, [eventId]);
 
   const link = token ? `${site.url}/scan?e=${eventId}&t=${token}` : '';
-  const secondsLeft = expiresAt ? Math.max(0, Math.round((expiresAt - now) / 1000)) : null;
 
-  // current_qr_token() itself now enforces the same event-start -> +20min
-  // window redeem_event_scan does (0038) — a null token outside that window
-  // used to still show a QR that would always fail to scan. now===0 is the
-  // pre-mount placeholder value (kept pure, see the clock effect above), so
-  // don't render a window message before the first real clock tick lands.
-  const startMs = new Date(eventDate).getTime();
-  const endMs = startMs + 20 * 60_000;
-  const windowState = now === 0 ? null : now < startMs ? 'before' : now > endMs ? 'after' : 'open';
+  const closesMs = closesAt ? new Date(closesAt).getTime() : null;
+  const windowState: 'not_started' | 'open' | 'closed' =
+    !opensAt || !closesAt ? 'not_started' : now !== 0 && closesMs !== null && now > closesMs ? 'closed' : 'open';
+
+  async function startAttendance() {
+    setStarting(true);
+    setStartError(null);
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc('start_event_attendance', {
+      p_event_id: eventId,
+      p_duration_minutes: duration,
+    });
+    setStarting(false);
+    if (error) {
+      setStartError(error.message);
+      return;
+    }
+    if (data?.[0]) {
+      setOpensAt(data[0].attendance_opens_at);
+      setClosesAt(data[0].attendance_closes_at);
+    }
+  }
 
   function copyLink() {
     if (!link) return;
@@ -100,37 +146,68 @@ export function StationClient({ eventId, eventName, jouleValue, eventDate }: Pro
             <p className="text-xs uppercase tracking-wide text-muted">{eventName}</p>
             <p className="text-sm text-tertiary">{jouleValue ?? '-'} SP per check-in</p>
           </div>
-          {secondsLeft !== null ? (
-            <span className="rounded-full border border-border px-2.5 py-1 text-xs text-tertiary">
-              rotates in {secondsLeft}s
-            </span>
-          ) : null}
         </div>
 
-        <div className="mt-6 flex flex-col items-center gap-4">
-          {link ? (
-            <div className="rounded-[var(--radius)] bg-white p-3">
-              <QRCode value={link} size={160} />
-            </div>
-          ) : windowState === 'before' ? (
-            <p className="text-sm text-muted">
-              Attendance window opens at{' '}
-              {new Date(eventDate).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
-            </p>
-          ) : windowState === 'after' ? (
-            <p className="text-sm text-muted">Attendance window closed 20 minutes after the event started.</p>
-          ) : null}
-          <p className="text-xs text-muted">Current check-in code</p>
-          <p className="font-mono text-4xl tracking-[0.15em] text-gold">{token ?? '··········'}</p>
-          <button
-            onClick={copyLink}
-            disabled={!link}
-            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted hover:text-gold disabled:opacity-50"
-          >
-            {copied ? <Check className="size-3.5" aria-hidden /> : null}
-            {copied ? 'Copied' : 'Copy check-in link'}
-          </button>
-        </div>
+        {windowState === 'not_started' || windowState === 'closed' ? (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            {windowState === 'closed' ? <p className="text-sm text-muted">Attendance closed.</p> : null}
+            <label className="flex flex-col items-center gap-1.5">
+              <span className="text-xs text-muted">Attendance window</span>
+              <select
+                className="input"
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+              >
+                {DURATION_PRESETS.map((m) => (
+                  <option key={m} value={m}>
+                    {m} minutes
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              onClick={startAttendance}
+              disabled={starting}
+              className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
+            >
+              <Play className="size-4" aria-hidden />
+              {starting ? 'Starting…' : windowState === 'closed' ? 'Start again' : 'Start attendance'}
+            </button>
+            {startError ? <p className="text-sm text-accent">{startError}</p> : null}
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            {closesAt ? (
+              <div className="w-full max-w-[200px]">
+                <EnergyBar
+                  key={closesAt}
+                  totalSeconds={Math.max(0, Math.round((new Date(closesAt).getTime() - new Date(opensAt!).getTime()) / 1000))}
+                  running
+                  onExpire={() => {}}
+                />
+              </div>
+            ) : null}
+            {link ? (
+              <div className="rounded-[var(--radius)] bg-white p-3">
+                <QRCode value={link} size={160} />
+              </div>
+            ) : null}
+            <p className="text-xs text-muted">Current check-in code</p>
+            <p className="font-mono text-4xl tracking-[0.15em] text-gold">{token ?? '··········'}</p>
+            <button
+              onClick={copyLink}
+              disabled={!link}
+              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted hover:text-gold disabled:opacity-50"
+            >
+              {copied ? <Check className="size-3.5" aria-hidden /> : null}
+              {copied ? 'Copied' : 'Copy check-in link'}
+            </button>
+            <button onClick={startAttendance} disabled={starting} className="text-xs text-muted underline hover:text-gold">
+              {starting ? 'Restarting…' : 'Restart window'}
+            </button>
+            {startError ? <p className="text-sm text-accent">{startError}</p> : null}
+          </div>
+        )}
       </div>
 
       {/* Plays once per page load — HeroClip only fires on mount, so the

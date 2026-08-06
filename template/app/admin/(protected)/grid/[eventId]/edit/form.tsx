@@ -46,6 +46,23 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
           />
         </label>
         <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Attendance window</span>
+          <select
+            name="attendance_duration_minutes"
+            className="input"
+            defaultValue={event.attendance_duration_minutes}
+          >
+            <option value={15}>15 minutes</option>
+            <option value={20}>20 minutes</option>
+            <option value={30}>30 minutes</option>
+            <option value={45}>45 minutes</option>
+            <option value={60}>60 minutes</option>
+          </select>
+          <span className="text-xs text-tertiary">
+            How long the QR check-in stays open once someone presses &quot;Start attendance&quot; at the event.
+          </span>
+        </label>
+        <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Location (optional)</span>
           <input name="location" className="input" defaultValue={event.location ?? ''} />
         </label>

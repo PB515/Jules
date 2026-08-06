@@ -36,10 +36,14 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
   const eventDate = String(formData.get('event_date') ?? '');
   const location = String(formData.get('location') ?? '').trim();
   const registrationFormUrl = String(formData.get('registration_form_url') ?? '').trim();
+  const attendanceDurationMinutes = Number(formData.get('attendance_duration_minutes') ?? 20);
 
   if (!name || !type || !eventDate) return { error: 'Fill in name, type, and date.' };
   if (!clubId) return { error: 'Pick the club this event belongs to.' };
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
+  if (!Number.isFinite(attendanceDurationMinutes) || attendanceDurationMinutes <= 0) {
+    return { error: 'Attendance window must be a positive number of minutes.' };
+  }
 
   const supabase = await createClient();
   const {
@@ -60,6 +64,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
       registration_form_url: registrationFormUrl || null,
       cover_image_path: cover.path ?? null,
       joule_value: JOULE_BY_TYPE[type],
+      attendance_duration_minutes: attendanceDurationMinutes,
       created_by: user?.id,
     })
     .select('id')
@@ -90,10 +95,14 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   const eventDate = String(formData.get('event_date') ?? '');
   const location = String(formData.get('location') ?? '').trim();
   const registrationFormUrl = String(formData.get('registration_form_url') ?? '').trim();
+  const attendanceDurationMinutes = Number(formData.get('attendance_duration_minutes') ?? 20);
 
   if (!eventId) return { error: 'Missing event.' };
   if (!name || !type || !eventDate) return { error: 'Fill in name, type, and date.' };
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
+  if (!Number.isFinite(attendanceDurationMinutes) || attendanceDurationMinutes <= 0) {
+    return { error: 'Attendance window must be a positive number of minutes.' };
+  }
 
   const supabase = await createClient();
 
@@ -118,6 +127,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     registration_form_url: registrationFormUrl || null,
     ...(cover.path ? { cover_image_path: cover.path } : {}),
     joule_value: JOULE_BY_TYPE[type],
+    attendance_duration_minutes: attendanceDurationMinutes,
   }).eq('id', eventId);
   if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('club_id', admin.club_id);

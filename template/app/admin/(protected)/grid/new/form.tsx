@@ -40,6 +40,20 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
           <input name="event_date" type="datetime-local" className="input" required />
         </label>
         <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Attendance window</span>
+          <select name="attendance_duration_minutes" className="input" defaultValue={20}>
+            <option value={15}>15 minutes</option>
+            <option value={20}>20 minutes</option>
+            <option value={30}>30 minutes</option>
+            <option value={45}>45 minutes</option>
+            <option value={60}>60 minutes</option>
+          </select>
+          <span className="text-xs text-tertiary">
+            How long the QR check-in stays open once someone presses &quot;Start attendance&quot; at the event.
+            Not tied to the scheduled time above, so a delayed event is never a problem.
+          </span>
+        </label>
+        <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Location (optional)</span>
           <input name="location" className="input" />
         </label>

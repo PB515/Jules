@@ -13,13 +13,13 @@ export default async function GridStationPage({
 }: {
   searchParams: Promise<{ event?: string }>;
 }) {
-  // The page itself stays reachable by all three tiers (Committee Member
-  // still needs the event list + Edit/New links to do their own job), but
-  // the actual QR/scanner panel below only ever renders for Professor/Super
-  // Admin — Committee Member's job is event creation + Event Report
-  // writing, not showing/scanning attendance QR (RBAC rework).
+  // Attendance is started and run on demand now (0050) — the committee
+  // member/professor actually present at the event presses Start, not a
+  // pre-scheduled window — so the real-world operator is a Committee
+  // Member, not a Professor. All three tiers can reach the scan panel;
+  // scoping to the caller's own club is still enforced server-side via
+  // can_manage_event() on every RPC this panel calls.
   const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
-  const canScan = admin.role === 'professor' || admin.role === 'super_admin';
   const { event: eventParam } = await searchParams;
   const supabase = await createClient();
 
@@ -27,7 +27,7 @@ export default async function GridStationPage({
   // club's events here; a Super Admin sees every club's.
   let query = supabase
     .from('events')
-    .select('id, name, type, event_date, end_date, joule_value')
+    .select('id, name, type, event_date, end_date, joule_value, attendance_duration_minutes, attendance_opens_at, attendance_closes_at')
     .neq('type', 'surge')
     .order('event_date', { ascending: false })
     .limit(60);
@@ -73,15 +73,13 @@ export default async function GridStationPage({
           <Pencil className="size-3.5" aria-hidden />
           Edit
         </Link>
-        {canScan ? (
-          <Link
-            href={`/admin/grid/${selected.id}/registrations`}
-            className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
-          >
-            <Users className="size-3.5" aria-hidden />
-            Registrations
-          </Link>
-        ) : null}
+        <Link
+          href={`/admin/grid/${selected.id}/registrations`}
+          className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
+        >
+          <Users className="size-3.5" aria-hidden />
+          Registrations
+        </Link>
         <Link
           href="/admin/grid/new"
           className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
@@ -90,20 +88,15 @@ export default async function GridStationPage({
           New
         </Link>
       </div>
-      {canScan ? (
-        <StationClient
-          eventId={selected.id}
-          eventName={selected.name}
-          jouleValue={selected.joule_value}
-          eventDate={selected.event_date}
-        />
-      ) : (
-        <EmptyState
-          icon={ScanLine}
-          title="QR check-in is staff-only"
-          message="Showing and scanning the attendance QR is handled by your club's Professor. You can still create and edit events, and write the Event Report once it's over."
-        />
-      )}
+      <StationClient
+        key={selected.id}
+        eventId={selected.id}
+        eventName={selected.name}
+        jouleValue={selected.joule_value}
+        attendanceDurationMinutes={selected.attendance_duration_minutes}
+        attendanceOpensAt={selected.attendance_opens_at}
+        attendanceClosesAt={selected.attendance_closes_at}
+      />
     </div>
   );
 }

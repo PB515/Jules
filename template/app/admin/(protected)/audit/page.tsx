@@ -23,6 +23,8 @@ const ACTION_LABEL: Record<AuditAction, string> = {
   report_create: 'Wrote an Event Report',
   gallery_upload: 'Uploaded a Gallery photo',
   live_round_create: 'Started a Live Round',
+  event_update_sent: 'Sent an event update',
+  attendance_start: 'Started attendance for an event',
 };
 
 export default async function AuditLogPage() {

@@ -29,7 +29,9 @@ export type AuditAction =
   | 'event_edit'
   | 'report_create'
   | 'gallery_upload'
-  | 'live_round_create';
+  | 'live_round_create'
+  | 'event_update_sent'
+  | 'attendance_start';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
 export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
@@ -107,6 +109,8 @@ export interface Database {
           location: string | null; joule_value: number | null; club_id: string;
           geofence_lat: number | null; geofence_lng: number | null; geofence_radius_m: number;
           registration_form_url: string | null; cover_image_path: string | null;
+          attendance_duration_minutes: number;
+          attendance_opens_at: string | null; attendance_closes_at: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
@@ -114,6 +118,8 @@ export interface Database {
           location?: string | null; joule_value?: number | null; club_id: string;
           geofence_lat?: number | null; geofence_lng?: number | null; geofence_radius_m?: number;
           registration_form_url?: string | null; cover_image_path?: string | null;
+          attendance_duration_minutes?: number;
+          attendance_opens_at?: string | null; attendance_closes_at?: string | null;
           created_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['events']['Insert']>;
@@ -385,6 +391,10 @@ export interface Database {
       redeem_event_scan: {
         Args: { p_event_id: string; p_token: string; p_lat?: number | null; p_lng?: number | null };
         Returns: { amount: number; season_joules: number; tier: Tier; flagged_geofence: boolean }[];
+      };
+      start_event_attendance: {
+        Args: { p_event_id: string; p_duration_minutes?: number | null };
+        Returns: { attendance_opens_at: string; attendance_closes_at: string }[];
       };
       start_surge: {
         Args: { p_surge_id: string };
