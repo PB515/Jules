@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { HomeAttendanceList, type AttendanceEventRow } from './home-attendance-list';
+import { NAV, GROUP_ORDER } from './admin-nav-items';
 
 export const metadata = { title: 'Home' };
 
@@ -11,9 +12,11 @@ export const metadata = { title: 'Home' };
  * "Start attendance" prompts now that attendance is decoupled from
  * event_date (0050) and started on demand instead of pre-scheduled.
  *
- * This is deliberately only the attendance-status widget, not the broader
- * home-screen/nav redesign discussed separately — that's the next, distinct
- * piece of work once this ships.
+ * Below the attendance widget, every other admin page is reachable as a
+ * grouped task tile — same NAV data the sidebar renders flat, grouped here
+ * into task clusters (Events/Quizzes/Reports & Data/Admin/App), per the
+ * user's own "guided, but nothing locked behind a wizard" preference. The
+ * sidebar itself stays exactly as it was, unchanged, by request.
  */
 export default async function AdminHomePage() {
   const admin = await requireAdmin();
@@ -49,17 +52,43 @@ export default async function AdminHomePage() {
     }));
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-lg font-medium">Attendance</h1>
-        <p className="text-sm text-muted">
-          Events waiting for attendance to be started, or with it open right now.
-        </p>
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
+      <div className="flex flex-col gap-3">
+        <div>
+          <h1 className="text-lg font-medium">Attendance</h1>
+          <p className="text-sm text-muted">
+            Events waiting for attendance to be started, or with it open right now.
+          </p>
+        </div>
+        <HomeAttendanceList events={events} showClub={isSuperAdmin} />
       </div>
-      <HomeAttendanceList events={events} showClub={isSuperAdmin} />
-      <Link href={admin.role === 'professor' ? '/admin/ledger' : '/admin/grid'} className="text-sm text-gold">
-        Go to {admin.role === 'professor' ? 'System Ledger' : 'Grid Station'} →
-      </Link>
+
+      <div className="flex flex-col gap-6">
+        {GROUP_ORDER.map((group) => {
+          const items = NAV.filter((item) => item.group === group && item.roles.includes(admin.role));
+          if (items.length === 0) return null;
+          return (
+            <div key={group} className="flex flex-col gap-3">
+              <h2 className="text-sm font-medium text-muted">{group}</h2>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {items.map(({ href, label, icon: Icon, blurb }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-gold/40"
+                  >
+                    <Icon className="mt-0.5 size-5 shrink-0 text-gold" aria-hidden />
+                    <div>
+                      <p className="text-sm font-medium">{label}</p>
+                      <p className="text-xs text-tertiary">{blurb}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
