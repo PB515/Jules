@@ -15,7 +15,7 @@ import { vibrate } from '@/lib/jules/haptics';
 import { AnswerGrid, type AnswerState } from '@/lib/patterns/answer-grid';
 import { leaveLiveTeamAction } from './team-actions';
 import { getQuizMilestone, MILESTONE_LABEL } from '@/lib/jules/quiz-milestones';
-import { Check, X, Crown, Trophy, Home } from '@/lib/icons';
+import { Check, X, Crown, Trophy, Home, RefreshCw } from '@/lib/icons';
 import type { Database } from '@/lib/supabase/database.types';
 
 type Round = Database['public']['Tables']['live_rounds']['Row'];
@@ -44,20 +44,53 @@ export function TeamClient({
   const [question, setQuestion] = useState<LiveQuestion | null>(null);
   const [selected, setSelected] = useState<Option | null>(null);
   const [awarded, setAwarded] = useState<number | null>(null);
+  const [answerError, setAnswerError] = useState<string | null>(null);
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
   const [leaveError, setLeaveError] = useState<string | null>(null);
   const [isLeaving, startLeave] = useTransition();
+  const [syncing, setSyncing] = useState(false);
   const supabase = useRef(createClient()).current;
+  // Mirrors `round` so applyRoundUpdate/resync can compare "did the phase or
+  // question actually change" without a stale closure over `round` — the
+  // effect that owns the realtime subscription intentionally only depends on
+  // [roundId] (see below), so anything it calls can't just close over state.
+  const roundRef = useRef(round);
+  useEffect(() => {
+    roundRef.current = round;
+  }, [round]);
   const milestone = getQuizMilestone(round.question_index, totalQuestions);
+
+  // A brief input lockout right after each new question renders. Every
+  // question renders the answer grid in the exact same 4 screen positions
+  // (AnswerGrid, decision: Kahoot-style 2x2 grid) — so a tap physically
+  // in flight for the PREVIOUS question (a "ghost tap") can land on the
+  // NEWLY rendered grid at the same coordinates the instant it appears,
+  // registering as an answer nobody consciously chose. Real-device reports
+  // showed this landing as "a new question opens with an option already
+  // ticked," worse on iPhone than Android — matching WebKit's known extra
+  // touch-to-click conversion latency, which widens exactly this race
+  // window. Locking input for a short beat after each question mount is
+  // the standard fix for this class of bug in quiz/trivia UIs.
+  const [inputReady, setInputReady] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot sync keyed to question.id changing, same pattern as the suspense/remainingSeconds effects below
+    setInputReady(false);
+    if (!question) return;
+    const t = setTimeout(() => setInputReady(true), 400);
+    return () => clearTimeout(t);
+    // Deliberately keyed on question?.id, not the whole `question` object —
+    // loadQuestion() only ever calls setQuestion with data for the id the
+    // round is currently on, so a new object reference always means a new
+    // id too; keying on the object itself would restart this lockout on
+    // every unrelated re-render that happens to produce a fresh reference.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question?.id]);
 
   function leaveTeam() {
     setLeaveError(null);
     startLeave(async () => {
-      try {
-        await leaveLiveTeamAction(roundId, teamId);
-      } catch (e) {
-        setLeaveError(e instanceof Error ? e.message : 'Something went wrong.');
-      }
+      const result = await leaveLiveTeamAction(roundId, teamId);
+      if (result.error) setLeaveError(result.error);
     });
   }
 
@@ -70,6 +103,49 @@ export function TeamClient({
     const { data } = await supabase.rpc('live_round_scoreboard', { p_round_id: roundId });
     setScoreboard(data ?? []);
   }, [supabase, roundId]);
+
+  // Shared by both the live realtime handler and resync() below, so the two
+  // paths can never apply a round update differently. Only clears the
+  // pick/award when a genuinely NEW question starts (a real phase/index
+  // change from what's currently on screen) — clearing unconditionally on
+  // every 'question' phase (the old behavior) was correct for realtime
+  // events, which only ever fire on a real change, but would wrongly wipe a
+  // valid in-progress pick if resync() re-fetches the exact same phase
+  // (e.g. a tab regaining focus mid-question with nothing having moved).
+  const applyRoundUpdate = useCallback(
+    (next: Round) => {
+      const prev = roundRef.current;
+      if (next.phase === 'question' && (prev.phase !== 'question' || next.question_index !== prev.question_index)) {
+        setSelected(null);
+        setAwarded(null);
+        setAnswerError(null);
+      }
+      setRound(next);
+      loadQuestion();
+      if (next.phase === 'reveal' || next.phase === 'leaderboard' || next.phase === 'complete') {
+        loadScoreboard();
+      }
+    },
+    [loadQuestion, loadScoreboard]
+  );
+
+  // Re-fetches the round directly from the table (RLS already allows any
+  // authenticated reader — "authenticated reads live rounds", migration
+  // 0010) rather than relying on the realtime stream having delivered every
+  // change. Supabase Realtime's postgres_changes does not replay missed
+  // events, so a phone whose WebSocket drops (screen lock, backgrounding,
+  // a flaky network switch — all common mid-quiz on a real device) can sit
+  // stuck showing a stale question/phase indefinitely even after the
+  // connection recovers, until something else happens to trigger a new
+  // event. This is called on tab/app focus and on every realtime
+  // (re)subscribe, so a dropped connection self-heals instead of requiring
+  // a full page reload.
+  const resync = useCallback(async () => {
+    setSyncing(true);
+    const { data } = await supabase.from('live_rounds').select('*').eq('id', roundId).maybeSingle();
+    if (data) applyRoundUpdate(data as Round);
+    setSyncing(false);
+  }, [supabase, roundId, applyRoundUpdate]);
 
   useEffect(() => {
     loadQuestion();
@@ -85,26 +161,30 @@ export function TeamClient({
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'live_rounds', filter: `id=eq.${roundId}` },
-        (payload) => {
-          const next = payload.new as Round;
-          setRound(next);
-          // Only clear the pick/award when a fresh question actually starts —
-          // clearing it on the question->reveal transition too would erase
-          // which option the team picked before the reveal screen can use it.
-          if (next.phase === 'question') {
-            setSelected(null);
-            setAwarded(null);
-          }
-          loadQuestion();
-          if (next.phase === 'reveal' || next.phase === 'leaderboard' || next.phase === 'complete') {
-            loadScoreboard();
-          }
-        }
+        (payload) => applyRoundUpdate(payload.new as Round)
       )
-      .subscribe();
+      .subscribe((status) => {
+        // Fires on the initial subscribe too (a harmless extra fetch,
+        // deduped by applyRoundUpdate's own no-op-if-unchanged comparison)
+        // — the real value is that Supabase's client auto-resubscribes
+        // after a dropped connection and calls this again with
+        // 'SUBSCRIBED', which is exactly the moment a stale phone needs to
+        // catch up on whatever it missed while disconnected.
+        if (status === 'SUBSCRIBED') resync();
+      });
+
+    const onFocus = () => {
+      if (document.visibilityState === 'visible') resync();
+    };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('pageshow', onFocus);
 
     return () => {
       supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('pageshow', onFocus);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundId]);
@@ -114,9 +194,13 @@ export function TeamClient({
       // Only the team captain (whoever created the team) can submit an
       // answer — submit_live_answer enforces this server-side too, but
       // checking here avoids a pointless round-trip for the common case of
-      // a teammate tapping an option on their own phone.
-      if (!isLeader || !question || selected) return;
+      // a teammate tapping an option on their own phone. !inputReady is the
+      // ghost-tap guard above — belt-and-suspenders alongside AnswerGrid's
+      // own `disabled` prop, in case a tap event somehow reaches the handler
+      // despite the button being visually disabled.
+      if (!isLeader || !question || selected || !inputReady) return;
       setSelected(opt);
+      setAnswerError(null);
       const start = performance.now();
       const { data, error } = await supabase.rpc('submit_live_answer', {
         p_round_id: roundId,
@@ -124,9 +208,21 @@ export function TeamClient({
         p_selected_option: opt,
         p_response_time_ms: Math.round(performance.now() - start) + 200,
       });
-      if (!error && data?.[0]) setAwarded(data[0].awarded);
+      if (error) {
+        // Previously left `selected` set with no feedback on a failed
+        // submission (a network blip, or the round having already moved on
+        // underneath a stale phone) — the option looked "ticked" and locked
+        // in, but the server never actually recorded an answer, so the
+        // student would see no correct/wrong feedback at reveal time and no
+        // points despite believing they'd answered. Un-tick it and say so,
+        // so they can retry instead of being silently stuck.
+        setSelected(null);
+        setAnswerError('That didn’t go through, tap your answer again.');
+        return;
+      }
+      if (data?.[0]) setAwarded(data[0].awarded);
     },
-    [isLeader, question, selected, supabase, roundId]
+    [isLeader, question, selected, inputReady, supabase, roundId]
   );
 
   const options: [Option, string][] = question
@@ -196,7 +292,22 @@ export function TeamClient({
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
       <div className="flex items-center justify-between text-xs text-accent">
         <span>Team: {teamName}</span>
-        <span className="text-gold">+{pointsPerQuestion} SP per correct answer</span>
+        <div className="flex items-center gap-3">
+          <span className="text-gold">+{pointsPerQuestion} SP per correct answer</span>
+          {/* Manual fallback alongside the automatic focus/reconnect resync
+              above — cheap insurance for the rare case a phone's screen
+              looks stuck and the student would rather tap something than
+              wait. */}
+          <button
+            type="button"
+            onClick={resync}
+            disabled={syncing}
+            aria-label="Refresh"
+            className="text-tertiary disabled:opacity-50"
+          >
+            <RefreshCw className={`size-4 ${syncing ? 'animate-spin' : ''}`} aria-hidden />
+          </button>
+        </div>
       </div>
 
       {round.phase === 'lobby' ? (
@@ -228,10 +339,10 @@ export function TeamClient({
           {!isLeader ? (
             <p className="text-center text-xs text-tertiary">Your team captain is answering for the team.</p>
           ) : null}
-          <div style={{ opacity: isLeader ? 1 : 0.6 }}>
+          <div style={{ opacity: isLeader && inputReady ? 1 : 0.6 }}>
             <AnswerGrid
               options={options}
-              disabled={!isLeader || !!selected}
+              disabled={!isLeader || !!selected || !inputReady}
               onSelect={choose}
               getState={(key): AnswerState => (selected === key ? 'selected' : 'neutral')}
             />
@@ -239,6 +350,7 @@ export function TeamClient({
           {isLeader && selected ? (
             <p className="text-center text-sm text-tertiary">Locked in, waiting for the host&hellip;</p>
           ) : null}
+          {answerError ? <p className="text-center text-sm text-accent">{answerError}</p> : null}
         </div>
       ) : null}
 

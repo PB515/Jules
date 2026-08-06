@@ -71,6 +71,7 @@ export {
   HeartHandshake,
   UserPlus,
   FileText,
+  RefreshCw,
 } from 'lucide-react';
 
 export type { LucideIcon } from 'lucide-react';

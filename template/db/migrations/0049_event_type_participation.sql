@@ -18,11 +18,18 @@
 -- created at the new 5/15 point values. Widened to (5, 10, 15) to match
 -- JOULE_BY_TYPE's new values exactly, no more and no fewer.
 --
--- Deliberately NOT retroactive: existing events' already-set joule_value
--- (10/25/50 from before this change) are left untouched — only affects
--- what a NEW event gets when created/edited going forward. Historical
--- joule_transactions.amount rows are unaffected either way, since that
--- amount was fixed at scan-time and never re-derives from the event row.
+-- CORRECTED: the first version of this migration was NOT retroactive on
+-- joule_value, on the theory that existing events' already-set amounts
+-- (10/25/50) could be left untouched. That's wrong — the new
+-- events_joule_value_check constraint only allows (5, 10, 15), so any
+-- existing row still holding 25 (expert_session) or 50 (volunteer_task)
+-- violates the new constraint the instant it's added, and `ADD CONSTRAINT`
+-- fails against real data before it ever reaches a new event. Fixed by
+-- retroactively remapping every existing event's joule_value to its type's
+-- new value, in the same up-migration, before the new constraint goes on.
+-- Historical joule_transactions.amount rows are unaffected either way,
+-- since that amount was fixed at scan-time and never re-derives from the
+-- event row.
 
 -- migrate:up
 
@@ -30,6 +37,10 @@ alter table events drop constraint if exists events_type_check;
 alter table events drop constraint if exists events_joule_value_check;
 
 update events set type = 'participation' where type = 'standard_meeting';
+
+update events set joule_value = 5 where type = 'expert_session';
+update events set joule_value = 15 where type = 'volunteer_task';
+update events set joule_value = 10 where type = 'participation';
 
 alter table events add constraint events_type_check
   check (type in ('participation', 'expert_session', 'volunteer_task', 'surge'));
@@ -42,6 +53,10 @@ alter table events drop constraint if exists events_type_check;
 alter table events drop constraint if exists events_joule_value_check;
 
 update events set type = 'standard_meeting' where type = 'participation';
+
+update events set joule_value = 25 where type = 'expert_session';
+update events set joule_value = 50 where type = 'volunteer_task';
+update events set joule_value = 10 where type = 'standard_meeting';
 
 alter table events add constraint events_type_check
   check (type in ('standard_meeting', 'expert_session', 'volunteer_task', 'surge'));

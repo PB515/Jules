@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { Crown, Check, Loader2 } from '@/lib/icons';
+import { Crown, Check, Loader2, RefreshCw } from '@/lib/icons';
 import { RevealScoreboard } from '@/lib/components/reveal-scoreboard';
 import { playSound } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
@@ -49,6 +49,7 @@ export function HostClient({
   const [scoreboard, setScoreboard] = useState<ScoreRow[]>([]);
   const [advancing, setAdvancing] = useState(false);
   const [advanceError, setAdvanceError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const supabase = useRef(createClient()).current;
 
   const refreshScoreboard = useCallback(async () => {
@@ -71,6 +72,25 @@ export function HostClient({
       .eq('round_id', initialRound.id);
     setMemberCount(count ?? 0);
   }, [supabase, initialRound.id]);
+
+  // Re-fetches the round row directly rather than relying on the realtime
+  // stream having delivered every change — Supabase's postgres_changes does
+  // not replay missed events, so a dropped WebSocket (screen lock, network
+  // switch) can leave the host screen stuck on a stale phase indefinitely.
+  // Called on tab/app focus and on every realtime (re)subscribe, same
+  // pattern as the team screen (team-client.tsx) — kept deliberately
+  // parallel so a fix to one side isn't silently missing from the other.
+  const resync = useCallback(async () => {
+    setSyncing(true);
+    const [{ data: roundData }] = await Promise.all([
+      supabase.from('live_rounds').select('*').eq('id', initialRound.id).maybeSingle(),
+      refreshTeamCount(),
+      refreshMemberCount(),
+      refreshScoreboard(),
+    ]);
+    if (roundData) setRound(roundData as Round);
+    setSyncing(false);
+  }, [supabase, initialRound.id, refreshTeamCount, refreshMemberCount, refreshScoreboard]);
 
   useEffect(() => {
     refreshTeamCount();
@@ -109,10 +129,28 @@ export function HostClient({
         { event: 'INSERT', schema: 'public', table: 'live_round_answers', filter: `round_id=eq.${initialRound.id}` },
         () => setAnsweredCount((c) => c + 1)
       )
-      .subscribe();
+      .subscribe((status) => {
+        // Fires on the initial subscribe too (redundant with the fetches
+        // above, harmless) — the real value is Supabase's client
+        // auto-resubscribing after a dropped connection and calling this
+        // again with 'SUBSCRIBED', the moment to catch up on anything
+        // missed while disconnected (e.g. answeredCount undercounting a
+        // student's answer that arrived during the gap).
+        if (status === 'SUBSCRIBED') resync();
+      });
+
+    const onFocus = () => {
+      if (document.visibilityState === 'visible') resync();
+    };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('pageshow', onFocus);
 
     return () => {
       supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('pageshow', onFocus);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialRound.id]);
@@ -164,7 +202,18 @@ export function HostClient({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 p-8 text-center">
-      <div className="text-xs uppercase tracking-[0.2em] text-accent">{surgeName} · Live Round</div>
+      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-accent">
+        {surgeName} · Live Round
+        <button
+          type="button"
+          onClick={resync}
+          disabled={syncing}
+          aria-label="Refresh"
+          className="normal-case text-tertiary disabled:opacity-50"
+        >
+          <RefreshCw className={`size-3.5 ${syncing ? 'animate-spin' : ''}`} aria-hidden />
+        </button>
+      </div>
 
       {round.phase === 'lobby' ? (
         <LobbyView roomCode={round.room_code} teamCount={teamCount} memberCount={memberCount} />

@@ -7,6 +7,7 @@
  * "team of 1" is the solo case, same as Surge groups.
  */
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { createLiveTeamAction, joinLiveTeamAction } from './team-actions';
 import { Users } from '@/lib/icons';
 
@@ -32,14 +33,11 @@ export function TeamFormationClient({
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  function run(action: () => Promise<void>) {
+  function run(action: () => Promise<{ error?: string }>) {
     setError(null);
     startTransition(async () => {
-      try {
-        await action();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Something went wrong.');
-      }
+      const result = await action();
+      if (result.error) setError(result.error);
     });
   }
 
@@ -54,7 +52,19 @@ export function TeamFormationClient({
         Whoever starts a team is its captain and answers for everyone. Other members share the team&apos;s
         points but don&apos;t answer themselves.
       </p>
-      {error ? <p className="text-sm text-accent">{error}</p> : null}
+      {error ? (
+        <div className="rounded-[var(--radius)] border border-accent/30 bg-card p-3">
+          <p className="text-sm text-accent">{error}</p>
+          {/* A student can land here mid-action if the host started the
+              round while this screen was still open (a stale page, since
+              this screen has no live subscription of its own) — the RPC's
+              own rejection is correct and now actually shown, but they
+              still need a real way forward instead of a dead-end screen. */}
+          <Link href="/live" className="mt-1 inline-block text-xs text-tertiary underline">
+            ← Back to room code
+          </Link>
+        </div>
+      ) : null}
 
       {openTeams.length > 0 ? (
         <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
@@ -91,9 +101,17 @@ export function TeamFormationClient({
               disabled={isPending || !name.trim()}
               onClick={() =>
                 run(async () => {
-                  await createLiveTeamAction(roundId, roomCode, name.trim());
-                  setCreating(false);
-                  setName('');
+                  const result = await createLiveTeamAction(roundId, roomCode, name.trim());
+                  // Only close/clear the form on success — previously did
+                  // this unconditionally, so a rejected create (e.g. the
+                  // round having already started) still closed the form on
+                  // top of showing no error at all, discarding what the
+                  // student typed for no reason.
+                  if (!result.error) {
+                    setCreating(false);
+                    setName('');
+                  }
+                  return result;
                 })
               }
               className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground disabled:opacity-60"
