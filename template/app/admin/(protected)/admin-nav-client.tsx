@@ -16,7 +16,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Menu, X } from '@/lib/icons';
+import { Menu, X, Home } from '@/lib/icons';
 import { NAV } from './admin-nav-items';
 
 export function AdminNav({ role }: { role: string }) {
@@ -25,6 +25,17 @@ export function AdminNav({ role }: { role: string }) {
 
   return (
     <nav className="flex flex-1 flex-col gap-1 p-3">
+      <Link
+        href="/admin"
+        className={`flex items-center gap-2.5 rounded-[var(--radius)] px-3 py-2 text-sm ${
+          pathname === '/admin'
+            ? 'border-l-2 border-accent bg-background text-accent'
+            : 'border-l-2 border-transparent text-muted hover:bg-background hover:text-foreground'
+        }`}
+      >
+        <Home className="size-4" aria-hidden />
+        Home
+      </Link>
       {nav.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href);
         return (
@@ -70,6 +81,18 @@ export function MobileAdminNav({ role }: { role: string }) {
       </button>
       {open ? (
         <nav className="absolute inset-x-0 top-full z-20 flex flex-col gap-1 border-b border-border bg-card p-3 shadow-lg">
+          <Link
+            href="/admin"
+            onClick={() => setOpen(false)}
+            className={`flex min-h-11 items-center gap-2.5 rounded-[var(--radius)] px-3 text-sm ${
+              pathname === '/admin'
+                ? 'border-l-2 border-accent bg-background text-accent'
+                : 'border-l-2 border-transparent text-muted hover:bg-background hover:text-foreground'
+            }`}
+          >
+            <Home className="size-4" aria-hidden />
+            Home
+          </Link>
           {nav.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (

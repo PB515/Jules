@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth/session';
 import { adminLogoutAction } from '@/app/(auth)/actions';
 import { AdminNav, MobileAdminNav } from './admin-nav-client';
@@ -11,10 +12,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <AdminSplash>
       <div className="flex min-h-screen flex-1 bg-background">
         <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card sm:flex">
-          <div className="border-b border-border px-5 py-5">
+          <Link href="/admin" className="border-b border-border px-5 py-5 hover:bg-background">
             <p className="text-xs uppercase tracking-[0.2em] text-muted">Synergy</p>
             <p className="text-sm font-medium">Reactor Command Center</p>
-          </div>
+          </Link>
           <AdminNav role={admin.role} />
           <div className="border-t border-border p-3">
             <p className="px-3 py-1 text-xs text-tertiary">{admin.name} · {admin.role}</p>
@@ -31,7 +32,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <header className="relative flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:hidden">
             <div className="flex items-center gap-1">
               <MobileAdminNav role={admin.role} />
-              <p className="text-sm font-medium">Reactor Command Center</p>
+              <Link href="/admin" className="text-sm font-medium">
+                Reactor Command Center
+              </Link>
             </div>
             <form action={adminLogoutAction}>
               <button className="text-xs text-muted">Log out</button>
