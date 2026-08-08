@@ -12,7 +12,7 @@ import type { Tables } from '@/lib/supabase/database.types';
  * charts, no month-by-month breakdown, no full-platform timeline; that's
  * Super Admin's job (the existing dense view in page.tsx, untouched).
  * Reuses getEventRegistrations()/rowsToCsv/downloadCsv, the exact same
- * data path the live Grid Station registrations dashboard already uses.
+ * data path the live registrations dashboard already uses.
  */
 export async function SimpleLedgerView({ admin, selectedEventId }: { admin: Tables<'admins'>; selectedEventId?: string }) {
   const supabase = await createClient();

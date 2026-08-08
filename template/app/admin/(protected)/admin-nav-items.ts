@@ -12,6 +12,7 @@
  */
 import {
   ScanLine,
+  Calendar,
   Zap,
   BarChart3,
   Users,
@@ -43,11 +44,19 @@ export const GROUP_ORDER: readonly AdminNavGroup[] = ['Events', 'Quizzes', 'Repo
 export const NAV: readonly AdminNavItem[] = [
   {
     href: '/admin/grid',
-    label: 'Grid Station',
+    label: 'Event Creation',
+    icon: Calendar,
+    roles: ['professor', 'committee_member', 'super_admin'],
+    group: 'Events',
+    blurb: 'Create and edit events',
+  },
+  {
+    href: '/admin/attendance',
+    label: 'Attendance',
     icon: ScanLine,
     roles: ['professor', 'committee_member', 'super_admin'],
     group: 'Events',
-    blurb: 'Scan attendance, see who checked in',
+    blurb: "Start attendance, share the link with whoever's running it",
   },
   {
     href: '/admin/updates',

@@ -1,22 +1,23 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
-import { HomeAttendanceList, type AttendanceEventRow } from './home-attendance-list';
 import { NAV, GROUP_ORDER } from './admin-nav-items';
 
 export const metadata = { title: 'Home' };
 
 /**
  * Real admin home screen, replacing the old bare role-based redirect
- * (`/admin/grid` or `/admin/ledger`) — needed as somewhere to surface
- * "Start attendance" prompts now that attendance is decoupled from
- * event_date (0050) and started on demand instead of pre-scheduled.
- *
- * Below the attendance widget, every other admin page is reachable as a
+ * (`/admin/grid` or `/admin/ledger`). Every admin page is reachable as a
  * grouped task tile — same NAV data the sidebar renders flat, grouped here
  * into task clusters (Events/Quizzes/Reports & Data/Admin/App), per the
- * user's own "guided, but nothing locked behind a wizard" preference. The
- * sidebar itself stays exactly as it was, unchanged, by request.
+ * user's own "guided, but nothing locked behind a wizard" preference.
+ *
+ * Attendance is just one tile among the others now (not a separate
+ * inline list up top) — with 5+ events needing action, a full list here
+ * would ruin the clean tile layout. Its blurb is the one dynamic piece:
+ * a live count, so there's still a glance-able signal without listing
+ * every event. Opening the tile goes to the real Attendance page
+ * (/admin/attendance), which lists everything, upcoming and past.
  */
 export default async function AdminHomePage() {
   const admin = await requireAdmin();
@@ -24,44 +25,22 @@ export default async function AdminHomePage() {
 
   let query = supabase
     .from('events')
-    .select('id, name, event_date, club_id, attendance_opens_at, attendance_closes_at')
+    .select('event_date, attendance_closes_at')
     .neq('type', 'surge')
-    .order('event_date', { ascending: true })
-    .limit(30);
+    .limit(200);
   if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {
     query = query.eq('club_id', admin.club_id);
   }
-  const { data: allEvents } = await query;
-
-  const isSuperAdmin = admin.role === 'super_admin';
-  const clubNameById = new Map<string, string>();
-  if (isSuperAdmin && allEvents && allEvents.length > 0) {
-    const { data: clubs } = await supabase.from('clubs').select('id, name');
-    for (const c of clubs ?? []) clubNameById.set(c.id, c.name);
-  }
-
-  const events: AttendanceEventRow[] = (allEvents ?? [])
-    .filter(isAttendanceActionable)
-    .map((e) => ({
-      id: e.id,
-      name: e.name,
-      event_date: e.event_date,
-      clubName: isSuperAdmin ? (clubNameById.get(e.club_id) ?? null) : null,
-      attendance_opens_at: e.attendance_opens_at,
-      attendance_closes_at: e.attendance_closes_at,
-    }));
+  const { data: events } = await query;
+  const actionableCount = (events ?? []).filter(isAttendanceActionable).length;
+  const attendanceBlurb =
+    actionableCount === 0
+      ? "All caught up, nothing needs starting"
+      : `${actionableCount} event${actionableCount === 1 ? '' : 's'} need${actionableCount === 1 ? 's' : ''} starting`;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
-      <div className="flex flex-col gap-3">
-        <div>
-          <h1 className="text-lg font-medium">Attendance</h1>
-          <p className="text-sm text-muted">
-            Events waiting for attendance to be started, or with it open right now.
-          </p>
-        </div>
-        <HomeAttendanceList events={events} showClub={isSuperAdmin} />
-      </div>
+      <h1 className="text-lg font-medium">Home</h1>
 
       <div className="flex flex-col gap-6">
         {GROUP_ORDER.map((group) => {
@@ -80,7 +59,7 @@ export default async function AdminHomePage() {
                     <Icon className="mt-0.5 size-5 shrink-0 text-gold" aria-hidden />
                     <div>
                       <p className="text-sm font-medium">{label}</p>
-                      <p className="text-xs text-tertiary">{blurb}</p>
+                      <p className="text-xs text-tertiary">{href === '/admin/attendance' ? attendanceBlurb : blurb}</p>
                     </div>
                   </Link>
                 ))}
@@ -93,16 +72,12 @@ export default async function AdminHomePage() {
   );
 }
 
-// A row stays on the home screen while it's still actionable: currently
-// open, or never started and not yet stale. Once attendance_closes_at
-// passes, it's done — that belongs in Ledger/Reports, not an action list.
+// Matches the same "still actionable" definition the Attendance page's own
+// list uses: currently open, or never started and not yet stale.
 function isAttendanceActionable(e: { attendance_closes_at: string | null; event_date: string }): boolean {
   const closesMs = e.attendance_closes_at ? new Date(e.attendance_closes_at).getTime() : null;
   const now = Date.now();
   if (closesMs !== null) return closesMs > now;
-  // Never started — still actionable unless it's genuinely stale (a
-  // reasonable 3-day grace for "forgot to start it," not an unbounded dump
-  // of every event that's ever existed).
   const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
   return new Date(e.event_date).getTime() >= threeDaysAgo;
 }

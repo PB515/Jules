@@ -10,7 +10,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ even
 
   const { data: event } = await supabase.from('events').select('*').eq('id', eventId).maybeSingle();
   if (!event) notFound();
-  // Same club-scoping as the Grid Station list itself — a club-scoped
+  // Same club-scoping as the Event Creation list itself — a club-scoped
   // Professor or Committee Member editing a URL for another club's event
   // should not see it.
   if (

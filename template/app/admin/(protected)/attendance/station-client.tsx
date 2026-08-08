@@ -1,9 +1,14 @@
 'use client';
 /**
- * Dynamic Grid Management / QR Scan Station (spec §7). The token rotates every
- * 90s (0004_jules_functions.sql, deterministic HMAC — no stored/mutable
- * column). This client polls for the current token + live metrics every 5s so
- * the display always shows a fresh, redeemable code without a full reload.
+ * The QR Scan Station (spec §7) — lives on its own dedicated Attendance page
+ * now, separate from Event Creation, specifically so each event has its own
+ * real, shareable URL (`/admin/attendance?event=<id>`): the admin managing
+ * the whole site opens the right event here and copies that link straight
+ * to whichever professor or committee member is actually running it — they
+ * open it and press Start themselves. The token rotates every 90s
+ * (0004_jules_functions.sql, deterministic HMAC — no stored/mutable column).
+ * This client polls for the current token + live metrics every 5s so the
+ * display always shows a fresh, redeemable code without a full reload.
  *
  * Attendance is decoupled from event_date (0050) — the scan window opens
  * only once someone actually presses "Start attendance," for a configurable

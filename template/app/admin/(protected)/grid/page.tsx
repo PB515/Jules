@@ -2,23 +2,21 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { ScanLine, Plus, Pencil, Users } from '@/lib/icons';
-import { StationClient } from './station-client';
-import { EventPicker } from './event-picker';
+import { Calendar, Plus, Pencil, Users, ScanLine } from '@/lib/icons';
+import { EventPicker } from '../event-picker';
 
-export const metadata = { title: 'Grid Station' };
+export const metadata = { title: 'Event Creation' };
 
-export default async function GridStationPage({
+/**
+ * Event Creation — create/edit events and see who's registered. The actual
+ * QR/Start-attendance flow lives on its own dedicated page now
+ * (`/admin/attendance`), so this page's job is purely what its name says.
+ */
+export default async function EventCreationPage({
   searchParams,
 }: {
   searchParams: Promise<{ event?: string }>;
 }) {
-  // Attendance is started and run on demand now (0050) — the committee
-  // member/professor actually present at the event presses Start, not a
-  // pre-scheduled window — so the real-world operator is a Committee
-  // Member, not a Professor. All three tiers can reach the scan panel;
-  // scoping to the caller's own club is still enforced server-side via
-  // can_manage_event() on every RPC this panel calls.
   const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
   const { event: eventParam } = await searchParams;
   const supabase = await createClient();
@@ -27,7 +25,7 @@ export default async function GridStationPage({
   // club's events here; a Super Admin sees every club's.
   let query = supabase
     .from('events')
-    .select('id, name, type, event_date, end_date, joule_value, attendance_duration_minutes, attendance_opens_at, attendance_closes_at')
+    .select('id, name, type, event_date, end_date')
     .neq('type', 'surge')
     .order('event_date', { ascending: false })
     .limit(60);
@@ -36,18 +34,17 @@ export default async function GridStationPage({
   }
   const { data: allEvents } = await query;
 
-  // Once an event has concluded there's nothing left to scan for — with 50-60
-  // real events on the calendar, leaving them all in this picker forever makes
-  // finding the one that's actually active or upcoming impractical. The data
-  // itself is untouched; this only narrows what the Scan Station's own picker
-  // shows (same "concluded" definition the student Dashboard already uses).
+  // Once an event has concluded there's nothing left to edit that matters
+  // day-to-day — with 50-60 real events on the calendar, leaving them all
+  // in this picker forever makes finding the one that's actually upcoming
+  // impractical. The data itself is untouched; this only narrows the picker.
   const events = (allEvents ?? []).filter((e) => !hasConcluded(e.end_date ?? e.event_date));
 
   if (events.length === 0) {
     return (
       <div className="p-6">
         <EmptyState
-          icon={ScanLine}
+          icon={Calendar}
           title={allEvents && allEvents.length > 0 ? 'No active or upcoming events' : 'No events yet'}
           message={allEvents && allEvents.length > 0 ? 'Every event on the calendar has already concluded.' : undefined}
           action={
@@ -65,7 +62,7 @@ export default async function GridStationPage({
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4 p-6">
       <div className="flex items-center justify-between gap-3">
-        <EventPicker events={events} selected={selected.id} />
+        <EventPicker events={events} selected={selected.id} basePath="/admin/grid" />
         <Link
           href={`/admin/grid/${selected.id}/edit`}
           className="flex shrink-0 items-center gap-1 rounded-[var(--radius)] border border-border px-3 py-2 text-xs text-muted hover:text-gold"
@@ -88,15 +85,13 @@ export default async function GridStationPage({
           New
         </Link>
       </div>
-      <StationClient
-        key={selected.id}
-        eventId={selected.id}
-        eventName={selected.name}
-        jouleValue={selected.joule_value}
-        attendanceDurationMinutes={selected.attendance_duration_minutes}
-        attendanceOpensAt={selected.attendance_opens_at}
-        attendanceClosesAt={selected.attendance_closes_at}
-      />
+      <Link
+        href={`/admin/attendance?event=${selected.id}`}
+        className="flex items-center justify-center gap-2 rounded-[var(--radius)] bg-gold py-2.5 text-sm font-medium text-gold-foreground"
+      >
+        <ScanLine className="size-4" aria-hidden />
+        Go to Attendance for this event
+      </Link>
     </div>
   );
 }
