@@ -67,7 +67,7 @@ export function RevealScoreboard({ rows, scale = 'full' }: { rows: RevealRow[]; 
               {row.rank === 1 ? <Crown className="size-4 text-gold" aria-hidden /> : <span className="w-4 text-tertiary">{row.rank}</span>}
               {row.label}
             </span>
-            <span className="text-sm text-gold">{row.amount} J</span>
+            <span className="text-sm text-gold">{row.amount} SP</span>
           </div>
         );
         return row.rank === 1 ? (

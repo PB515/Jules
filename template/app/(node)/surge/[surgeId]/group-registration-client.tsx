@@ -63,7 +63,10 @@ export function GroupRegistrationClient({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-muted">Playing solo right now. Team up, or just wait here.</p>
+      <p className="text-sm text-muted">
+        Playing solo right now. Team up, or just wait here. Everyone answers on their own device, and the group&apos;s
+        total is split once the Surge closes.
+      </p>
       {error ? <p className="text-sm text-accent">{error}</p> : null}
 
       {openGroups.length > 0 ? (

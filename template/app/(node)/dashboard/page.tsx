@@ -115,8 +115,13 @@ export default async function DashboardPage() {
   const litCount = activitySummary.attendance.attended + activitySummary.soloQuizCount + activitySummary.groupQuizCount;
 
   const registeredEventIds = new Set((registrations ?? []).map((r) => r.event_id));
+  // Excludes anything already registered — otherwise a signed-up event shows
+  // up twice on the page, once here and again under "My registered events,"
+  // both reading "Registered" with no explanation of why there are two
+  // lists. This way each section has one clear job: here is what you
+  // haven't acted on yet, the other is what you've already committed to.
   const upcomingEvents = (candidateEvents ?? [])
-    .filter((e) => !hasConcluded(e.end_date ?? e.event_date))
+    .filter((e) => !hasConcluded(e.end_date ?? e.event_date) && !registeredEventIds.has(e.id))
     .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
     .slice(0, 6);
 
@@ -250,25 +255,22 @@ export default async function DashboardPage() {
           <EmptyState icon={Calendar} title="Nothing on the calendar yet" />
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
-            {upcomingEvents.map((e) => {
-              const registered = registeredEventIds.has(e.id);
-              return (
-                <li key={e.id}>
-                  <Link href={`/events/${e.id}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-background">
-                    <div className="min-w-0">
-                      <p className="truncate">{e.name}</p>
-                      <p className="text-xs text-tertiary">
-                        {formatDateUTC(e.event_date)} <span className="font-medium text-accent">{formatTimeUTC(e.event_date)}</span>
-                      </p>
-                    </div>
-                    <span className="flex shrink-0 items-center gap-1 text-xs text-muted">
-                      {registered ? 'Registered' : 'View & register'}
-                      <ChevronRight className="size-3.5" aria-hidden />
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
+            {upcomingEvents.map((e) => (
+              <li key={e.id}>
+                <Link href={`/events/${e.id}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-background">
+                  <div className="min-w-0">
+                    <p className="truncate">{e.name}</p>
+                    <p className="text-xs text-tertiary">
+                      {formatDateUTC(e.event_date)} <span className="font-medium text-accent">{formatTimeUTC(e.event_date)}</span>
+                    </p>
+                  </div>
+                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted">
+                    View & register
+                    <ChevronRight className="size-3.5" aria-hidden />
+                  </span>
+                </Link>
+              </li>
+            ))}
           </ul>
         )}
       </section>
@@ -333,7 +335,7 @@ export default async function DashboardPage() {
                   </div>
                   <span className={`font-medium ${row.amount >= 0 ? 'text-gold' : 'text-accent'}`}>
                     {row.amount >= 0 ? '+' : ''}
-                    {row.amount} J
+                    {row.amount} SP
                   </span>
                 </li>
               );

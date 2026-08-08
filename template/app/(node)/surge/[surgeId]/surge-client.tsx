@@ -17,14 +17,24 @@ type Option = 'A' | 'B' | 'C' | 'D';
 
 type Phase = 'answering' | 'revealed' | 'expired';
 
-export function SurgeClient({ surgeId, questions }: { surgeId: string; questions: Question[] }) {
+export function SurgeClient({
+  surgeId,
+  questions,
+  groupName,
+}: {
+  surgeId: string;
+  questions: Question[];
+  groupName?: string | null;
+}) {
   const router = useRouter();
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('answering');
   const [selected, setSelected] = useState<Option | null>(null);
   const [correctOption, setCorrectOption] = useState<Option | null>(null);
+  const [wasCorrect, setWasCorrect] = useState(false);
   const [awarded, setAwarded] = useState(0);
   const [totalAwarded, setTotalAwarded] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [questionKey, setQuestionKey] = useState(0); // forces EnergyBar remount per question
 
   const q = questions[index];
@@ -70,8 +80,10 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
 
       if (!error && data?.[0]) {
         setCorrectOption(data[0].correct_option);
+        setWasCorrect(data[0].correct);
         setAwarded(data[0].awarded);
         setTotalAwarded((t) => t + data[0].awarded);
+        if (data[0].correct) setCorrectCount((c) => c + 1);
       }
       setTimeout(advance, 1100);
     },
@@ -91,11 +103,19 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
       <div className="flex items-center justify-between text-xs text-tertiary">
         <span>
           Question {index + 1} / {questions.length}
+          {groupName ? <span className="ml-2 text-gold">· Playing with: {groupName}</span> : null}
         </span>
-        <span className={totalAwarded >= 0 ? 'text-gold' : 'text-accent'}>
-          {totalAwarded >= 0 ? '+' : ''}
-          {totalAwarded} SP so far
-        </span>
+        {groupName ? (
+          // A group's points are pooled and split once the Surge closes, not
+          // credited per-answer — showing a running "+X SP" total here would
+          // imply a guaranteed personal payout that isn't real yet.
+          <span className="text-gold">{correctCount} correct so far</span>
+        ) : (
+          <span className={totalAwarded >= 0 ? 'text-gold' : 'text-accent'}>
+            {totalAwarded >= 0 ? '+' : ''}
+            {totalAwarded} SP so far
+          </span>
+        )}
       </div>
 
       <EnergyBar key={questionKey} totalSeconds={q.time_limit_seconds} running={phase === 'answering'} onExpire={onExpire} />
@@ -121,10 +141,13 @@ export function SurgeClient({ surgeId, questions }: { surgeId: string; questions
       />
 
       {phase === 'expired' ? <p className="text-center text-sm text-tertiary">Time&apos;s up</p> : null}
-      {phase === 'revealed' && awarded !== 0 ? (
+      {phase === 'revealed' && groupName ? (
+        <p className={`text-center text-sm ${wasCorrect ? 'text-success' : 'text-accent'}`}>{wasCorrect ? 'Correct' : 'Not quite'}</p>
+      ) : null}
+      {phase === 'revealed' && !groupName && awarded !== 0 ? (
         <p className={`text-center text-sm ${awarded > 0 ? 'text-success' : 'text-accent'}`}>
           {awarded > 0 ? '+' : ''}
-          {awarded} J
+          {awarded} SP
         </p>
       ) : null}
     </div>

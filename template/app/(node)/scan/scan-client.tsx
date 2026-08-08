@@ -104,6 +104,21 @@ export function ScanClient({
     );
   }
 
+  // A student who opens the deep link from their phone's own camera app
+  // never clicks anything here — redeem() fires automatically on mount
+  // (the effect above). Without this branch the screen looked identical to
+  // "you haven't scanned anything yet" for however long the location
+  // lookup takes (up to ~4s), which reads as the scan having silently
+  // failed to register at all.
+  if (result.state === 'redeeming' && initialEventId && initialToken) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center">
+        <ScanLine className="size-10 animate-pulse text-gold" aria-hidden />
+        <p className="text-sm text-muted">Checking you in…</p>
+      </div>
+    );
+  }
+
   if (cameraOpen) {
     return (
       <div className="flex flex-col gap-5">
@@ -167,7 +182,7 @@ export function ScanClient({
               <option value="">Select event…</option>
               {events.map((ev) => (
                 <option key={ev.id} value={ev.id}>
-                  {ev.name} ({ev.joule_value}J)
+                  {ev.name} ({ev.joule_value} SP)
                 </option>
               ))}
             </select>

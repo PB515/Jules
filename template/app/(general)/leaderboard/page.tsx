@@ -88,7 +88,7 @@ export default async function LeaderboardPage({
                     <span className="text-sm">{row.name}</span>
                   </div>
                   <span className={`text-sm font-medium ${isFirst ? 'text-adani-gradient font-semibold' : 'text-gold'}`}>
-                    {row.total_amount} J
+                    {row.total_amount} SP
                   </span>
                 </li>
               );

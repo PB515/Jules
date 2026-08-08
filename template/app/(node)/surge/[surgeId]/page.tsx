@@ -50,11 +50,27 @@ export default async function SurgePage({ params }: { params: Promise<{ surgeId:
 
     return (
       <div className="flex flex-col gap-6 px-5 pt-8">
-        <EmptyState icon={Zap} title="Not live yet" message="This Surge hasn't started. Check back when it goes live." />
+        {/* Deliberately not the generic EmptyState pattern here — that
+            reads as "there's nothing to do on this screen," which
+            contradicts the fully interactive group form right below it. */}
+        <p className="text-sm text-muted">Starts once the host opens it. Team up below while you wait.</p>
         <GroupRegistrationClient surgeId={surgeId} myGroup={myGroup} openGroups={openGroups} />
       </div>
     );
   }
+
+  // So the live-play screen can show "Playing with: X" the same way Live
+  // Round's team-client.tsx always does — without this, a group member had
+  // no on-screen reminder they weren't playing solo (see group-registration-
+  // client.tsx for the equivalent pre-start indicator).
+  const { data: myGroupMembership } = await supabase
+    .from('quiz_group_members')
+    .select('quiz_groups(name)')
+    .eq('surge_id', surgeId)
+    .eq('student_id', student.id)
+    .returns<{ quiz_groups: { name: string } | null }[]>()
+    .maybeSingle();
+  const groupName = myGroupMembership?.quiz_groups?.name ?? null;
 
   // Pre-fetch the full question set ONCE (spec §11) — never per-question polling.
   const { data: questions, error } = await supabase.rpc('start_surge', { p_surge_id: surgeId });
@@ -77,7 +93,7 @@ export default async function SurgePage({ params }: { params: Promise<{ surgeId:
 
   return (
     <div className="flex flex-1 flex-col px-5 pt-8">
-      <SurgeClient surgeId={surgeId} questions={unanswered} />
+      <SurgeClient surgeId={surgeId} questions={unanswered} groupName={groupName} />
     </div>
   );
 }
