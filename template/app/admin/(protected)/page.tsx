@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/session';
-import { NAV, GROUP_ORDER } from './admin-nav-items';
+import { ArrowRight } from '@/lib/icons';
+import { NAV, GROUP_ORDER, type AdminNavItem } from './admin-nav-items';
 
 export const metadata = { title: 'Home' };
 
@@ -18,7 +19,19 @@ export const metadata = { title: 'Home' };
  * a live count, so there's still a glance-able signal without listing
  * every event. Opening the tile goes to the real Attendance page
  * (/admin/attendance), which lists everything, upcoming and past.
+ *
+ * "How it works" (below) exists because the tile grid alone doesn't
+ * convey sequence — a Committee Member new to the app can't tell that
+ * Attendance and Event Reports are downstream of Event Creation just by
+ * scanning a grid. Each flow only renders if every one of its steps is
+ * actually reachable by the signed-in role (a Committee Member never
+ * sees the quiz-hosting flow, since Live Round is staff-only, decision 81).
  */
+const FLOWS: { title: string; steps: readonly string[] }[] = [
+  { title: 'Running an event', steps: ['/admin/grid', '/admin/attendance', '/admin/event-reports'] },
+  { title: 'Running a quiz', steps: ['/admin/surges', '/admin/live/new'] },
+];
+
 export default async function AdminHomePage() {
   const admin = await requireAdmin();
   const supabase = await createClient();
@@ -38,9 +51,48 @@ export default async function AdminHomePage() {
       ? "All caught up, nothing needs starting"
       : `${actionableCount} event${actionableCount === 1 ? '' : 's'} need${actionableCount === 1 ? 's' : ''} starting`;
 
+  const flows = FLOWS.map((flow) => {
+    const steps: AdminNavItem[] = [];
+    for (const href of flow.steps) {
+      const item = NAV.find((n) => n.href === href);
+      if (!item || !item.roles.includes(admin.role)) break;
+      steps.push(item);
+    }
+    return { title: flow.title, steps, complete: steps.length === flow.steps.length };
+  }).filter((flow) => flow.complete);
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
       <h1 className="text-lg font-medium">Home</h1>
+
+      {flows.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-muted">How it works</h2>
+          <div className="flex flex-col gap-3">
+            {flows.map((flow) => (
+              <div key={flow.title} className="rounded-2xl border border-border bg-card p-4">
+                <p className="mb-3 text-xs font-medium text-tertiary">{flow.title}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {flow.steps.map((step, i) => (
+                    <div key={step.href} className="flex items-center gap-2">
+                      <Link
+                        href={step.href}
+                        className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium transition-colors hover:border-gold/40"
+                      >
+                        <step.icon className="size-3.5 text-gold" aria-hidden />
+                        {step.label}
+                      </Link>
+                      {i < flow.steps.length - 1 && (
+                        <ArrowRight className="size-3.5 shrink-0 text-tertiary" aria-hidden />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
         {GROUP_ORDER.map((group) => {

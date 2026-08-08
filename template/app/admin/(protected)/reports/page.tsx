@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/auth/session';
 import { ScopePicker } from './scope-picker';
 import { ReportButtons } from './report-buttons';
 
-export const metadata = { title: 'Reports' };
+export const metadata = { title: 'Data Exports' };
 
 /**
  * The actual gap against the Dean's stated top priority — row-level,
@@ -29,7 +29,7 @@ export default async function ReportsPage({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <div>
-        <h1 className="text-lg font-medium">Reports</h1>
+        <h1 className="text-lg font-medium">Data Exports</h1>
         <p className="mt-1 text-xs text-tertiary">
           Row-level CSV exports, ready to drop into Excel or Power BI, one file per table, not one pre-aggregated
           sheet.

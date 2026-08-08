@@ -111,7 +111,7 @@ export const NAV: readonly AdminNavItem[] = [
   },
   {
     href: '/admin/reports',
-    label: 'Reports',
+    label: 'Data Exports',
     icon: FileText,
     roles: ['professor', 'committee_member', 'super_admin'],
     group: 'Reports & Data',
