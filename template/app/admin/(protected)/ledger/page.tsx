@@ -7,7 +7,7 @@ import { ClubEngagementChart } from './club-engagement-chart';
 import { SimpleLedgerView } from './simple-ledger-view';
 import { Users, Trophy, Calendar, Zap } from '@/lib/icons';
 
-export const metadata = { title: 'System Ledger' };
+export const metadata = { title: 'Attendance & Points' };
 
 export default async function LedgerPage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
   const admin = await requireAdmin(['professor', 'committee_member', 'super_admin']);
@@ -48,7 +48,7 @@ export default async function LedgerPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
-      <h1 className="text-lg font-medium">System Ledger</h1>
+      <h1 className="text-lg font-medium">Attendance & Points</h1>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <SummaryCard icon={Users} label="Students" value={summary.total_students} />

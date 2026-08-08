@@ -31,7 +31,9 @@ export type AuditAction =
   | 'gallery_upload'
   | 'live_round_create'
   | 'event_update_sent'
-  | 'attendance_start';
+  | 'attendance_start'
+  | 'operator_link_created'
+  | 'operator_link_reset';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
 export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
@@ -111,6 +113,7 @@ export interface Database {
           registration_form_url: string | null; cover_image_path: string | null;
           attendance_duration_minutes: number;
           attendance_opens_at: string | null; attendance_closes_at: string | null;
+          operator_token: string | null;
           created_by: string | null; created_at: string;
         };
         Insert: {
@@ -120,6 +123,7 @@ export interface Database {
           registration_form_url?: string | null; cover_image_path?: string | null;
           attendance_duration_minutes?: number;
           attendance_opens_at?: string | null; attendance_closes_at?: string | null;
+          operator_token?: string | null;
           created_by?: string | null; created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['events']['Insert']>;
@@ -219,6 +223,7 @@ export interface Database {
         Row: {
           id: string; surge_id: string; room_code: string; phase: LivePhase;
           question_index: number; question_started_at: string | null;
+          operator_token: string | null;
           created_by: string; created_at: string;
         };
         Insert: never; // only via host_create_round()
@@ -382,18 +387,41 @@ export interface Database {
         Returns: Database['public']['Tables']['event_registrations']['Row'];
       };
       unregister_from_event: { Args: { p_event_id: string }; Returns: undefined };
-      current_qr_token: { Args: { p_event_id: string }; Returns: { token: string; expires_at: string }[] };
-      event_scan_metrics: { Args: { p_event_id: string }; Returns: { students_scanned: number; joules_distributed: number }[] };
+      current_qr_token: { Args: { p_event_id: string; p_token?: string | null }; Returns: { token: string; expires_at: string }[] };
+      event_scan_metrics: {
+        Args: { p_event_id: string; p_token?: string | null };
+        Returns: { students_scanned: number; joules_distributed: number }[];
+      };
       event_recent_scans: {
-        Args: { p_event_id: string; p_limit?: number };
+        Args: { p_event_id: string; p_limit?: number; p_token?: string | null };
         Returns: { student_name: string; amount: number; flagged_geofence: boolean; created_at: string }[];
+      };
+      ensure_event_operator_token: { Args: { p_event_id: string }; Returns: string };
+      reset_event_operator_token: { Args: { p_event_id: string }; Returns: string };
+      ensure_round_operator_token: { Args: { p_round_id: string }; Returns: string };
+      reset_round_operator_token: { Args: { p_round_id: string }; Returns: string };
+      get_event_for_operator: {
+        Args: { p_event_id: string; p_token: string };
+        Returns: {
+          name: string; joule_value: number | null;
+          attendance_duration_minutes: number; attendance_opens_at: string | null; attendance_closes_at: string | null;
+        }[];
+      };
+      get_round_for_operator: {
+        Args: { p_round_id: string; p_token: string };
+        Returns: {
+          round_id: string; room_code: string; phase: LivePhase; question_index: number; question_started_at: string | null;
+          surge_name: string; points_per_question: number;
+          question_id: string; question_text: string; option_a: string; option_b: string; option_c: string; option_d: string;
+          correct_option: SurgeOption | null; time_limit_seconds: number; order_index: number;
+        }[];
       };
       redeem_event_scan: {
         Args: { p_event_id: string; p_token: string; p_lat?: number | null; p_lng?: number | null };
         Returns: { amount: number; season_joules: number; tier: Tier; flagged_geofence: boolean }[];
       };
       start_event_attendance: {
-        Args: { p_event_id: string; p_duration_minutes?: number | null };
+        Args: { p_event_id: string; p_duration_minutes?: number | null; p_token?: string | null };
         Returns: { attendance_opens_at: string; attendance_closes_at: string }[];
       };
       start_surge: {
@@ -472,15 +500,18 @@ export interface Database {
         Returns: Database['public']['Tables']['live_round_team_members']['Row'];
       };
       leave_live_team: { Args: { p_team_id: string }; Returns: undefined };
-      complete_live_round: { Args: { p_round_id: string }; Returns: undefined };
-      host_advance_round: { Args: { p_round_id: string }; Returns: Database['public']['Tables']['live_rounds']['Row'] };
+      complete_live_round: { Args: { p_round_id: string; p_token?: string | null }; Returns: undefined };
+      host_advance_round: {
+        Args: { p_round_id: string; p_token?: string | null };
+        Returns: Database['public']['Tables']['live_rounds']['Row'];
+      };
       submit_live_answer: {
         Args: { p_round_id: string; p_question_id: string; p_selected_option: string; p_response_time_ms?: number | null };
         Returns: { correct: boolean; correct_option: SurgeOption; awarded: number }[];
       };
       live_round_scoreboard: {
-        Args: { p_round_id: string };
-        Returns: { team_id: string; team_name: string; total_amount: number; rank: number }[];
+        Args: { p_round_id: string; p_token?: string | null };
+        Returns: { team_id: string; team_name: string; total_amount: number; rank: number; team_count: number; member_count: number }[];
       };
       live_round_question: {
         Args: { p_round_id: string };

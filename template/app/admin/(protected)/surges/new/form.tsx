@@ -10,11 +10,11 @@ export function NewSurgeForm({ clubs }: { clubs: { id: string; name: string }[] 
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-6 text-lg font-medium">New Surge</h1>
+      <h1 className="mb-6 text-lg font-medium">New Quiz</h1>
       <form action={formAction} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Name</span>
-          <input name="name" className="input" placeholder="Winter Surge 2026" required />
+          <input name="name" className="input" placeholder="Winter Quiz 2026" required />
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Club</span>
@@ -45,7 +45,7 @@ export function NewSurgeForm({ clubs }: { clubs: { id: string; name: string }[] 
           disabled={pending}
           className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
         >
-          {pending ? 'Creating…' : 'Create Surge'}
+          {pending ? 'Creating…' : 'Create Quiz'}
         </button>
       </form>
     </div>

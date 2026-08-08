@@ -1,44 +1,21 @@
 'use client';
 /**
- * The QR Scan Station (spec §7) — lives on its own dedicated Attendance page
- * now, separate from Event Creation, specifically so each event has its own
- * real, shareable URL (`/admin/attendance?event=<id>`): the admin managing
- * the whole site opens the right event here and copies that link straight
- * to whichever professor or committee member is actually running it — they
- * open it and press Start themselves. The token rotates every 90s
- * (0004_jules_functions.sql, deterministic HMAC — no stored/mutable column).
- * This client polls for the current token + live metrics every 5s so the
- * display always shows a fresh, redeemable code without a full reload.
- *
- * Attendance is decoupled from event_date (0050) — the scan window opens
- * only once someone actually presses "Start attendance," for a configurable
- * duration, independent of the event's scheduled time. This is the fix for
- * real events running late: the window opens whenever the room actually
- * fills up, not whenever the calendar said it would.
- *
- * Renders a real scannable QR (react-qr-code, decision 43) alongside the
- * text code + copy link, which stay as the manual/accessible fallback. The
- * QR itself is kept standard black-on-white (not theme-colored) — real-world
- * scan reliability across random phone cameras and lighting matters more
- * here than matching the dark UI around it.
+ * No-login twin of station-client.tsx — same "Start attendance" flow, same
+ * 5s poll, same rotating check-in code, but authorized purely by the
+ * `token` prop (a long random secret from events.operator_token) instead
+ * of an admin session. Every RPC call below passes p_token; the RPCs
+ * themselves accept it as an OR'd alternative to the normal
+ * can_manage_event() session check (0051_operator_links.sql). Deliberately
+ * bare — no sidebar, no nav, no "Copy host link" (this already is the host
+ * link) — just event name, Start/Restart, live metrics, recent scans.
  */
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
 import { EmptyState } from '@/lib/patterns/empty-state';
-import { HeroClip } from '@/lib/components/hero-clip';
 import { EnergyBar } from '@/lib/components/energy-bar';
 import { Check, ShieldAlert, ScanLine, Play } from '@/lib/icons';
 import QRCode from 'react-qr-code';
-
-interface Props {
-  eventId: string;
-  eventName: string;
-  jouleValue: number | null;
-  attendanceDurationMinutes: number;
-  attendanceOpensAt: string | null;
-  attendanceClosesAt: string | null;
-}
 
 interface RecentScan {
   student_name: string;
@@ -49,57 +26,53 @@ interface RecentScan {
 
 const DURATION_PRESETS = [15, 20, 30, 45, 60];
 
-export function StationClient({
-  eventId,
-  eventName,
-  jouleValue,
-  attendanceDurationMinutes,
-  attendanceOpensAt,
-  attendanceClosesAt,
-}: Props) {
-  const [token, setToken] = useState<string | null>(null);
+export function OperatorStationClient({ eventId, token }: { eventId: string; token: string }) {
+  const [eventName, setEventName] = useState<string | null>(null);
+  const [jouleValue, setJouleValue] = useState<number | null>(null);
+  const [notFound, setNotFound] = useState(false);
+
+  const [qrToken, setQrToken] = useState<string | null>(null);
   const [metrics, setMetrics] = useState({ students_scanned: 0, joules_distributed: 0 });
   const [recent, setRecent] = useState<RecentScan[]>([]);
   const [copied, setCopied] = useState(false);
-  const [hostLinkCopied, setHostLinkCopied] = useState(false);
-  const [hostLinkError, setHostLinkError] = useState<string | null>(null);
 
-  const [opensAt, setOpensAt] = useState(attendanceOpensAt);
-  const [closesAt, setClosesAt] = useState(attendanceClosesAt);
-  const [duration, setDuration] = useState(attendanceDurationMinutes);
+  const [opensAt, setOpensAt] = useState<string | null>(null);
+  const [closesAt, setClosesAt] = useState<string | null>(null);
+  const [duration, setDuration] = useState(20);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
-  // Starts at 0, not Date.now() (keeps the component body pure) — the clock
-  // interval below (started with no synchronous setState call, matching this
-  // component's own established pattern) sets a real value within the first
-  // tick.
   const [now, setNow] = useState(0);
 
-  // The parent (grid/page.tsx) remounts this component via `key={eventId}`
-  // when a different event is picked, so `opensAt`/`closesAt`/`duration`
-  // above are always fresh from that event's own server-fetched props — no
-  // reset-on-prop-change effect needed, same pattern EnergyBar's own
-  // per-question remount already uses.
-
   useEffect(() => {
+    if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate one-shot sync on mount when the URL has no token, same pattern as lib/components/count-up.tsx
+      setNotFound(true);
+      return;
+    }
     const supabase = createClient();
     let cancelled = false;
 
     async function poll() {
-      const [tokenRes, metricsRes, recentRes, eventRes] = await Promise.all([
-        supabase.rpc('current_qr_token', { p_event_id: eventId }),
-        supabase.rpc('event_scan_metrics', { p_event_id: eventId }),
-        supabase.rpc('event_recent_scans', { p_event_id: eventId, p_limit: 8 }),
-        supabase.from('events').select('attendance_opens_at, attendance_closes_at').eq('id', eventId).maybeSingle(),
+      const [eventRes, tokenRes, metricsRes, recentRes] = await Promise.all([
+        supabase.rpc('get_event_for_operator', { p_event_id: eventId, p_token: token }),
+        supabase.rpc('current_qr_token', { p_event_id: eventId, p_token: token }),
+        supabase.rpc('event_scan_metrics', { p_event_id: eventId, p_token: token }),
+        supabase.rpc('event_recent_scans', { p_event_id: eventId, p_limit: 8, p_token: token }),
       ]);
       if (cancelled) return;
-      setToken(tokenRes.data?.[0]?.token ?? null);
+      if (eventRes.error || !eventRes.data?.[0]) {
+        setNotFound(true);
+        return;
+      }
+      const e = eventRes.data[0];
+      setEventName(e.name);
+      setJouleValue(e.joule_value);
+      setDuration(e.attendance_duration_minutes);
+      setOpensAt(e.attendance_opens_at);
+      setClosesAt(e.attendance_closes_at);
+      setQrToken(tokenRes.data?.[0]?.token ?? null);
       if (metricsRes.data?.[0]) setMetrics(metricsRes.data[0]);
       if (recentRes.data) setRecent(recentRes.data);
-      if (eventRes.data) {
-        setOpensAt(eventRes.data.attendance_opens_at);
-        setClosesAt(eventRes.data.attendance_closes_at);
-      }
     }
 
     poll();
@@ -110,9 +83,9 @@ export function StationClient({
       clearInterval(dataInterval);
       clearInterval(clockInterval);
     };
-  }, [eventId]);
+  }, [eventId, token]);
 
-  const link = token ? `${site.url}/scan?e=${eventId}&t=${token}` : '';
+  const link = qrToken ? `${site.url}/scan?e=${eventId}&t=${qrToken}` : '';
 
   const closesMs = closesAt ? new Date(closesAt).getTime() : null;
   const windowState: 'not_started' | 'open' | 'closed' =
@@ -125,6 +98,7 @@ export function StationClient({
     const { data, error } = await supabase.rpc('start_event_attendance', {
       p_event_id: eventId,
       p_duration_minutes: duration,
+      p_token: token,
     });
     setStarting(false);
     if (error) {
@@ -145,53 +119,30 @@ export function StationClient({
     });
   }
 
-  // Distinct from copyLink() above (the student-facing scan link) — this
-  // one mints (or reuses) a durable operator_token and copies a link to
-  // the no-login /admin/operate/attendance page, for handing off "press
-  // Start" to whoever's actually running the room, no admin account
-  // needed.
-  async function copyHostLink() {
-    setHostLinkError(null);
-    const supabase = createClient();
-    const { data, error } = await supabase.rpc('ensure_event_operator_token', { p_event_id: eventId });
-    if (error || !data) {
-      setHostLinkError(error?.message ?? 'Could not create a host link.');
-      return;
-    }
-    const hostLink = `${site.url}/admin/operate/attendance/${eventId}?token=${data}`;
-    navigator.clipboard?.writeText(hostLink).then(() => {
-      setHostLinkCopied(true);
-      setTimeout(() => setHostLinkCopied(false), 1500);
-    });
+  if (notFound) {
+    return (
+      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-2 p-8 text-center">
+        <EmptyState icon={ShieldAlert} title="This link isn't valid" message="Ask the person who shared it to send a fresh one." />
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 p-6">
+      <p className="text-xs uppercase tracking-[0.2em] text-accent">Attendance</p>
+
       <div className="rounded-2xl border border-border bg-card p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted">{eventName}</p>
-            <p className="text-sm text-tertiary">{jouleValue ?? '-'} SP per check-in</p>
-          </div>
-          <button
-            onClick={copyHostLink}
-            className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs text-muted hover:text-gold"
-          >
-            {hostLinkCopied ? 'Copied' : 'Copy host link'}
-          </button>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted">{eventName ?? 'Loading…'}</p>
+          <p className="text-sm text-tertiary">{jouleValue ?? '-'} SP per check-in</p>
         </div>
-        {hostLinkError ? <p className="mt-2 text-xs text-accent">{hostLinkError}</p> : null}
 
         {windowState === 'not_started' || windowState === 'closed' ? (
           <div className="mt-6 flex flex-col items-center gap-4">
             {windowState === 'closed' ? <p className="text-sm text-muted">Attendance closed.</p> : null}
             <label className="flex flex-col items-center gap-1.5">
               <span className="text-xs text-muted">Attendance window</span>
-              <select
-                className="input"
-                value={duration}
-                onChange={(e) => setDuration(Number(e.target.value))}
-              >
+              <select className="input" value={duration} onChange={(e) => setDuration(Number(e.target.value))}>
                 {DURATION_PRESETS.map((m) => (
                   <option key={m} value={m}>
                     {m} minutes
@@ -201,7 +152,7 @@ export function StationClient({
             </label>
             <button
               onClick={startAttendance}
-              disabled={starting}
+              disabled={starting || !eventName}
               className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
             >
               <Play className="size-4" aria-hidden />
@@ -227,7 +178,7 @@ export function StationClient({
               </div>
             ) : null}
             <p className="text-xs text-muted">Current check-in code</p>
-            <p className="font-mono text-4xl tracking-[0.15em] text-gold">{token ?? '··········'}</p>
+            <p className="font-mono text-4xl tracking-[0.15em] text-gold">{qrToken ?? '··········'}</p>
             <button
               onClick={copyLink}
               disabled={!link}
@@ -243,14 +194,6 @@ export function StationClient({
           </div>
         )}
       </div>
-
-      {/* Plays once per page load — HeroClip only fires on mount, so the
-          5s metrics poll below doesn't retrigger it. Deliberately a one-time
-          accent, not a persistent loop — a professor/committee-member
-          dashboard should read as calm, not have a flashy animation running
-          forever underneath it (design-brief.md's own "restraint" direction
-          for admin screens specifically). */}
-      <HeroClip src="/videos/professor-analytics.webp" frames={96} />
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-[var(--radius)] border border-border bg-card p-4 text-center">

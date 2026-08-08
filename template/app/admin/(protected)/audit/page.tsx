@@ -25,6 +25,8 @@ const ACTION_LABEL: Record<AuditAction, string> = {
   live_round_create: 'Started a Live Round',
   event_update_sent: 'Sent an event update',
   attendance_start: 'Started attendance for an event',
+  operator_link_created: 'Created a no-login operator link',
+  operator_link_reset: 'Reset a no-login operator link',
 };
 
 export default async function AuditLogPage() {

@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   '/reset-password',
   '/admin/login',
   '/admin/get-app',
+  '/admin/operate',
   '/events',
   '/get-app',
   '/event-reports',

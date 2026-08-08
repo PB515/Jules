@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth/session';
 import { EmptyState } from '@/lib/patterns/empty-state';
 import { Zap, Plus } from '@/lib/icons';
 
-export const metadata = { title: 'Surge Builder' };
+export const metadata = { title: 'Quiz Builder' };
 
 const STATUS_STYLE: Record<string, string> = {
   draft: 'text-tertiary border-border',
@@ -26,18 +26,18 @@ export default async function SurgesListPage() {
   return (
     <div className="mx-auto max-w-2xl p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-medium">Surges</h1>
+        <h1 className="text-lg font-medium">Quizzes</h1>
         <Link
           href="/admin/surges/new"
           className="flex items-center gap-1.5 rounded-[var(--radius)] bg-gold px-3 py-2 text-xs font-medium text-gold-foreground"
         >
           <Plus className="size-3.5" aria-hidden />
-          New Surge
+          New Quiz
         </Link>
       </div>
 
       {!surges || surges.length === 0 ? (
-        <EmptyState icon={Zap} title="No Surges yet" message="Create one to start building questions." />
+        <EmptyState icon={Zap} title="No quizzes yet" message="Create one to start building questions." />
       ) : (
         <ul className="flex flex-col divide-y divide-border rounded-[var(--radius)] border border-border bg-card">
           {surges.map((s) => (

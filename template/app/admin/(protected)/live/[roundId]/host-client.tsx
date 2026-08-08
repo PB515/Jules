@@ -50,7 +50,27 @@ export function HostClient({
   const [advancing, setAdvancing] = useState(false);
   const [advanceError, setAdvanceError] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [hostLinkCopied, setHostLinkCopied] = useState(false);
+  const [hostLinkError, setHostLinkError] = useState<string | null>(null);
   const supabase = useRef(createClient()).current;
+
+  // Mints (or reuses) a durable operator_token and copies a link to the
+  // no-login /admin/operate/live host page — hand it to whoever's actually
+  // running the room, no admin account needed, same idea as Attendance's
+  // "Copy host link".
+  const copyHostLink = useCallback(async () => {
+    setHostLinkError(null);
+    const { data, error } = await supabase.rpc('ensure_round_operator_token', { p_round_id: initialRound.id });
+    if (error || !data) {
+      setHostLinkError(error?.message ?? 'Could not create a host link.');
+      return;
+    }
+    const hostLink = `${site.url}/admin/operate/live/${initialRound.id}?token=${data}`;
+    navigator.clipboard?.writeText(hostLink).then(() => {
+      setHostLinkCopied(true);
+      setTimeout(() => setHostLinkCopied(false), 1500);
+    });
+  }, [supabase, initialRound.id]);
 
   const refreshScoreboard = useCallback(async () => {
     const { data } = await supabase.rpc('live_round_scoreboard', { p_round_id: initialRound.id });
@@ -213,7 +233,15 @@ export function HostClient({
         >
           <RefreshCw className={`size-3.5 ${syncing ? 'animate-spin' : ''}`} aria-hidden />
         </button>
+        <button
+          type="button"
+          onClick={copyHostLink}
+          className="normal-case rounded-full border border-border px-3 py-1 text-tertiary hover:text-gold"
+        >
+          {hostLinkCopied ? 'Copied' : 'Copy host link'}
+        </button>
       </div>
+      {hostLinkError ? <p className="text-sm text-accent">{hostLinkError}</p> : null}
 
       {round.phase === 'lobby' ? (
         <LobbyView roomCode={round.room_code} teamCount={teamCount} memberCount={memberCount} />

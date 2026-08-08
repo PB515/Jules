@@ -33,7 +33,7 @@ export async function SimpleLedgerView({ admin, selectedEventId }: { admin: Tabl
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <h1 className="text-lg font-medium">System Ledger</h1>
+      <h1 className="text-lg font-medium">Attendance & Points</h1>
 
       <p className="text-sm text-muted">
         {summary.total_events} event{summary.total_events === 1 ? '' : 's'} held · {summary.total_students} student

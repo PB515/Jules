@@ -68,7 +68,7 @@ export const NAV: readonly AdminNavItem[] = [
   },
   {
     href: '/admin/surges',
-    label: 'Surge Builder',
+    label: 'Quiz Builder',
     icon: Zap,
     roles: ['professor', 'committee_member', 'super_admin'],
     group: 'Quizzes',
@@ -87,7 +87,7 @@ export const NAV: readonly AdminNavItem[] = [
   },
   {
     href: '/admin/ledger',
-    label: 'System Ledger',
+    label: 'Attendance & Points',
     icon: BarChart3,
     roles: ['professor', 'committee_member', 'super_admin'],
     group: 'Reports & Data',

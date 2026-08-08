@@ -4,7 +4,7 @@ import { EmptyState } from '@/lib/patterns/empty-state';
 import { Zap } from '@/lib/icons';
 import { BuilderClient } from './builder-client';
 
-export const metadata = { title: 'Surge Builder' };
+export const metadata = { title: 'Quiz Builder' };
 
 export default async function SurgeBuilderPage({ params }: { params: Promise<{ surgeId: string }> }) {
   await requireAdmin(['professor', 'committee_member', 'super_admin']);
@@ -15,7 +15,7 @@ export default async function SurgeBuilderPage({ params }: { params: Promise<{ s
   if (!surge) {
     return (
       <div className="p-6">
-        <EmptyState icon={Zap} title="Surge not found" />
+        <EmptyState icon={Zap} title="Quiz not found" />
       </div>
     );
   }
