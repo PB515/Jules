@@ -13,7 +13,7 @@ const initialState: ActionResult = {};
 
 export default function ForgotPasswordPage() {
   const [state, formAction, pending] = useActionState(forgotPasswordAction, initialState);
-  const sent = state && state.error === undefined;
+  const sent = state?.sent === true;
 
   return (
     <main className="flex flex-1 items-center justify-center px-6 py-12">

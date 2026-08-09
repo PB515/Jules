@@ -8,6 +8,7 @@ import { site } from '@/lib/site';
 
 export interface ActionResult {
   error?: string;
+  sent?: boolean;
 }
 
 export async function signupAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
@@ -124,7 +125,7 @@ export async function forgotPasswordAction(_prev: ActionResult, formData: FormDa
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${site.url}/reset-password`,
   });
-  return { error: undefined };
+  return { sent: true };
 }
 
 export async function resetPasswordAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
