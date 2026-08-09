@@ -25,8 +25,8 @@ Items sat unresolved across many sessions.*
 
 ## Mumbai migration — still open
 
-- [ ] **Set up a backup habit for Mumbai** (see CLAUDE.md's ★★ Known Open Item) — no rollback path exists if this project is lost too. Simplest: a periodic `pg_dump` via the pooler connection string.
-- [ ] Confirm Preview/Development Vercel environments also point at Mumbai (only Production was confirmed)
+- [x] Backup script built and run once (`scripts/backup-db.mjs`, 25 tables/311 rows captured) — **still needs a real recurring habit**, not just this one snapshot; copy `backups/` off-machine too.
+- [ ] Confirm Preview/Development Vercel environments also point at Mumbai (only Production was confirmed; the CLI removal attempt was blocked by the safety classifier — do this manually via the dashboard, same 3 vars as Production)
 - [ ] Regenerate `database.types.ts` for real once `supabase login` is possible interactively (currently hand-maintained, validated by `build` + live RPC calls, not a real `gen types` diff)
 
 ## Before onboarding any real students (pilot prerequisites)
@@ -35,7 +35,7 @@ Items sat unresolved across many sessions.*
 - [x] Replace the placeholder college email domain (decision 10) with the real one — `allowed_domains` now `['adaniuni.ac.in']` (decision 87)
 - [x] Create the additional Super Admin account(s) needed — Dr. Riya Mehta (`riya.mehta@adaniuni.ac.in`) added alongside the bootstrapped account (decision 87)
 - [x] Bulk-create the real student roster — 243 real accounts created from the supplied Excel roster, 0 failures, credentials CSV delivered directly (not printed to chat) (decision 87). 2 rows skipped for missing emails (Madhav Sharma, Mohit Tilokchand Kumawat) — need their emails supplied separately.
-- [ ] Flip `ALWAYS_SHOW_FOR_TESTING` back to `false` in both `launch-splash.tsx` and `admin-splash.tsx` — currently fires every login for demo purposes, would be annoying at real daily-use cadence
+- [x] Flip `ALWAYS_SHOW_FOR_TESTING` back to `false` in both `launch-splash.tsx` and `admin-splash.tsx`
 
 ## Real-device confirmations still outstanding (pre-existing, not new from the migration)
 
