@@ -22,7 +22,7 @@ import { HeroClip } from '@/lib/components/hero-clip';
 // testing/demoing. MUST flip back to `false` before the real student
 // launch — see CLAUDE.md Known Open Items. Flipping it back restores the
 // exact original daily-gated behavior with no other changes needed.
-const ALWAYS_SHOW_FOR_TESTING = true;
+const ALWAYS_SHOW_FOR_TESTING = false;
 
 const STORAGE_KEY = 'jules_splash_date';
 // Real generated clip (trimmed to its first 100 frames/4.0s — the source

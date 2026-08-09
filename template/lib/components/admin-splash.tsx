@@ -21,7 +21,7 @@ import { HeroClip } from '@/lib/components/hero-clip';
 // ★ TEMPORARY, confirmed with the user for the pre-launch testing/demo
 // period — see the matching flag/comment in launch-splash.tsx, same
 // reasoning and same revert-before-launch requirement.
-const ALWAYS_SHOW_FOR_TESTING = true;
+const ALWAYS_SHOW_FOR_TESTING = false;
 
 const STORAGE_KEY = 'jules_admin_splash_date';
 const CLIP_FRAMES = 66;
