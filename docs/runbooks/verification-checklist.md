@@ -26,7 +26,7 @@ Items sat unresolved across many sessions.*
 ## Mumbai migration — still open
 
 - [x] Backup script built and run once (`scripts/backup-db.mjs`, 25 tables/311 rows captured) — **still needs a real recurring habit**, not just this one snapshot; copy `backups/` off-machine too.
-- [ ] Confirm Preview/Development Vercel environments also point at Mumbai (only Production was confirmed; the CLI removal attempt was blocked by the safety classifier — do this manually via the dashboard, same 3 vars as Production)
+- [x] Preview and Development Vercel environments now also point at Mumbai (done manually via the dashboard, since the CLI attempt was blocked by the safety classifier)
 - [ ] Regenerate `database.types.ts` for real once `supabase login` is possible interactively (currently hand-maintained, validated by `build` + live RPC calls, not a real `gen types` diff)
 
 ## Before onboarding any real students (pilot prerequisites)
