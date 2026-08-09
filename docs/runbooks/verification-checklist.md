@@ -32,9 +32,9 @@ Items sat unresolved across many sessions.*
 ## Before onboarding any real students (pilot prerequisites)
 
 - [ ] Replace the placeholder season/term dates (decision 9) with the real semester calendar — every season-scoped report/leaderboard/Joule total is silently wrong until this happens
-- [ ] Replace the placeholder college email domain (decision 10) with the real one(s), via Institution Settings
-- [ ] Create the additional Super Admin account(s) needed (see below)
-- [ ] Bulk-create the real student roster via `/admin/students` (see below)
+- [x] Replace the placeholder college email domain (decision 10) with the real one — `allowed_domains` now `['adaniuni.ac.in']` (decision 87)
+- [x] Create the additional Super Admin account(s) needed — Dr. Riya Mehta (`riya.mehta@adaniuni.ac.in`) added alongside the bootstrapped account (decision 87)
+- [x] Bulk-create the real student roster — 243 real accounts created from the supplied Excel roster, 0 failures, credentials CSV delivered directly (not printed to chat) (decision 87). 2 rows skipped for missing emails (Madhav Sharma, Mohit Tilokchand Kumawat) — need their emails supplied separately.
 - [ ] Flip `ALWAYS_SHOW_FOR_TESTING` back to `false` in both `launch-splash.tsx` and `admin-splash.tsx` — currently fires every login for demo purposes, would be annoying at real daily-use cadence
 
 ## Real-device confirmations still outstanding (pre-existing, not new from the migration)
