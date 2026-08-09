@@ -62,7 +62,7 @@ async function main() {
 
   const { error: insertErr } = await supabase
     .from('admins')
-    .insert({ id: created.user.id, name, email, role: 'owner' });
+    .insert({ id: created.user.id, name, email, role: 'super_admin' });
   if (insertErr) {
     console.error('Auth user created, but the admins row failed:', insertErr.message);
     process.exit(1);
