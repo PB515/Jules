@@ -31,7 +31,7 @@ Items sat unresolved across many sessions.*
 
 ## Before onboarding any real students (pilot prerequisites)
 
-- [ ] Replace the placeholder season/term dates (decision 9) with the real semester calendar — every season-scoped report/leaderboard/Joule total is silently wrong until this happens
+- [x] Replace the placeholder season/term dates (decision 9) with the real calendar — single `IM_2026-2027` season, 2026-07-01 → 2027-05-31, annual (decision 88)
 - [x] Replace the placeholder college email domain (decision 10) with the real one — `allowed_domains` now `['adaniuni.ac.in']` (decision 87)
 - [x] Create the additional Super Admin account(s) needed — Dr. Riya Mehta (`riya.mehta@adaniuni.ac.in`) added alongside the bootstrapped account (decision 87)
 - [x] Bulk-create the real student roster — 243 real accounts created from the supplied Excel roster, 0 failures, credentials CSV delivered directly (not printed to chat) (decision 87). 2 rows skipped for missing emails (Madhav Sharma, Mohit Tilokchand Kumawat) — need their emails supplied separately.
