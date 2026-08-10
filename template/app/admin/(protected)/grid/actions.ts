@@ -16,6 +16,25 @@ const JOULE_BY_TYPE: Record<string, number> = {
   volunteer_task: 15,
 };
 
+// A real, previously-undiscovered bug: `new Date(`${date}T${time}`)` (no
+// explicit offset) parses as local time in whatever timezone the *runtime*
+// happens to be in — for a Server Action, that's Vercel's own server
+// timezone (UTC), not the admin's real one (India, IST, UTC+5:30, no DST).
+// An admin typing "1:00 PM" was silently getting 1:00 PM UTC stored (=
+// 6:30 PM IST) — a 5.5-hour drift that stayed invisible only because the
+// display side (formatDateUTC/formatTimeUTC, lib/jules/format-date.ts)
+// used to format in raw UTC too, so "what you typed" still matched "what
+// you saw" even though both were wrong relative to real IST wall-clock
+// time. Fixed together: this helper pins the admin's typed date/time to
+// IST explicitly before converting to the true UTC instant for storage,
+// and format-date.ts now displays in Asia/Kolkata instead of UTC, so
+// anything comparing event_date against real `Date.now()` (hasConcluded(),
+// the QR attendance window, day-before reminders) becomes correct too,
+// with no changes needed at those call sites.
+function toUtcFromIst(date: string, time: string): string {
+  return new Date(`${date}T${time}:00+05:30`).toISOString();
+}
+
 // Displayed at aspect-video (16:9) with object-cover on both the events
 // grid and detail page (app/(general)/events/*) — the size/type limits
 // below are enforced server-side too, not just hinted in the form, since
@@ -34,7 +53,7 @@ function parseEventEnd(formData: FormData, startIso: string): { endIso?: string 
   if (!endDate && !endTime) return { endIso: null };
   if (!endDate || !endTime) return { error: 'Fill in both an end date and an end time, or leave both blank.' };
 
-  const endIso = new Date(`${endDate}T${endTime}`).toISOString();
+  const endIso = toUtcFromIst(endDate, endTime);
   if (endIso <= startIso) return { error: 'End date/time must be after the start date/time.' };
   return { endIso };
 }
@@ -76,7 +95,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
     return { error: 'Attendance window must be a positive number of minutes.' };
   }
 
-  const startIso = new Date(`${eventDate}T${eventTime}`).toISOString();
+  const startIso = toUtcFromIst(eventDate, eventTime);
   const end = parseEventEnd(formData, startIso);
   if (end.error) return { error: end.error };
 
@@ -141,7 +160,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     return { error: 'Attendance window must be a positive number of minutes.' };
   }
 
-  const newEventDate = new Date(`${eventDate}T${eventTime}`).toISOString();
+  const newEventDate = toUtcFromIst(eventDate, eventTime);
   const end = parseEventEnd(formData, newEventDate);
   if (end.error) return { error: end.error };
 
