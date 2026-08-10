@@ -156,7 +156,7 @@ export function GeneralLayoutClient({
               <p className="max-w-xs text-tertiary">{site.description}</p>
               <Link
                 href="/get-app"
-                className="inline-flex w-fit items-center gap-1.5 rounded-[var(--radius)] bg-gold px-4 py-2 text-xs font-medium text-gold-foreground"
+                className="bg-adani-gradient inline-flex w-fit items-center gap-1.5 rounded-[var(--radius)] px-4 py-2 text-xs font-medium text-white"
               >
                 <Download className="size-3.5" aria-hidden />
                 Install the App
