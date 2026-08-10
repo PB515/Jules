@@ -69,7 +69,8 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Cover image (optional)</span>
-          <input name="cover_image" type="file" accept="image/*" className="input" />
+          <input name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" className="input" />
+          <span className="text-xs text-tertiary">JPG, PNG, or WebP · up to 5MB · shown at 16:9, so 1280×720 or similar fits best.</span>
         </label>
         {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
         <button

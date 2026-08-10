@@ -16,9 +16,23 @@ const JOULE_BY_TYPE: Record<string, number> = {
   volunteer_task: 15,
 };
 
+// Displayed at aspect-video (16:9) with object-cover on both the events
+// grid and detail page (app/(general)/events/*) — the size/type limits
+// below are enforced server-side too, not just hinted in the form, since
+// the client's `accept`/helper text alone is never a real guarantee.
+const COVER_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const COVER_IMAGE_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 async function uploadCoverImage(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData): Promise<{ path?: string; error?: string }> {
   const file = formData.get('cover_image');
   if (!(file instanceof File) || file.size === 0) return {};
+
+  if (file.size > COVER_IMAGE_MAX_BYTES) {
+    return { error: 'Cover image is too large — please use a JPG, PNG, or WebP under 5MB.' };
+  }
+  if (!COVER_IMAGE_ALLOWED_TYPES.includes(file.type)) {
+    return { error: 'Cover image must be a JPG, PNG, or WebP file.' };
+  }
 
   const ext = file.name.split('.').pop() ?? 'jpg';
   const path = `${crypto.randomUUID()}.${ext}`;
