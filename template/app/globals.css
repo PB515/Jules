@@ -137,8 +137,11 @@
   animation: plasma-pulse 2.4s ease-in-out infinite;
 }
 @keyframes plasma-pulse {
-  0%, 100% { box-shadow: 0 0 0 rgba(255, 199, 44, 0); }
-  50% { box-shadow: 0 0 18px rgba(255, 199, 44, 0.35); }
+  /* rgb(189, 56, 97) = --gold (#BD3861) — was a stale rgba(255, 199, 44, ...)
+     golden-yellow left over from the pre-pivot "solar blue" palette, not
+     matching any current token (same class of bug as decision 35). */
+  0%, 100% { box-shadow: 0 0 0 rgba(189, 56, 97, 0); }
+  50% { box-shadow: 0 0 18px rgba(189, 56, 97, 0.35); }
 }
 @keyframes float-drift {
   0% { transform: translateY(0); }
