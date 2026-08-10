@@ -88,20 +88,36 @@ export default async function CatalystPage({
             {rangeStart}–{rangeEnd} of {totalCount} students
           </p>
           <ol className="flex flex-col gap-2">
-            {rows.map((row) => (
-              <li
-                key={row.student_id}
-                className={`flex items-center justify-between rounded-[var(--radius)] border px-4 py-3 ${
-                  row.student_id === student.id ? 'border-gold' : 'border-border'
-                } bg-card`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="w-8 text-center text-sm font-medium text-tertiary">#{row.rank}</span>
-                  <span className="text-sm">{row.name}</span>
-                </div>
-                <span className="text-sm font-medium text-gold">{row.total_amount} SP</span>
-              </li>
-            ))}
+            {rows.map((row) => {
+              const isFirst = row.rank === 1;
+              const isMe = row.student_id === student.id;
+              return (
+                <li
+                  key={row.student_id}
+                  className={`flex items-center justify-between rounded-[var(--radius)] border px-4 py-3 bg-card ${
+                    isFirst ? 'border-transparent' : isMe ? 'border-gold' : 'border-border'
+                  }`}
+                  style={isFirst ? { boxShadow: 'inset 0 0 0 1.5px var(--adani-teal)' } : undefined}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex w-8 items-center justify-center rounded-full text-center text-sm font-semibold ${
+                        isFirst ? 'bg-adani-gradient text-white' : 'text-tertiary'
+                      }`}
+                    >
+                      {row.rank}
+                    </span>
+                    <span className="text-sm">
+                      {row.name}
+                      {isMe ? <span className="ml-1.5 text-xs text-tertiary">(you)</span> : null}
+                    </span>
+                  </div>
+                  <span className={`text-sm font-medium ${isFirst ? 'text-adani-gradient font-semibold' : 'text-gold'}`}>
+                    {row.total_amount} SP
+                  </span>
+                </li>
+              );
+            })}
           </ol>
 
           {hasPrev || hasNext ? (

@@ -454,18 +454,30 @@ function FinalView({ scoreboard }: { scoreboard: ScoreRow[] }) {
 function Scoreboard({ rows }: { rows: ScoreRow[] }) {
   return (
     <ul className="flex flex-col gap-2">
-      {rows.map((r) => (
-        <li
-          key={r.team_id}
-          className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3"
-        >
-          <span className="flex items-center gap-2 text-lg">
-            {r.rank === 1 ? <Crown className="size-5 text-gold" aria-hidden /> : <span className="w-5 text-tertiary">{r.rank}</span>}
-            {r.team_name}
-          </span>
-          <span className="text-lg text-gold">{r.total_amount} SP</span>
-        </li>
-      ))}
+      {rows.map((r) => {
+        const isFirst = r.rank === 1;
+        return (
+          <li
+            key={r.team_id}
+            className={`flex items-center justify-between rounded-[var(--radius)] border bg-card px-4 py-3 ${
+              isFirst ? 'border-transparent' : 'border-border'
+            }`}
+            style={isFirst ? { boxShadow: 'inset 0 0 0 1.5px var(--adani-teal)' } : undefined}
+          >
+            <span className="flex items-center gap-2 text-lg">
+              {isFirst ? (
+                <span className="bg-adani-gradient flex size-6 items-center justify-center rounded-full text-white">
+                  <Crown className="size-3.5" aria-hidden />
+                </span>
+              ) : (
+                <span className="w-5 text-tertiary">{r.rank}</span>
+              )}
+              {r.team_name}
+            </span>
+            <span className={`text-lg ${isFirst ? 'text-adani-gradient font-semibold' : 'text-gold'}`}>{r.total_amount} SP</span>
+          </li>
+        );
+      })}
     </ul>
   );
 }

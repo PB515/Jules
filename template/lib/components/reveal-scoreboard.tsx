@@ -54,20 +54,36 @@ export function RevealScoreboard({ rows, scale = 'full' }: { rows: RevealRow[]; 
   return (
     <ul className="flex flex-col gap-2">
       {visibleSorted.map((row) => {
+        const isFirst = row.rank === 1;
+        // `highlight` ("is this my own team," set by team-client.tsx) and
+        // `isFirst` ("is this rank 1") are two independent signals — a
+        // team can be both, or "me" without being first. isFirst always
+        // wins the visual treatment when both are true; `highlight` alone
+        // keeps its own original gold border, unrelated to the gradient.
         const rowContent = (
           <div
-            className="flex items-center justify-between rounded-[var(--radius)] border px-4 py-3"
+            className={`flex items-center justify-between rounded-[var(--radius)] border px-4 py-3 ${
+              isFirst ? 'border-transparent' : ''
+            }`}
             style={
-              row.highlight
-                ? { borderColor: 'var(--gold)', background: 'var(--tier-volt-bg)' }
-                : { borderColor: 'var(--border)', background: 'var(--card)' }
+              isFirst
+                ? { boxShadow: 'inset 0 0 0 1.5px var(--adani-teal)', background: 'var(--card)' }
+                : row.highlight
+                  ? { borderColor: 'var(--gold)', background: 'var(--tier-volt-bg)' }
+                  : { borderColor: 'var(--border)', background: 'var(--card)' }
             }
           >
             <span className="flex items-center gap-2 text-sm">
-              {row.rank === 1 ? <Crown className="size-4 text-gold" aria-hidden /> : <span className="w-4 text-tertiary">{row.rank}</span>}
+              {isFirst ? (
+                <span className="bg-adani-gradient flex size-5 items-center justify-center rounded-full text-white">
+                  <Crown className="size-3" aria-hidden />
+                </span>
+              ) : (
+                <span className="w-4 text-tertiary">{row.rank}</span>
+              )}
               {row.label}
             </span>
-            <span className="text-sm text-gold">{row.amount} SP</span>
+            <span className={`text-sm ${isFirst ? 'text-adani-gradient font-semibold' : 'text-gold'}`}>{row.amount} SP</span>
           </div>
         );
         return row.rank === 1 ? (
