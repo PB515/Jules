@@ -22,7 +22,7 @@ export function UploadForm() {
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-[var(--radius)] bg-gold px-4 py-2 text-xs font-medium text-gold-foreground disabled:opacity-60"
+        className="bg-adani-gradient self-start rounded-[var(--radius)] px-4 py-2 text-xs font-medium text-white disabled:opacity-60"
       >
         {pending ? 'Uploading…' : 'Upload'}
       </button>

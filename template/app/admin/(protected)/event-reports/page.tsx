@@ -21,7 +21,7 @@ export default async function AdminEventReportsListPage() {
         <h1 className="text-lg font-medium">Event Reports</h1>
         <Link
           href="/admin/event-reports/new"
-          className="flex items-center gap-1.5 rounded-[var(--radius)] bg-gold px-3 py-2 text-xs font-medium text-gold-foreground"
+          className="bg-adani-gradient flex items-center gap-1.5 rounded-[var(--radius)] px-3 py-2 text-xs font-medium text-white"
         >
           <Plus className="size-3.5" aria-hidden />
           New report

@@ -51,7 +51,7 @@ export function SeasonsSection({ seasons }: { seasons: Season[] }) {
           </select>
           {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
           <div className="flex gap-2">
-            <button disabled={pending} className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground">
+            <button disabled={pending} className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white">
               {pending ? 'Adding…' : 'Add season'}
             </button>
             <button type="button" onClick={() => setOpen(false)} className="flex-1 rounded-[var(--radius)] border border-border py-2 text-sm">

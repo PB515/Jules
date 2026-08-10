@@ -29,7 +29,7 @@ export function DomainsEditor({ initial }: { initial: string[] }) {
         <button
           onClick={save}
           disabled={isPending}
-          className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+          className="bg-adani-gradient rounded-[var(--radius)] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
         >
           {isPending ? 'Saving…' : 'Save domains'}
         </button>

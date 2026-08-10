@@ -87,7 +87,7 @@ export default async function EventCreationPage({
       </div>
       <Link
         href={`/admin/attendance?event=${selected.id}`}
-        className="flex items-center justify-center gap-2 rounded-[var(--radius)] bg-gold py-2.5 text-sm font-medium text-gold-foreground"
+        className="bg-adani-gradient flex items-center justify-center gap-2 rounded-[var(--radius)] py-2.5 text-sm font-medium text-white"
       >
         <ScanLine className="size-4" aria-hidden />
         Go to Attendance for this event

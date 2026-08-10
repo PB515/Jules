@@ -153,7 +153,7 @@ export function OperatorStationClient({ eventId, token }: { eventId: string; tok
             <button
               onClick={startAttendance}
               disabled={starting || !eventName}
-              className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
+              className="bg-adani-gradient flex items-center gap-2 rounded-[var(--radius)] px-5 py-3 text-sm font-medium text-white disabled:opacity-60"
             >
               <Play className="size-4" aria-hidden />
               {starting ? 'Starting…' : windowState === 'closed' ? 'Start again' : 'Start attendance'}

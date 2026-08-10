@@ -225,7 +225,7 @@ function StudentDetail({ student }: { student: StudentRow }) {
           onChange={(e) => setReason(e.target.value)}
           className="input flex-1"
         />
-        <button onClick={doAdjust} disabled={isPending} className="rounded-[var(--radius)] bg-gold px-3 py-2 text-xs font-medium text-gold-foreground">
+        <button onClick={doAdjust} disabled={isPending} className="bg-adani-gradient rounded-[var(--radius)] px-3 py-2 text-xs font-medium text-white">
           Adjust
         </button>
       </div>

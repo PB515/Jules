@@ -443,7 +443,7 @@ function FinalView({ scoreboard }: { scoreboard: ScoreRow[] }) {
       />
       <Link
         href="/admin/live/new"
-        className="mx-auto rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
+        className="bg-adani-gradient mx-auto rounded-[var(--radius)] px-5 py-3 text-sm font-medium text-white"
       >
         Start another Live Round
       </Link>

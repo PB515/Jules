@@ -78,7 +78,7 @@ export function RosterSection({ admins, clubs }: { admins: Admin[]; clubs: ClubO
             </p>
           ) : null}
           <div className="flex gap-2">
-            <button disabled={pending} className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground">
+            <button disabled={pending} className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white">
               {pending ? 'Creating…' : 'Create admin'}
             </button>
             <button type="button" onClick={() => setOpen(false)} className="flex-1 rounded-[var(--radius)] border border-border py-2 text-sm">

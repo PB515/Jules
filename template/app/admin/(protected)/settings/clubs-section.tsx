@@ -64,7 +64,7 @@ export function ClubsSection({ clubs }: { clubs: Club[] }) {
           <input name="description" className="input" placeholder="Short description (optional)" />
           {state?.error ? <p className="text-sm text-accent">{state.error}</p> : null}
           <div className="flex gap-2">
-            <button disabled={pending} className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground">
+            <button disabled={pending} className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white">
               {pending ? 'Adding…' : 'Add club'}
             </button>
             <button type="button" onClick={() => setOpen(false)} className="flex-1 rounded-[var(--radius)] border border-border py-2 text-sm">
@@ -115,7 +115,7 @@ function ClubDetailsForm({ club, onDone }: { club: Club; onDone: () => void }) {
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-[var(--radius)] bg-gold py-1.5 text-xs font-medium text-gold-foreground"
+          className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-1.5 text-xs font-medium text-white"
         >
           {pending ? 'Saving…' : 'Save'}
         </button>

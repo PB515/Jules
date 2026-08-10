@@ -126,7 +126,7 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
         <button
           type="submit"
           disabled={pending}
-          className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-60"
+          className="bg-adani-gradient rounded-[var(--radius)] py-3 text-sm font-medium text-white disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save changes'}
         </button>

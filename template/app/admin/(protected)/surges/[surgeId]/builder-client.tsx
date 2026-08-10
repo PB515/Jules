@@ -54,7 +54,7 @@ export function BuilderClient({ surge, questions }: { surge: Surge; questions: Q
             <button
               onClick={advanceStatus}
               disabled={isPending}
-              className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+              className="bg-adani-gradient rounded-[var(--radius)] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
             >
               {isPending ? 'Updating…' : next === 'live' ? 'Go live' : 'Close Surge'}
             </button>
@@ -130,7 +130,7 @@ function ScoringEditor({ surge }: { surge: Surge }) {
         <button
           onClick={save}
           disabled={isPending}
-          className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+          className="bg-adani-gradient rounded-[var(--radius)] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
         >
           {isPending ? 'Saving…' : 'Save scoring'}
         </button>
@@ -217,7 +217,7 @@ function CsvImport({ surgeId }: { surgeId: string }) {
             <button
               onClick={confirmImport}
               disabled={isPending || rows.every((r) => r.errors.length > 0)}
-              className="rounded-[var(--radius)] bg-gold px-3 py-2 text-xs font-medium text-gold-foreground disabled:opacity-50"
+              className="bg-adani-gradient rounded-[var(--radius)] px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
             >
               {isPending ? 'Importing…' : `Import ${rows.filter((r) => r.errors.length === 0).length} question(s)`}
             </button>
@@ -346,7 +346,7 @@ function ManualAdd({ surgeId, nextOrder }: { surgeId: string; nextOrder: number 
         <button
           onClick={submit}
           disabled={isPending}
-          className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground disabled:opacity-60"
+          className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white disabled:opacity-60"
         >
           {isPending ? 'Adding…' : 'Add question'}
         </button>
@@ -439,7 +439,7 @@ function QuestionEditRow({ surgeId, question, onDone }: { surgeId: string; quest
         );
       })}
       <div className="flex gap-2">
-        <button onClick={save} disabled={isPending} className="rounded-[var(--radius)] bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground">
+        <button onClick={save} disabled={isPending} className="bg-adani-gradient rounded-[var(--radius)] px-3 py-1.5 text-xs font-medium text-white">
           Save
         </button>
         <button onClick={onDone} className="rounded-[var(--radius)] border border-border px-3 py-1.5 text-xs">
