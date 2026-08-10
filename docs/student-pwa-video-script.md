@@ -10,16 +10,22 @@ target: ~3–4 minutes.*
 **Before recording**: use a real, already-created student account (not a
 disposable test one you'll delete) — pick one from the roster, or ask
 someone to demo their own phone. Make sure at least one real event exists
-with attendance open, and ideally one Live Round ready to join, so shots 4
-and 6 have something real to show.
+with attendance open, so shots 4 and 5 have something real to show.
+
+**For this first event specifically**: it's participation-only (register,
+check in, earn points — no quiz). Shot 6 (Live Round) covers a feature
+that exists but isn't part of this event, so it's framed as "coming soon"
+below, not something students should expect to use right away. Cut it
+entirely if the video needs to be shorter and quiz nights aren't imminent.
 
 ---
 
 ## Shot 1 — Install (0:00–0:25)
 
 **Show:** Open a browser (Safari on iPhone, Chrome on Android) to
-`jules-purven-s-projects.vercel.app/get-app`. Tap through the install flow —
-"Add to Home Screen" on iPhone, the install prompt/banner on Android.
+`jules-delta-nine.vercel.app/get-app` (or scan the QR code shown on that
+page). Tap through the install flow — "Add to Home Screen" on iPhone, the
+install prompt/banner on Android.
 
 **Say (voiceover or on-camera):**
 > "Synergy only works installed as an app on your phone — not in a browser
@@ -88,7 +94,12 @@ in-app. Show the success screen ("Checked in!" + points awarded).
 
 ---
 
-## Shot 6 — Live Round quiz (2:35–3:15)
+## Shot 6 — Live Round quiz — coming soon, optional (2:35–3:15)
+
+*Not part of the first event — this is a preview of a feature you'll use at
+a future quiz night, not something to expect right away. Fine to cut this
+shot entirely for now and re-add it once a real Live Round is actually
+scheduled.*
 
 **Show:** From the home screen (or a link/QR the host shares), join a Live
 Round with a room code. Show team formation ("Go solo" or joining a
@@ -97,10 +108,12 @@ for the host…" suspense state, then the reveal (green for correct, orange
 for wrong) and the final scoreboard.
 
 **Say:**
-> "For live quizzes, your host gives you a room code. Join solo or team up
-> with classmates — if you're on a team, only the team captain answers for
+> "Down the line, some events will include Live Round — a Kahoot-style
+> quiz. Your host gives you a room code. Join solo or team up with
+> classmates — if you're on a team, only the team captain answers for
 > everyone, so lock in together. Answer, then wait — you won't know if
-> you're right until the host reveals it to the whole room."
+> you're right until the host reveals it to the whole room. Nothing to do
+> with this yet — just so it's not a surprise later."
 
 ---
 
@@ -142,8 +155,10 @@ event) on the lock screen or notification shade.
 - Keep each shot's screen recording, trim dead air, add the "Say" lines as
   either voiceover (recorded separately, cleaner) or on-screen captions —
   captions are safer if multiple people might record different shots.
-- Shot 6 (Live Round) is the most fun to watch — if the video needs
-  trimming for length, cut shots 7–8 before cutting this one.
+- Shot 6 (Live Round) is the first one to cut if the video needs trimming
+  for length or timing — it's the only shot that isn't about this first
+  event. Shots 1–5 and 7 (install through leaderboard) are the ones that
+  actually matter for the students walking into this event.
 - If a shot didn't go cleanly live (e.g., no real event was open for
   attendance that day), it's fine to stage it once with a real disposable
   test event — just don't present it as "live" if it wasn't.

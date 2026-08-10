@@ -13,7 +13,18 @@
  * restarting the whole app, which remounts this component without a real
  * cold start) reads as "you need to install this" to someone who already
  * has. Once confirmed standalone, that fact is cached in sessionStorage so
- * later remounts within the same tab session skip the check entirely.
+ * later remounts within the same tab session resolve on the very next
+ * effect tick — but the sessionStorage read itself only ever happens
+ * inside the effect, never in the useState initializer. Reading it
+ * synchronously during render (an earlier version of this file did) made
+ * the client's very first hydration-time render diverge from the
+ * server's — the server always renders 'checking' (no sessionStorage
+ * access), but a client with an already-cached '1' from an earlier
+ * navigation this same tab session would render 'standalone' immediately,
+ * a real hydration mismatch on every navigation after the first. Always
+ * starting at 'checking' guarantees hydration always matches; the cached
+ * value is folded into the same effect that does the real check, so
+ * there's still only one setStatus call, one render past 'checking'.
  */
 import { useEffect, useState } from 'react';
 import { PwaRequired } from '@/lib/components/pwa-required';
@@ -24,20 +35,18 @@ type Status = 'checking' | 'standalone' | 'blocked';
 
 const CONFIRMED_KEY = 'synergy_pwa_standalone';
 
-function initialStatus(): Status {
-  if (typeof window === 'undefined') return 'checking';
-  try {
-    return window.sessionStorage.getItem(CONFIRMED_KEY) === '1' ? 'standalone' : 'checking';
-  } catch {
-    return 'checking';
-  }
-}
-
 export function PwaGate({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<Status>(initialStatus);
+  const [status, setStatus] = useState<Status>('checking');
 
   useEffect(() => {
     if (status !== 'checking') return;
+
+    let cachedStandalone = false;
+    try {
+      cachedStandalone = window.sessionStorage.getItem(CONFIRMED_KEY) === '1';
+    } catch {
+      // sessionStorage unavailable (private mode etc.) — falls through to the real check below
+    }
 
     const iosStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     // DEV-TESTING-ONLY: mirrors proxy.ts's own dev_mobile_bypass cookie, gated
@@ -47,7 +56,7 @@ export function PwaGate({ children }: { children: React.ReactNode }) {
     // PWA's standalone display-mode — no real browser tab can satisfy that)
     // purely so this can be verified live during development.
     const devBypass = process.env.NODE_ENV !== 'production' && document.cookie.includes('dev_mobile_bypass=1');
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || iosStandalone || devBypass;
+    const isStandalone = cachedStandalone || window.matchMedia('(display-mode: standalone)').matches || iosStandalone || devBypass;
 
     if (isStandalone) {
       try {
