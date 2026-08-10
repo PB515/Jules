@@ -35,10 +35,16 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
             <option value="volunteer_task">Volunteer task (15 SP)</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Date &amp; time</span>
-          <input name="event_date" type="datetime-local" className="input" required />
-        </label>
+        <div className="flex gap-3">
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">Date</span>
+            <input name="event_date" type="date" className="input" required />
+          </label>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">Time</span>
+            <input name="event_time" type="time" className="input" required />
+          </label>
+        </div>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Attendance window</span>
           <select name="attendance_duration_minutes" className="input" defaultValue={20}>

@@ -34,11 +34,12 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
   const clubId = String(formData.get('club_id') ?? '');
   const type = String(formData.get('type') ?? '');
   const eventDate = String(formData.get('event_date') ?? '');
+  const eventTime = String(formData.get('event_time') ?? '');
   const location = String(formData.get('location') ?? '').trim();
   const registrationFormUrl = String(formData.get('registration_form_url') ?? '').trim();
   const attendanceDurationMinutes = Number(formData.get('attendance_duration_minutes') ?? 20);
 
-  if (!name || !type || !eventDate) return { error: 'Fill in name, type, and date.' };
+  if (!name || !type || !eventDate || !eventTime) return { error: 'Fill in name, type, date, and time.' };
   if (!clubId) return { error: 'Pick the club this event belongs to.' };
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
   if (!Number.isFinite(attendanceDurationMinutes) || attendanceDurationMinutes <= 0) {
@@ -59,7 +60,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
       name,
       club_id: clubId,
       type: type as 'participation' | 'expert_session' | 'volunteer_task',
-      event_date: new Date(eventDate).toISOString(),
+      event_date: new Date(`${eventDate}T${eventTime}`).toISOString(),
       location: location || null,
       registration_form_url: registrationFormUrl || null,
       cover_image_path: cover.path ?? null,
@@ -93,12 +94,13 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   const name = String(formData.get('name') ?? '').trim();
   const type = String(formData.get('type') ?? '');
   const eventDate = String(formData.get('event_date') ?? '');
+  const eventTime = String(formData.get('event_time') ?? '');
   const location = String(formData.get('location') ?? '').trim();
   const registrationFormUrl = String(formData.get('registration_form_url') ?? '').trim();
   const attendanceDurationMinutes = Number(formData.get('attendance_duration_minutes') ?? 20);
 
   if (!eventId) return { error: 'Missing event.' };
-  if (!name || !type || !eventDate) return { error: 'Fill in name, type, and date.' };
+  if (!name || !type || !eventDate || !eventTime) return { error: 'Fill in name, type, date, and time.' };
   if (!(type in JOULE_BY_TYPE)) return { error: 'Invalid event type.' };
   if (!Number.isFinite(attendanceDurationMinutes) || attendanceDurationMinutes <= 0) {
     return { error: 'Attendance window must be a positive number of minutes.' };
@@ -122,7 +124,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   let query = supabase.from('events').update({
     name,
     type: type as 'participation' | 'expert_session' | 'volunteer_task',
-    event_date: new Date(eventDate).toISOString(),
+    event_date: new Date(`${eventDate}T${eventTime}`).toISOString(),
     location: location || null,
     registration_form_url: registrationFormUrl || null,
     ...(cover.path ? { cover_image_path: cover.path } : {}),
@@ -141,7 +143,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   // Type 2 — only students actually registered for THIS event, and only
   // when the location/date genuinely changed (not on every edit — e.g. a
   // typo fix to the name shouldn't push).
-  const newEventDate = new Date(eventDate).toISOString();
+  const newEventDate = new Date(`${eventDate}T${eventTime}`).toISOString();
   const changed = before && (before.location !== (location || null) || before.event_date !== newEventDate);
   if (changed) {
     (async () => {

@@ -6,13 +6,18 @@ import type { Tables } from '@/lib/supabase/database.types';
 
 const initialState: ActionResult = {};
 
-// Local (not UTC-pinned) is intentional here — a datetime-local input reflects
-// whatever the admin's own browser/OS timezone is, and re-submitting the form
-// unchanged should round-trip to the same instant, not drift.
-function toDatetimeLocalValue(iso: string): string {
+// Local (not UTC-pinned) is intentional here — separate date/time inputs
+// reflect whatever the admin's own browser/OS timezone is, and re-submitting
+// the form unchanged should round-trip to the same instant, not drift.
+function toDateValue(iso: string): string {
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function toTimeValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'>; coverImageUrl: string | null }) {
@@ -35,16 +40,28 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
             <option value="volunteer_task">Volunteer task (15 SP)</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted">Date &amp; time</span>
-          <input
-            name="event_date"
-            type="datetime-local"
-            className="input"
-            defaultValue={toDatetimeLocalValue(event.event_date)}
-            required
-          />
-        </label>
+        <div className="flex gap-3">
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">Date</span>
+            <input
+              name="event_date"
+              type="date"
+              className="input"
+              defaultValue={toDateValue(event.event_date)}
+              required
+            />
+          </label>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">Time</span>
+            <input
+              name="event_time"
+              type="time"
+              className="input"
+              defaultValue={toTimeValue(event.event_date)}
+              required
+            />
+          </label>
+        </div>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Attendance window</span>
           <select
