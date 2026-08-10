@@ -21,7 +21,7 @@ import { playSound, type SoundName } from '@/lib/jules/sound';
 import { vibrate } from '@/lib/jules/haptics';
 import { HeroClip } from '@/lib/components/hero-clip';
 
-const DEFAULT_COLOR_VARS = ['--gold', '--accent'];
+const DEFAULT_COLOR_VARS = ['--gold', '--accent', '--adani-teal', '--adani-blue', '--adani-violet'];
 const DEFAULT_VIBRATION = [50, 40, 50, 40, 120];
 
 /**
