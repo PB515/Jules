@@ -20,7 +20,7 @@ export function PwaRequired() {
       </div>
       <Link
         href="/get-app"
-        className="rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
+        className="bg-adani-gradient rounded-[var(--radius)] px-5 py-3 text-sm font-medium text-white"
       >
         Get the app on your phone
       </Link>

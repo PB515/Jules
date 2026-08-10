@@ -429,7 +429,7 @@ export function TeamClient({
           <div className="mt-2 flex flex-col gap-2">
             <Link
               href="/leaderboard"
-              className="flex items-center justify-center gap-1.5 rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground"
+              className="bg-adani-gradient flex items-center justify-center gap-1.5 rounded-[var(--radius)] py-3 text-sm font-medium text-white"
             >
               <Trophy className="size-4" aria-hidden />
               View Leaderboard

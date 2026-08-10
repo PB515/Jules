@@ -36,7 +36,7 @@ export function ProfileForm({ name, phone }: { name: string; phone: string }) {
             <button
               onClick={save}
               disabled={saving}
-              className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground disabled:opacity-60"
+              className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>

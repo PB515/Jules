@@ -77,7 +77,7 @@ export function TeamFormationClient({
                 type="button"
                 disabled={isPending}
                 onClick={() => run(() => joinLiveTeamAction(roundId, t.id))}
-                className="rounded-full bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+                className="bg-adani-gradient rounded-full px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               >
                 Join
               </button>
@@ -114,7 +114,7 @@ export function TeamFormationClient({
                   return result;
                 })
               }
-              className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground disabled:opacity-60"
+              className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               {isPending ? 'Creating…' : 'Create'}
             </button>
@@ -133,7 +133,7 @@ export function TeamFormationClient({
             type="button"
             disabled={isPending}
             onClick={() => run(() => createLiveTeamAction(roundId, roomCode, studentName))}
-            className="rounded-[var(--radius)] bg-gold py-2.5 text-sm font-medium text-gold-foreground disabled:opacity-60"
+            className="bg-adani-gradient rounded-[var(--radius)] py-2.5 text-sm font-medium text-white disabled:opacity-60"
           >
             {isPending ? 'Joining…' : 'Go solo'}
           </button>

@@ -80,7 +80,7 @@ export function GroupRegistrationClient({
                 type="button"
                 disabled={isPending}
                 onClick={() => run(() => joinGroupAction(surgeId, g.id))}
-                className="rounded-full bg-gold px-3 py-1.5 text-xs font-medium text-gold-foreground disabled:opacity-60"
+                className="bg-adani-gradient rounded-full px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
               >
                 Join
               </button>
@@ -107,7 +107,7 @@ export function GroupRegistrationClient({
                 setCreating(false);
                 setName('');
               })}
-              className="flex-1 rounded-[var(--radius)] bg-gold py-2 text-sm font-medium text-gold-foreground disabled:opacity-60"
+              className="bg-adani-gradient flex-1 rounded-[var(--radius)] py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               {isPending ? 'Creating…' : 'Create'}
             </button>

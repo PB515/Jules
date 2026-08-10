@@ -58,7 +58,7 @@ export function InstallButton({ label = 'Install Synergy' }: { label?: string })
         window.__deferredInstallPrompt = null;
         setDeferred(null);
       }}
-      className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-5 py-3 text-sm font-medium text-gold-foreground"
+      className="bg-adani-gradient flex items-center gap-2 rounded-[var(--radius)] px-5 py-3 text-sm font-medium text-white"
     >
       <Download className="size-4" aria-hidden />
       {label}

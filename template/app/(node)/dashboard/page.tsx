@@ -224,7 +224,7 @@ export default async function DashboardPage() {
 
       <Link
         href="/scan"
-        className="flex items-center justify-center gap-2 rounded-[var(--radius)] bg-gold py-3.5 text-sm font-medium text-gold-foreground"
+        className="bg-adani-gradient flex items-center justify-center gap-2 rounded-[var(--radius)] py-3.5 text-sm font-medium text-white"
       >
         <ScanLine className="size-4" aria-hidden />
         Scan event QR

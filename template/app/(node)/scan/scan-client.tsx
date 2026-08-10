@@ -154,7 +154,7 @@ export function ScanClient({
             setResult({ state: 'idle' });
             setCameraOpen(true);
           }}
-          className="flex items-center gap-2 rounded-[var(--radius)] bg-gold px-4 py-2.5 text-sm font-medium text-gold-foreground"
+          className="bg-adani-gradient flex items-center gap-2 rounded-[var(--radius)] px-4 py-2.5 text-sm font-medium text-white"
         >
           <Camera className="size-4" aria-hidden />
           Scan with camera
@@ -196,7 +196,7 @@ export function ScanClient({
             <button
               onClick={() => redeem(eventId, token)}
               disabled={!eventId || !token || result.state === 'redeeming'}
-              className="rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground disabled:opacity-50"
+              className="bg-adani-gradient rounded-[var(--radius)] py-3 text-sm font-medium text-white disabled:opacity-50"
             >
               {result.state === 'redeeming' ? 'Checking in…' : 'Check in'}
             </button>

@@ -106,7 +106,7 @@ export function OnboardingTour() {
         <button
           type="button"
           onClick={() => (isLast ? dismiss() : setStep((s) => s + 1))}
-          className="w-full max-w-xs rounded-[var(--radius)] bg-gold py-3 text-sm font-medium text-gold-foreground"
+          className="bg-adani-gradient w-full max-w-xs rounded-[var(--radius)] py-3 text-sm font-medium text-white"
         >
           {isLast ? 'Get started' : 'Next'}
         </button>
