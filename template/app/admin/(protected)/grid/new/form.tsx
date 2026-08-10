@@ -56,6 +56,15 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
           </label>
         </div>
         <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Volunteer bonus (SP)</span>
+          <input name="volunteer_joule_value" type="number" min={1} step={1} className="input" defaultValue={15} />
+          <span className="text-xs text-tertiary">
+            Points a registered student earns for this event if you mark them as a volunteer (e.g. someone
+            helping run it) instead of a regular participant. Everyone checks in the same way, same QR: you
+            flag who&apos;s a volunteer beforehand on the event&apos;s Registrations page.
+          </span>
+        </label>
+        <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Attendance window</span>
           <select name="attendance_duration_minutes" className="input" defaultValue={20}>
             <option value={15}>15 minutes</option>

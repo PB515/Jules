@@ -16,6 +16,22 @@ const JOULE_BY_TYPE: Record<string, number> = {
   volunteer_task: 15,
 };
 
+// The "volunteer" credit here is a per-registration role on THIS event
+// (event_registrations.role, set via set_registration_role) -- distinct
+// from the 'volunteer_task' event *type* above. A Participation event can
+// still have a few registered students marked as volunteers and credited
+// this amount instead of the event's normal joule_value at scan time. See
+// migration 0052.
+const DEFAULT_VOLUNTEER_JOULE_VALUE = 15;
+
+function parseVolunteerJouleValue(formData: FormData): { value?: number; error?: string } {
+  const raw = String(formData.get('volunteer_joule_value') ?? '').trim();
+  if (!raw) return { value: DEFAULT_VOLUNTEER_JOULE_VALUE };
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) return { error: 'Volunteer bonus must be a positive number.' };
+  return { value };
+}
+
 // A real, previously-undiscovered bug: `new Date(`${date}T${time}`)` (no
 // explicit offset) parses as local time in whatever timezone the *runtime*
 // happens to be in — for a Server Action, that's Vercel's own server
@@ -99,6 +115,9 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
   const end = parseEventEnd(formData, startIso);
   if (end.error) return { error: end.error };
 
+  const volunteerJouleValue = parseVolunteerJouleValue(formData);
+  if (volunteerJouleValue.error) return { error: volunteerJouleValue.error };
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -119,6 +138,7 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
       registration_form_url: registrationFormUrl || null,
       cover_image_path: cover.path ?? null,
       joule_value: JOULE_BY_TYPE[type],
+      volunteer_joule_value: volunteerJouleValue.value,
       attendance_duration_minutes: attendanceDurationMinutes,
       created_by: user?.id,
     })
@@ -164,6 +184,9 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   const end = parseEventEnd(formData, newEventDate);
   if (end.error) return { error: end.error };
 
+  const volunteerJouleValue = parseVolunteerJouleValue(formData);
+  if (volunteerJouleValue.error) return { error: volunteerJouleValue.error };
+
   const supabase = await createClient();
 
   // Fetched before the update so Type 2 (registered-students-only) can
@@ -188,6 +211,7 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     registration_form_url: registrationFormUrl || null,
     ...(cover.path ? { cover_image_path: cover.path } : {}),
     joule_value: JOULE_BY_TYPE[type],
+    volunteer_joule_value: volunteerJouleValue.value,
     attendance_duration_minutes: attendanceDurationMinutes,
   }).eq('id', eventId);
   if ((admin.role === 'professor' || admin.role === 'committee_member') && admin.club_id) {

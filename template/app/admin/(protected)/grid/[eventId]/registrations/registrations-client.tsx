@@ -21,7 +21,7 @@ import { EmptyState } from '@/lib/patterns/empty-state';
 import { CountUp } from '@/lib/components/count-up';
 import { getEventRegistrations, bucketRegistrationsByHour, type EventRegistrationRow } from '@/lib/jules/event-registrations';
 import { rowsToCsv, downloadCsv } from '@/lib/jules/csv-export';
-import { Users, Mail, Phone, CircleCheck, Download } from '@/lib/icons';
+import { Users, Mail, Phone, CircleCheck, Download, HeartHandshake } from '@/lib/icons';
 
 export function RegistrationsClient({
   eventId,
@@ -34,6 +34,8 @@ export function RegistrationsClient({
 }) {
   const [registrations, setRegistrations] = useState(initialRegistrations);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
+  const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+  const [toggleError, setToggleError] = useState<string | null>(null);
   const supabase = useRef(createClient()).current;
   const knownIds = useRef(new Set(initialRegistrations.map((r) => r.id)));
 
@@ -79,15 +81,43 @@ export function RegistrationsClient({
   }, [eventId]);
 
   const attendedCount = registrations.filter((r) => r.attended_at).length;
+  const volunteerCount = registrations.filter((r) => r.role === 'volunteer').length;
   const hourly = bucketRegistrationsByHour(registrations);
   const maxHourly = Math.max(1, ...hourly.map((h) => h.count));
 
   function exportCsv() {
     const csv = rowsToCsv(
-      ['Name', 'Email', 'Phone', 'Registered At (UTC)', 'Attended At (UTC)'],
-      registrations.map((r) => [r.name, r.college_email, r.phone ?? '', r.registered_at, r.attended_at ?? ''])
+      ['Name', 'Email', 'Phone', 'Role', 'Registered At (UTC)', 'Attended At (UTC)'],
+      registrations.map((r) => [r.name, r.college_email, r.phone ?? '', r.role, r.registered_at, r.attended_at ?? ''])
     );
     downloadCsv(`${eventName.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-registrations.csv`, csv);
+  }
+
+  // Refetches rather than patches local state on success -- matching this
+  // file's own established lesson (decision 60): patching a realtime
+  // payload directly is exactly what broke once already when a payload
+  // arrived incomplete. The postgres_changes subscription above would
+  // eventually refetch on its own too, but calling it directly here avoids
+  // waiting on the realtime round-trip for the toggle to visibly land.
+  async function toggleRole(row: EventRegistrationRow) {
+    const nextRole = row.role === 'volunteer' ? 'participant' : 'volunteer';
+    setToggleError(null);
+    setTogglingIds((prev) => new Set(prev).add(row.id));
+    const { error } = await supabase.rpc('set_registration_role', {
+      p_event_id: eventId,
+      p_student_id: row.student_id,
+      p_role: nextRole,
+    });
+    setTogglingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(row.id);
+      return next;
+    });
+    if (error) {
+      setToggleError(error.message);
+      return;
+    }
+    await refreshRegistrations();
   }
 
   return (
@@ -105,7 +135,7 @@ export function RegistrationsClient({
         ) : null}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div data-testid="stat-registered" className="rounded-[var(--radius)] border border-gold/30 bg-card p-4">
           <p className="flex items-center gap-1.5 text-xs text-tertiary">
             <Users className="size-3.5" aria-hidden />
@@ -119,6 +149,13 @@ export function RegistrationsClient({
             Attended
           </p>
           <CountUp value={attendedCount} className="text-3xl font-medium text-success" />
+        </div>
+        <div data-testid="stat-volunteers" className="rounded-[var(--radius)] border border-border bg-card p-4">
+          <p className="flex items-center gap-1.5 text-xs text-tertiary">
+            <HeartHandshake className="size-3.5" aria-hidden />
+            Volunteers
+          </p>
+          <CountUp value={volunteerCount} className="text-3xl font-medium text-accent" />
         </div>
       </div>
 
@@ -138,6 +175,8 @@ export function RegistrationsClient({
         </div>
       ) : null}
 
+      {toggleError ? <p className="text-sm text-accent">{toggleError}</p> : null}
+
       {registrations.length === 0 ? (
         <EmptyState icon={Users} title="No registrations yet" message="Registrations will appear here the moment a student signs up." />
       ) : (
@@ -146,11 +185,19 @@ export function RegistrationsClient({
             <div
               key={r.id}
               className={`flex flex-col gap-1.5 rounded-[var(--radius)] border p-4 transition-colors duration-1000 ${
-                newIds.has(r.id) ? 'border-gold bg-gold/10' : 'border-border bg-card'
+                newIds.has(r.id) ? 'border-gold bg-gold/10' : r.role === 'volunteer' ? 'border-accent/40 bg-card' : 'border-border bg-card'
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium">{r.name}</p>
+                <p className="flex items-center gap-1.5 text-sm font-medium">
+                  {r.name}
+                  {r.role === 'volunteer' ? (
+                    <span className="flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent">
+                      <HeartHandshake className="size-3" aria-hidden />
+                      Volunteer
+                    </span>
+                  ) : null}
+                </p>
                 {r.attended_at ? (
                   <span className="flex shrink-0 items-center gap-1 text-xs text-success">
                     <CircleCheck className="size-3.5" aria-hidden />
@@ -170,9 +217,18 @@ export function RegistrationsClient({
                   {r.phone}
                 </p>
               ) : null}
-              <p className="text-xs text-tertiary">
-                {formatDateUTC(r.registered_at)} · {formatTimeUTC(r.registered_at)}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs text-tertiary">
+                  {formatDateUTC(r.registered_at)} · {formatTimeUTC(r.registered_at)}
+                </p>
+                <button
+                  onClick={() => toggleRole(r)}
+                  disabled={togglingIds.has(r.id)}
+                  className="shrink-0 rounded-full border border-border px-2.5 py-1 text-[11px] text-muted hover:border-accent/50 hover:text-accent disabled:opacity-50"
+                >
+                  {togglingIds.has(r.id) ? 'Saving…' : r.role === 'volunteer' ? 'Mark as participant' : 'Mark as volunteer'}
+                </button>
+              </div>
             </div>
           ))}
         </div>

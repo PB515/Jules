@@ -83,6 +83,21 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
           </label>
         </div>
         <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Volunteer bonus (SP)</span>
+          <input
+            name="volunteer_joule_value"
+            type="number"
+            min={1}
+            step={1}
+            className="input"
+            defaultValue={event.volunteer_joule_value}
+          />
+          <span className="text-xs text-tertiary">
+            Points a registered student earns for this event if you mark them as a volunteer instead of a
+            regular participant. Flag who&apos;s a volunteer on the event&apos;s Registrations page.
+          </span>
+        </label>
+        <label className="flex flex-col gap-1.5">
           <span className="text-xs text-muted">Attendance window</span>
           <select
             name="attendance_duration_minutes"

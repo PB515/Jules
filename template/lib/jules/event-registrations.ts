@@ -13,8 +13,10 @@ import type { Database } from '@/lib/supabase/database.types';
 
 export interface EventRegistrationRow {
   id: string;
+  student_id: string;
   registered_at: string;
   attended_at: string | null;
+  role: 'participant' | 'volunteer';
   name: string;
   college_email: string;
   phone: string | null;
@@ -26,14 +28,16 @@ export async function getEventRegistrations(
 ): Promise<EventRegistrationRow[]> {
   const { data } = await supabase
     .from('event_registrations')
-    .select('id, registered_at, attended_at, students(name, college_email, phone)')
+    .select('id, student_id, registered_at, attended_at, role, students(name, college_email, phone)')
     .eq('event_id', eventId)
     .order('registered_at', { ascending: false });
 
   return (data ?? []).map((r) => ({
     id: r.id,
+    student_id: r.student_id,
     registered_at: r.registered_at,
     attended_at: r.attended_at,
+    role: r.role,
     name: r.students?.name ?? 'Unknown',
     college_email: r.students?.college_email ?? '',
     phone: r.students?.phone ?? null,

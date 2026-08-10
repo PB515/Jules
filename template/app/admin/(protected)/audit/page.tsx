@@ -27,6 +27,7 @@ const ACTION_LABEL: Record<AuditAction, string> = {
   attendance_start: 'Started attendance for an event',
   operator_link_created: 'Created a no-login operator link',
   operator_link_reset: 'Reset a no-login operator link',
+  registration_role_set: 'Marked a registration as volunteer/participant',
 };
 
 export default async function AuditLogPage() {

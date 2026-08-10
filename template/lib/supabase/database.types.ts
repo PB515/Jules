@@ -33,7 +33,8 @@ export type AuditAction =
   | 'event_update_sent'
   | 'attendance_start'
   | 'operator_link_created'
-  | 'operator_link_reset';
+  | 'operator_link_reset'
+  | 'registration_role_set';
 export type Tier = 'ember' | 'volt' | 'current' | 'plasma';
 export type SurgeOption = 'A' | 'B' | 'C' | 'D';
 export type LivePhase = 'lobby' | 'question' | 'reveal' | 'leaderboard' | 'complete';
@@ -108,7 +109,7 @@ export interface Database {
       events: {
         Row: {
           id: string; name: string; type: EventType; event_date: string; end_date: string | null;
-          location: string | null; joule_value: number | null; club_id: string;
+          location: string | null; joule_value: number | null; volunteer_joule_value: number; club_id: string;
           geofence_lat: number | null; geofence_lng: number | null; geofence_radius_m: number;
           registration_form_url: string | null; cover_image_path: string | null;
           attendance_duration_minutes: number;
@@ -118,7 +119,7 @@ export interface Database {
         };
         Insert: {
           id?: string; name: string; type: EventType; event_date: string; end_date?: string | null;
-          location?: string | null; joule_value?: number | null; club_id: string;
+          location?: string | null; joule_value?: number | null; volunteer_joule_value?: number; club_id: string;
           geofence_lat?: number | null; geofence_lng?: number | null; geofence_radius_m?: number;
           registration_form_url?: string | null; cover_image_path?: string | null;
           attendance_duration_minutes?: number;
@@ -322,10 +323,10 @@ export interface Database {
       event_registrations: {
         Row: {
           id: string; event_id: string; student_id: string; registered_at: string; attended_at: string | null;
-          location_at_registration: string | null;
+          location_at_registration: string | null; role: 'participant' | 'volunteer';
         };
         Insert: never; // only via register_for_event()
-        Update: never; // attended_at is only ever set by redeem_event_scan()
+        Update: never; // attended_at is only ever set by redeem_event_scan(); role only by set_registration_role()
         Relationships: [
           {
             foreignKeyName: 'event_registrations_student_id_fkey';
@@ -423,6 +424,10 @@ export interface Database {
       start_event_attendance: {
         Args: { p_event_id: string; p_duration_minutes?: number | null; p_token?: string | null };
         Returns: { attendance_opens_at: string; attendance_closes_at: string }[];
+      };
+      set_registration_role: {
+        Args: { p_event_id: string; p_student_id: string; p_role: 'participant' | 'volunteer' };
+        Returns: undefined;
       };
       start_surge: {
         Args: { p_surge_id: string };
