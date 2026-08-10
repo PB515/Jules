@@ -42,7 +42,7 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
         </label>
         <div className="flex gap-3">
           <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-xs text-muted">Date</span>
+            <span className="text-xs text-muted">Start date</span>
             <input
               name="event_date"
               type="date"
@@ -52,13 +52,33 @@ export function EditEventForm({ event, coverImageUrl }: { event: Tables<'events'
             />
           </label>
           <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-xs text-muted">Time</span>
+            <span className="text-xs text-muted">Start time</span>
             <input
               name="event_time"
               type="time"
               className="input"
               defaultValue={toTimeValue(event.event_date)}
               required
+            />
+          </label>
+        </div>
+        <div className="flex gap-3">
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">End date (optional)</span>
+            <input
+              name="event_end_date"
+              type="date"
+              className="input"
+              defaultValue={event.end_date ? toDateValue(event.end_date) : ''}
+            />
+          </label>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">End time (optional)</span>
+            <input
+              name="event_end_time"
+              type="time"
+              className="input"
+              defaultValue={event.end_date ? toTimeValue(event.end_date) : ''}
             />
           </label>
         </div>

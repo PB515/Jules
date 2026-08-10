@@ -23,6 +23,22 @@ const JOULE_BY_TYPE: Record<string, number> = {
 const COVER_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const COVER_IMAGE_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+// End date/time is optional — not every event (e.g. a single QR check-in
+// moment) has a meaningful "end," matching the already-nullable
+// events.end_date column, which app/admin/(protected)/grid/page.tsx and
+// the public event detail page already read (`e.end_date ?? e.event_date`)
+// but no form has ever actually let an admin set.
+function parseEventEnd(formData: FormData, startIso: string): { endIso?: string | null; error?: string } {
+  const endDate = String(formData.get('event_end_date') ?? '').trim();
+  const endTime = String(formData.get('event_end_time') ?? '').trim();
+  if (!endDate && !endTime) return { endIso: null };
+  if (!endDate || !endTime) return { error: 'Fill in both an end date and an end time, or leave both blank.' };
+
+  const endIso = new Date(`${endDate}T${endTime}`).toISOString();
+  if (endIso <= startIso) return { error: 'End date/time must be after the start date/time.' };
+  return { endIso };
+}
+
 async function uploadCoverImage(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData): Promise<{ path?: string; error?: string }> {
   const file = formData.get('cover_image');
   if (!(file instanceof File) || file.size === 0) return {};
@@ -60,6 +76,10 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
     return { error: 'Attendance window must be a positive number of minutes.' };
   }
 
+  const startIso = new Date(`${eventDate}T${eventTime}`).toISOString();
+  const end = parseEventEnd(formData, startIso);
+  if (end.error) return { error: end.error };
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -74,7 +94,8 @@ export async function createEventAction(_prev: ActionResult, formData: FormData)
       name,
       club_id: clubId,
       type: type as 'participation' | 'expert_session' | 'volunteer_task',
-      event_date: new Date(`${eventDate}T${eventTime}`).toISOString(),
+      event_date: startIso,
+      end_date: end.endIso,
       location: location || null,
       registration_form_url: registrationFormUrl || null,
       cover_image_path: cover.path ?? null,
@@ -120,6 +141,10 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
     return { error: 'Attendance window must be a positive number of minutes.' };
   }
 
+  const newEventDate = new Date(`${eventDate}T${eventTime}`).toISOString();
+  const end = parseEventEnd(formData, newEventDate);
+  if (end.error) return { error: end.error };
+
   const supabase = await createClient();
 
   // Fetched before the update so Type 2 (registered-students-only) can
@@ -138,7 +163,8 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   let query = supabase.from('events').update({
     name,
     type: type as 'participation' | 'expert_session' | 'volunteer_task',
-    event_date: new Date(`${eventDate}T${eventTime}`).toISOString(),
+    event_date: newEventDate,
+    end_date: end.endIso,
     location: location || null,
     registration_form_url: registrationFormUrl || null,
     ...(cover.path ? { cover_image_path: cover.path } : {}),
@@ -157,7 +183,6 @@ export async function editEventAction(_prev: ActionResult, formData: FormData): 
   // Type 2 — only students actually registered for THIS event, and only
   // when the location/date genuinely changed (not on every edit — e.g. a
   // typo fix to the name shouldn't push).
-  const newEventDate = new Date(`${eventDate}T${eventTime}`).toISOString();
   const changed = before && (before.location !== (location || null) || before.event_date !== newEventDate);
   if (changed) {
     (async () => {

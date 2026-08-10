@@ -37,12 +37,22 @@ export function NewEventForm({ clubs }: { clubs: { id: string; name: string }[] 
         </label>
         <div className="flex gap-3">
           <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-xs text-muted">Date</span>
+            <span className="text-xs text-muted">Start date</span>
             <input name="event_date" type="date" className="input" required />
           </label>
           <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-xs text-muted">Time</span>
+            <span className="text-xs text-muted">Start time</span>
             <input name="event_time" type="time" className="input" required />
+          </label>
+        </div>
+        <div className="flex gap-3">
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">End date (optional)</span>
+            <input name="event_end_date" type="date" className="input" />
+          </label>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-muted">End time (optional)</span>
+            <input name="event_end_time" type="time" className="input" />
           </label>
         </div>
         <label className="flex flex-col gap-1.5">
