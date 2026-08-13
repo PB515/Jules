@@ -1,52 +1,62 @@
-# Synergy — Student PWA Explainer Video Script
+# Synergy — Student Video Scripts (3 videos)
 
-*A shot-by-shot script for recording on a real phone with the app actually
-installed. Record each numbered shot as its own clip (10–40s) — easier to
-re-shoot one bad take than the whole thing, and easier to cut together after.
-Total runtime target: ~5–5.5 minutes.*
+*Split into three standalone videos so a student only has to watch what's
+relevant to them — an iPhone user never sits through Android steps, and
+the full walkthrough doesn't get bloated repeating install instructions
+twice.*
+
+| # | Video | Suggested filename | Length |
+|---|---|---|---|
+| 1 | Install on Android | `synergy-install-android.mp4` | ~20s |
+| 2 | Install on iPhone | `synergy-install-iphone.mp4` | ~30–40s |
+| 3 | Full Walkthrough | `synergy-full-walkthrough.mp4` | ~4–4.5 min |
+
+**When sharing these**, pin a short note so it's obvious it's not one video
+split by accident — e.g. "New here? Watch the install video for your
+phone, then the full walkthrough."
 
 **Screen recorder:**
-- **Android:** use the built-in recorder — Quick Settings (swipe down twice)
-  → **Screen Record**. Every phone on Android 11+ already has this, no app
-  install needed, no watermark. If an older phone doesn't have it, **AZ
-  Screen Recorder** (free, Play Store) is the standard fallback.
+- **Android:** built-in — Quick Settings (swipe down twice) → **Screen
+  Record**. Every phone on Android 11+ has this, no app needed, no
+  watermark. If an older phone doesn't have it, **AZ Screen Recorder**
+  (free, Play Store) is the standard fallback.
 - **iPhone:** Control Center → **Screen Recording** (add it to Control
-  Center first under Settings → Control Center, if it's not already there).
-
-**Before recording**: use a real, already-created student account (not a
-disposable test one you'll delete) — pick one from the roster, or ask
-someone to demo their own phone. Make sure at least one real event exists
-with attendance open, so shots 5 and 6 have something real to show.
-
-**For this first event specifically**: it's participation-only (register,
-check in, earn points — no quiz). Shot 7 (What's a quiz?) is included so
-students aren't caught off guard later, but it's explicitly framed as "not
-part of this event yet" — no need to stage a real Live Round to record it.
+  Center first under Settings → Control Center, if it's not already
+  there).
 
 ---
+---
 
-## Shot 1 — Install on Android (0:00–0:20)
+# Video 1 — Install on Android
 
-**Show:** Open Chrome to `jules-delta-nine.vercel.app/get-app` (or scan the
-QR code shown on that page). Tap the **Install** button, or Chrome's own
-menu (⋮) → "Add to Home screen." Show the app icon landing on the home
-screen.
+*`synergy-install-android.mp4` — ~20 seconds, one shot.*
+
+**Show:** Open Chrome to `jules-delta-nine.vercel.app/get-app` (or scan
+the QR code shown on that page). Tap the **Install** button, or Chrome's
+own menu (⋮) → "Add to Home screen." Show the app icon landing on the
+home screen.
 
 **Say (voiceover or on-camera):**
 > "Synergy only works installed as an app on your phone, not in a browser
 > tab. On Android: open this link, tap Install, and it's on your home
 > screen."
 
+**End on:** the Synergy icon sitting on the home screen. Tap it once to
+show it opens the real app (optional, nice confirmation beat) — no need
+to go further than the launch splash for this video.
+
+---
 ---
 
-## Shot 2 — Install on iPhone (0:20–0:50)
+# Video 2 — Install on iPhone
 
-*Give this one more time and detail than the Android shot — iPhone install
-is the one that actually trips people up, since there's no obvious
-"Install" button at all.*
+*`synergy-install-iphone.mp4` — ~30–40 seconds, one shot. Give this one
+more time and detail than the Android video — iPhone install is the one
+that actually trips people up, since there's no obvious "Install" button
+at all.*
 
 **Show:** Open **Safari** (must be real Safari, not an in-app browser —
-see the note below) to `jules-delta-nine.vercel.app/get-app`. Point out
+see the callout below) to `jules-delta-nine.vercel.app/get-app`. Point out
 there's no install button on this page for iPhone — that's expected, not
 broken. Tap the **Share icon** in the bottom toolbar (square with an arrow
 pointing up). Scroll down the share sheet. Tap **"Add to Home Screen."**
@@ -64,9 +74,27 @@ screen.
 > ••• or Safari icon first to open it in your real browser — "Add to Home
 > Screen" only shows up there.
 
+**End on:** the Synergy icon sitting on the home screen.
+
+---
 ---
 
-## Shot 3 — First open, login (0:50–1:20)
+# Video 3 — Full Walkthrough
+
+*`synergy-full-walkthrough.mp4` — ~4–4.5 minutes. Starts from first open,
+assumes the app is already installed (that's Videos 1/2's job).*
+
+**Before recording**: use a real, already-created student account (not a
+disposable test one you'll delete) — pick one from the roster, or ask
+someone to demo their own phone. Make sure at least one real event exists
+with attendance open, so shots 4 and 5 have something real to show.
+
+**For this first event specifically**: it's participation-only (register,
+check in, earn points — no quiz). Shot 6 (What's a quiz?) is included so
+students aren't caught off guard later, but it's explicitly framed as "not
+part of this event yet" — no need to stage a real Live Round to record it.
+
+## Shot 1 — First open, login (0:00–0:30)
 
 **Show:** Tap the home-screen icon. The launch splash plays (logo
 animation + "Progress, Together."). Land on the login screen, type in a
@@ -81,7 +109,7 @@ real student email/password, tap in.
 
 ---
 
-## Shot 4 — Dashboard tour (1:20–2:00)
+## Shot 2 — Dashboard tour (0:30–1:10)
 
 **Show:** Slowly scroll the Dashboard top to bottom: Season Points hero
 number, tier badge (Ember/Volt/Current/Plasma), the Power Grid, the streak
@@ -97,7 +125,7 @@ chain, Upcoming Events, My Registered Events.
 
 ---
 
-## Shot 5 — Register for an event (2:00–2:30)
+## Shot 3 — Register for an event (1:10–1:40)
 
 **Show:** The event detail page — name, date/time, venue, points value.
 Tap "Register." If the event has an external form linked, show it opening
@@ -112,7 +140,7 @@ Events."
 
 ---
 
-## Shot 6 — QR check-in at the event (2:30–3:00)
+## Shot 4 — QR check-in at the event (1:40–2:10)
 
 **Show:** On the day of the event, open the Scan page. Either point the
 phone's camera at the coordinator's QR code, or tap "Scan with camera"
@@ -125,7 +153,7 @@ in-app. Show the success screen ("Checked in!" + points awarded).
 
 ---
 
-## Shot 7 — What's a quiz? (3:00–3:30)
+## Shot 5 — What's a quiz? (2:10–2:40)
 
 *Not part of this first event — no need to stage a real Live Round. Just
 show the Live tab from the bottom nav and explain the concept in
@@ -144,7 +172,7 @@ room-code entry screen exists. No need to join or play anything.
 
 ---
 
-## Shot 8 — Profile & Leaderboard (3:30–4:00)
+## Shot 6 — Profile & Leaderboard (2:40–3:10)
 
 **Show:** Profile page — stats, activity breakdown (events attended, quiz
 participation), streak chain again. Then the Leaderboard — scroll to find
@@ -157,7 +185,7 @@ your own name/rank.
 
 ---
 
-## Shot 9 — Notifications & password (very important) (4:00–4:45)
+## Shot 7 — Notifications & password (very important) (3:10–3:55)
 
 **Show:** From Profile, tap **Enable** on the Notifications card. Show the
 permission prompt being accepted. Then scroll to **Change password**, tap
@@ -187,17 +215,20 @@ this is the most important thing in the whole video):**
 > Questions or issues of any kind? Contact the Synergy team.
 
 ---
+---
 
 ## Notes for whoever edits this together
 
 - Keep each shot's screen recording, trim dead air, add the "Say" lines as
   either voiceover (recorded separately, cleaner) or on-screen captions —
   captions are safer if multiple people might record different shots.
-- Shot 7 (What's a quiz?) is the first one to cut if the video needs
+- Videos 1 and 2 (install) are already self-contained — no editing needed
+  beyond trimming dead air and adding the voiceover/captions.
+- In Video 3, Shot 5 (What's a quiz?) is the first one to cut if it needs
   trimming for length — it's the only shot that isn't about this first
   event, and it's a short voiceover-only beat with almost nothing to show
   on screen anyway.
-- Shot 9's "forgot password → contact the Synergy team" callout should be
+- Shot 7's "forgot password → contact the Synergy team" callout should be
   the single most visible text overlay in the whole video (bigger, held
   longer, brighter color) — it's the one piece of information a student
   actually needs to act on if something goes wrong, not just background
