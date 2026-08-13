@@ -7,7 +7,7 @@ twice.*
 
 | # | Video | Suggested filename | Length |
 |---|---|---|---|
-| 1 | Install on Android | `synergy-install-android.mp4` | ~20s |
+| 1 | Install on Android | `synergy-install-android.mp4` | ~20–60s |
 | 2 | Install on iPhone | `synergy-install-iphone.mp4` | ~30–40s |
 | 3 | Full Walkthrough | `synergy-full-walkthrough.mp4` | ~4–4.5 min |
 
@@ -29,7 +29,10 @@ phone, then the full walkthrough."
 
 # Video 1 — Install on Android
 
-*`synergy-install-android.mp4` — ~20 seconds, one shot.*
+*`synergy-install-android.mp4` — 20–60 seconds is all fine, one shot.
+Showing the full flow from opening Chrome through to the icon landing on
+the home screen (rather than cutting straight to "tap Install") is good —
+more clarity for a first-timer beats a shorter runtime.*
 
 **Show:** Open Chrome to `jules-delta-nine.vercel.app/get-app` (or scan
 the QR code shown on that page). Tap the **Install** button, or Chrome's
@@ -40,6 +43,11 @@ home screen.
 > "Synergy only works installed as an app on your phone, not in a browser
 > tab. On Android: open this link, tap Install, and it's on your home
 > screen."
+
+**Callout to show on screen (text overlay) or add to voiceover:**
+> This isn't a big native app — it's a lightweight web app. In practice
+> it's well under 5MB even after regular use, nothing close to the size
+> of a typical app. No need to worry about phone storage.
 
 **End on:** the Synergy icon sitting on the home screen. Tap it once to
 show it opens the real app (optional, nice confirmation beat) — no need
@@ -73,6 +81,11 @@ screen.
 > Opened this link from WhatsApp or Instagram instead of Safari? Tap the
 > ••• or Safari icon first to open it in your real browser — "Add to Home
 > Screen" only shows up there.
+
+**Second callout (text overlay) or add to voiceover:**
+> This isn't a big native app — it's a lightweight web app. In practice
+> it's well under 5MB even after regular use, nothing close to the size
+> of a typical app. No need to worry about phone storage.
 
 **End on:** the Synergy icon sitting on the home screen.
 
